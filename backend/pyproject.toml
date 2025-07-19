@@ -1,0 +1,35 @@
+[project]
+name = "poc-intake-backend"
+version = "1.0.0"
+description = "Patient intake system for Pound of Cure Weight Loss"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "pydantic-ai>=0.0.14",
+    "openai>=1.6.1",
+    "supabase>=2.3.0",
+    "httpx>=0.25.2",
+    "python-multipart>=0.0.6",
+    "python-dotenv>=1.0.0",
+    "google-cloud-secret-manager>=2.18.1",
+    "google-auth>=2.25.2",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "debugpy>=1.8.15",
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

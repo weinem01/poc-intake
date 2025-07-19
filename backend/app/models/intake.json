@@ -1,0 +1,298 @@
+// JSON Schema for "PoundOfCureIntake"
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PoundOfCureIntake",
+  "type": "object",
+  "required": [
+    "name","dateOfBirth","email","phoneNumber","homeAddress",
+    "gender","maritalStatus","emergencyContact","heightAndWeight"
+  ],
+  "properties": {
+    "name": { "$ref": "#/definitions/FullName" },
+    "partnersName": { "$ref": "#/definitions/FullName" },
+    "insurance_policy_holder_name": { "$ref": "#/definitions/FullName" },
+    "policyHolderName_Secondary": { "$ref": "#/definitions/FullName" },
+
+    "dateOfBirth": { "type": "string", "format": "date" },
+    "email":       { "type": "string", "format": "email" },
+    "phoneNumber": { "type": "string", "pattern": "^\\(\\d{3}\\) \\d{3}-\\d{4}$" },
+
+    "homeAddress": { "$ref": "#/definitions/Address" },
+
+    "ssn": {
+      "type": "string", "pattern": "^[0-9]{3}-[0-9]{2}-[0-9]{4}$"
+    },
+
+    "gender":       { "type":"string", "enum":["Male","Female","Non-binary"] },
+    "maritalStatus":{ "type":"string", "enum":["Single","Married","Life Partner","Divorced","Legally Separated","Widowed"] },
+    "employmentStatus":{ "type":"string", "enum":["Employed","Unemployed","Full-Time Student","Part-Time Student","Retired"] },
+
+    "emergencyContact": { "$ref": "#/definitions/EmergencyContact" },
+    "heightAndWeight":  { "$ref": "#/definitions/HeightWeight" },
+
+    "PMHx": {
+      "type":"array","items":{"type":"string","enum":[
+        "Epilepsy or Seizures","Cancer","Diverticulitis","Stomach Ulcers",
+        "Ulcerative Colitis or Crohn's Disease","Hepatitis","History of Pancreatitis",
+        "Anemia or Blood Disorders","Blood Clots","COPD","Thyroid Disease",
+        "Medullary Thyroid Cancer","Glaucoma","Autoimmune condition",
+        "Other Mental Health Diagnosis","None of the Above"
+      ]}
+    },
+    "PMHxObesityComorbid": {
+      "type":"array","items":{"type":"string","enum":[
+        "Diabetes","Pre-Diabetes","PCOS","High Blood Pressure","High Cholesterol",
+        "Atrial Fibrillation","Congestive Heart Failure","History of Stroke",
+        "History of Heart Attack","Sleep Apnea","Fatty Liver Disease","Heartburn/GERD",
+        "Arthritis","Depression","Anxiety","Asthma","Chronic Kidney Disease",
+        "None of the Above"
+      ]}
+    },
+    "PMHx_Cancer":                        { "type":"string" },
+    "PMHxFU_Other_Mental_Health_Diagnosis":{ "type":"string" },
+
+    "YearDiagnosedWithDiabetes":{ "type":"integer" },
+    "TakesInsulin":            { "type":"boolean" },
+
+    "MedsForGERD": { "type":"boolean" },
+    "GERDSeverity":{
+      "type":"string","enum":[
+        "I've been diagnosed but don't have symptoms",
+        "I get heartburn symptoms occasionally, but it is not bothersome",
+        "My heartburn symptoms are bothersome",
+        "My heartburn makes me miserable"
+      ]
+    },
+
+    "FamHx":      { "type":"array","items":{ "$ref":"#/definitions/FamilyHistoryItem" } },
+    "providers":  { "type":"array","items":{ "$ref":"#/definitions/Provider" } },
+    "PSHx":       { "type":"array","items":{ "$ref":"#/definitions/Surgery" } },
+
+    "currentlySmoke":{
+      "type":"string","enum":[
+        "I currently smoke and vape","I currently smoke cigarettes",
+        "I currently smoke cigars","I currently vape","I don't smoke or vape"
+      ]
+    },
+    "SmokedInThePast":    { "type":"boolean" },
+    "PastSmokingHistory":{
+      "type":"array","items":{"type":"string","enum":[
+        "I've smoked cigarettes in the past",
+        "I've smoked cigars in the past","I've vaped in the past"
+      ]}
+    },
+    "cigarettesPerDay":   { "type":"string" },
+    "cigarsPerWeek":      { "$ref":"#/definitions/CigarsPerWeek" },
+    "quitYear":           { "type":"integer" },
+    "YearsSmoking":       { "type":"integer" },
+    "packYears":          { "type":"integer" },
+    "VapingFrequency": {
+      "type":"string","enum":[
+        "A few puffs a week, or less","Almost every day",
+        "Every day, a few times a day","All day, every day"
+      ]
+    },
+
+    "AlcoholUse": {
+      "type":"string","enum":[
+        "Never, ever","A few times a year at most","A few times a month","A few times a week",
+        "One drink per day, on average","Two drinks per day, on average",
+        "More than 2 drinks per day","I've had a problem in the past and am currently sober"
+      ]
+    },
+    "MarijuanaUse":{
+      "type":"string","enum":[
+        "Never, ever","A few times a year at most","A few times a month",
+        "A few times a week","Once a day","More than once a day"
+      ]
+    },
+    "DrugUse":{
+      "type":"string","enum":[
+        "I've never used them regularly","I've used them in the past and am in recovery",
+        "I use them once a week","I use them a few times a week","I use them daily"
+      ]
+    },
+
+    "GenROS":      { "type":"array","items":{"type":"string"} },
+    "CardioPulmROS":{ "type":"array","items":{"type":"string"} },
+    "GIROS":       { "type":"array","items":{"type":"string"} },
+    "GUROS":       { "type":"array","items":{"type":"string"} },
+    "PsychROS":    { "type":"array","items":{"type":"string"} },
+    "GynROS":      { "type":"array","items":{"type":"string"} },
+
+    "PastDietstried": { "type":"array","items":{"type":"string"} },
+    "CausesOfWeightGain": { "type":"array","items":{"type":"string"} },
+    "struggleswithdiet":  { "type":"array","items":{"type":"string"} },
+    "typicaldayeating":   { "$ref":"#/definitions/TypicalDayEating" },
+    "pastweightloss":     { "$ref":"#/definitions/PastWeightLoss" },
+
+    "exercisetype":     { "type":"array","items":{"type":"string"} },
+    "exercisedaysperweek":{ "type":"integer" },
+    "exerciseminutes":   { "type":"integer" },
+    "physicallimitations":{ "type":"boolean" },
+    "physicallimitationdetails":{ "type":"array","items":{"type":"string"} },
+
+    "AOMstried": { "type":"array","items":{"type":"string"} },
+    "AOMstaking":{ "type":"array","items":{"type":"string"} },
+    "whatIs":    { "type":"number" },
+
+    "surgical_or_nonsurgical":{
+      "type":"string","enum":["Surgical","Non-surgical","Both","Undecided"]
+    },
+
+    "Historyofbariatricsurgery":{ "type":"boolean" },
+    "yearofbariatricsurgery":   { "type":"integer" },
+    "whichBariatricSurgery":    { "type":"array","items":{"type":"string"} },
+    "presurgeryweight":         { "type":"number" },
+    "nadirweight":              { "type":"number" },
+
+    "hgba1c": { "type":"number" },
+
+    "insurance_company_name":{ "type":"string" },
+    "insurance_employer":    { "type":"string" },
+    "insurance_policy_holder":{
+      "type":"string","enum":["Me","Spouse or Life Partner","Child","Other"]
+    },
+    "policyHolders":         { "type":"string" },
+    "insurance_details":     { "$ref":"#/definitions/InsuranceDetails" },
+    "insurancecard_front":   { "type":"string","format":"uri" },
+    "insurancecard_back":    { "type":"string","format":"uri" },
+
+    "has_pharmacy_card":     { "type":"boolean" },
+    "pharmacy_card_front":   { "type":"string","format":"uri" },
+    "pharmacy_card_back":    { "type":"string","format":"uri" },
+
+    "driverslicense":        { "type":"string","format":"uri" },
+
+    "contactMethod": {
+      "type":"array","items":{
+        "type":"string","enum":["Email","Text/SMS","Automated voice","Our patient portal"]
+      }
+    },
+    "preferredCommunication":{ "type":"string","enum":["Email","Our patient portal"] },
+
+    "Secondary":           { "type":"boolean" },
+    "InsuranceName_Secondary":{ "type":"string" },
+    "Employer_Secondary":  { "type":"string" },
+    "PolicyHolder_Secondary":{ "type":"string" },
+    "MemberAndGroup_Secondary":{ "$ref":"#/definitions/InsuranceDetails" },
+    "front_secondary":     { "type":"string","format":"uri" },
+    "back_secondary":      { "type":"string","format":"uri" }
+  },
+  "definitions": {
+    "FullName": {
+      "type":"object",
+      "properties":{
+        "prefix": { "type":"string" },
+        "first":  { "type":"string" },
+        "middle": { "type":"string" },
+        "last":   { "type":"string" },
+        "suffix": { "type":"string" }
+      },
+      "required":["first","last"]
+    },
+    "Address": {
+      "type":"object",
+      "properties":{
+        "addr_line1":{ "type":"string" },
+        "addr_line2":{ "type":"string" },
+        "city":       { "type":"string" },
+        "state":      { "type":"string" },
+        "postal":     { "type":"string" },
+        "country":    { "type":"string" }
+      },
+      "required":["addr_line1","city","state","postal","country"]
+    },
+    "EmergencyContact": {
+      "type":"object",
+      "properties":{
+        "name":         { "type":"string" },
+        "relationship": { "type":"string" },
+        "phone":        { "type":"string" }
+      },
+      "required":["name","relationship","phone"]
+    },
+    "HeightWeight": {
+      "type":"object",
+      "properties":{
+        "feet":   { "type":"integer" },
+        "inches": { "type":"integer" },
+        "weight": { "type":"number" }
+      },
+      "required":["feet","inches","weight"]
+    },
+    "Provider": {
+      "type":"object",
+      "properties":{
+        "DoctorsName":   { "type":"string" },
+        "TypeOfProvider":{
+          "type":"string","enum":["Primary Care","Cardiologist","Pulmonologist","Endocrinologist","Other"]
+        },
+        "Referring":     { "type":"boolean" },
+        "Phone":         { "type":"string" }
+      },
+      "required":["DoctorsName","TypeOfProvider","Referring","Phone"]
+    },
+    "Surgery": {
+      "type":"object",
+      "properties":{
+        "SurgeryType":{ "type":"string" },
+        "Year":       { "type":"integer" }
+      },
+      "required":["SurgeryType","Year"]
+    },
+    "FamilyHistoryItem": {
+      "type":"object",
+      "properties":{
+        "FamilyMember":{
+          "type":"string","enum":[
+            "Mother","Father","Daughter","Son","Brother","Sister",
+            "Maternal Grandmother","Maternal Grandfather",
+            "Paternal Grandmother","Paternal Grandfather"
+          ]
+        },
+        "MedicalProblem":{ "type":"string" }
+      },
+      "required":["FamilyMember","MedicalProblem"]
+    },
+    "CigarsPerWeek": {
+      "type":"object",
+      "properties":{
+        "packsPerWeek":  { "type":"number" },
+        "cigarsPerWeek":{ "type":"number" },
+        "years":        { "type":"number" }
+      },
+      "required":["packsPerWeek","cigarsPerWeek","years"]
+    },
+    "TypicalDayEating": {
+      "type":"object",
+      "properties":{
+        "Breakfast":      { "type":"string" },
+        "Lunch":          { "type":"string" },
+        "Dinner":         { "type":"string" },
+        "SnacksDesserts": { "type":"string" },
+        "Beverages":      { "type":"string" }
+      }
+    },
+    "PastWeightLoss": {
+      "type":"object",
+      "properties":{
+        "ageStarted":       { "type":"integer" },
+        "maxEverWeighed":   { "type":"number" },
+        "maxLostByDieting": { "type":"number" },
+        "ageAtMaxLost":     { "type":"integer" }
+      },
+      "required":["ageStarted","maxEverWeighed","maxLostByDieting","ageAtMaxLost"]
+    },
+    "InsuranceDetails": {
+      "type":"object",
+      "properties":{
+        "MemberNumber":                { "type":"string" },
+        "GroupNumber":                 { "type":"string" },
+        "MainBenefitsPhoneNumber":     { "type":"string" },
+        "PharmacyBenefitsPhoneNumber": { "type":"string" }
+      },
+      "required":["MemberNumber","GroupNumber"]
+    }
+  }
+}

@@ -1,0 +1,285 @@
+{
+  "apiName": "Insurance APIs",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Add Insurance",
+      "method": "POST",
+      "path": "/patients/{patient_id}/insurance",
+      "description": "This API is used to add Insurance details for a patient.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "insurance_type": { "type": "string", "required": true, "enum": ["MEDICARE", "MEDICAID", "TRICARE", "CHAMPUS", "CHAMPVA", "GROUP HEALTH PLAN", "FECA BLK LUNG", "OTHER"] },
+          "insurance_plan_name": { "type": "string", "required": false, "maxLength": 150 },
+          "insurance_plan_id": { "type": "string", "required": true, "maxLength": 30 },
+          "policy_group_number": { "type": "string", "required": false, "maxLength": 30 },
+          "insurance_category": { "type": "string", "required": false, "enum": ["PRIMARY", "SECONDARY", "TERTIARY", "AUTO", "WORKERCOMP", "OTHER"], "default": "PRIMARY" },
+          "practice_payer_id": { "type": "integer", "required": false },
+          "payer_name": { "type": "string", "required": false, "maxLength": 150 },
+          "payer_id": { "type": "string", "required": false, "maxLength": 50 },
+          "eligibility_payer_id": { "type": "string", "required": false, "maxLength": 50 },
+          "payer_address_line_1": { "type": "string", "required": false, "maxLength": 35 },
+          "payer_city": { "type": "string", "required": false, "maxLength": 35 },
+          "payer_state": { "type": "string", "required": false, "maxLength": 50 },
+          "payer_country": { "type": "string", "required": false, "maxLength": 2, "default": "us" },
+          "payer_zip_code": { "type": "string", "required": false, "maxLength": 5 },
+          "payer_post_box": { "type": "string", "required": false, "maxLength": 4 },
+          "payer_phone": { "type": "string", "required": false, "maxLength": 15 },
+          "payer_fax": { "type": "string", "required": false, "maxLength": 15 },
+          "copay": { "type": "number", "required": false },
+          "deductible": { "type": "number", "required": false },
+          "coinsurance": { "type": "string", "required": false, "maxLength": 16 },
+          "additional_pr_details": { "type": "string", "required": false, "maxLength": 50 },
+          "valid_from": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "valid_to": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "employer_name": { "type": "string", "required": false, "maxLength": 150 },
+          "prior_authorization_details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "prior_authorization_number": { "type": "string", "maxLength": 50 },
+                "prior_authorization_type": { "type": "string", "enum": ["G1", "EW", "9F", "X4"] },
+                "prior_authorization_valid_from": { "type": "string", "format": "YYYY-MM-DD" },
+                "prior_authorization_valid_until": { "type": "string", "format": "YYYY-MM-DD" },
+                "additional_information": { "type": "string", "maxLength": 50 }
+              }
+            }
+          },
+          "insured_person_relationship": { "type": "string", "required": true, "enum": ["Self", "Spouse", "Child", "Other"] },
+          "insured_person_first_name": { "type": "string", "required": true, "maxLength": 35 },
+          "insured_person_last_name": { "type": "string", "required": true, "maxLength": 35 },
+          "insured_person_dob": { "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          "insured_person_gender": { "type": "string", "required": true, "enum": ["male", "female", "unknown"] },
+          "insured_person_ssn": { "type": "string", "required": false, "maxLength": 9 },
+          "insured_person_address_line_1": { "type": "string", "required": false, "maxLength": 35 },
+          "insured_person_address_line_2": { "type": "string", "required": false, "maxLength": 35 },
+          "insured_person_city": { "type": "string", "required": false, "maxLength": 35 },
+          "insured_person_state": { "type": "string", "required": false, "maxLength": 50 },
+          "insured_person_country": { "type": "string", "required": false, "maxLength": 2, "default": "us" },
+          "insured_person_zipcode": { "type": "string", "required": false, "maxLength": 5 },
+          "insured_person_home_phone": { "type": "string", "required": false, "maxLength": 10 },
+          "insured_person_mobile_phone": { "type": "string", "required": false, "maxLength": 10 },
+          "comments": { "type": "string", "required": false, "maxLength": 250 },
+          "release_medical_info": { "type": "string", "required": false, "enum": ["yes", "no"], "default": "yes" },
+          "date_of_signature": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "assign_medical_benefits": { "type": "string", "required": false, "enum": ["yes", "no"], "default": "yes" }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "Insurance added successfully.",
+            "insurance": {
+              "insurance_id": "string"
+            }
+          }
+        },
+        "errors": {
+          "5566": "This insurance already exists for the patient.",
+          "5558": "Error occurred while adding insurance.",
+          "59028": "New Payer is not allowed. Add payer data in Payer Settings",
+          "59029": "No matching payer details found for the 'practice_payer_id'."
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Update Insurance",
+      "method": "PUT",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}",
+      "description": "This API is used to update the Patient's Insurance details.",
+      "headers": {},
+      "request": { "body": {} },
+      "response": {
+        "success": { "status": 200, "body": { "code": 0, "message": "Insurance updated successfully." } },
+        "errors": { "5559": "Error occurred while adding insurance." }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Insurance",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}",
+      "description": "This API deletes patient's insurance detail.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": { "status": 200, "body": { "code": 0, "message": "Insurance deleted successfully." } }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Payers List",
+      "method": "GET",
+      "path": "/payers",
+      "description": "This API is used to get insurance payers details.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "search_string", "type": "string", "required": false },
+          { "name": "is_verified", "type": "boolean", "required": false },
+          { "name": "has_patients", "type": "boolean", "required": false },
+          { "name": "start_index", "type": "integer", "required": false },
+          { "name": "count", "type": "integer", "required": false },
+          { "name": "payer_name", "type": "string", "required": false },
+          { "name": "phone_number", "type": "string", "required": false },
+          { "name": "fax", "type": "string", "required": false },
+          { "name": "address", "type": "string", "required": false },
+          { "name": "patient_name", "type": "string", "required": false },
+          { "name": "clearing_house", "type": "string", "required": false, "enum": ["OPTUM", "CHANGE_HEALTH"] }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "payers": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Payer Details",
+      "method": "GET",
+      "path": "/payers/{practice_payer_id}",
+      "description": "This api is used to get specific payer details.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "payer": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Patient Insurance Details",
+      "method": "GET",
+      "path": "/patients/{patient_id}/insurances",
+      "description": "Gives the details of the available active insurances of a patient.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "filter_by", "type": "string", "required": false, "enum": ["All", "Active", "Inactive"] }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "insurances": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Specific Patient Insurance",
+      "method": "GET",
+      "path": "/patients/{patient_id}/insurances/{insurance_id}",
+      "description": "Gives the details of the specific insurance of a patient.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "insurances": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Upload Insurance Card Front",
+      "method": "POST",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}/front_page",
+      "description": "This API is used to upload the photo copy of the front page of the patient's insurance card.",
+      "headers": {},
+      "request": { "body": { "file": { "type": "file" } } },
+      "response": {
+        "success": { "status": 200, "body": { "code": 0, "message": "Insurance card front page uploaded successfully." } },
+        "errors": { "102": "File is not attached", "5560": "Error occurred while uploading insurance card.", "257": "Error:File type not supported. Please upload a proper file." }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Upload Insurance Card Back",
+      "method": "POST",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}/back_page",
+      "description": "This API is used to upload the photo copy of the back page of the patient's insurance card.",
+      "headers": {},
+      "request": { "body": { "file": { "type": "file" } } },
+      "response": {
+        "success": { "status": 200, "body": { "code": 0, "message": "Insurance card back page uploaded successfully." } },
+        "errors": { "102": "File is not attached", "5560": "Error occurred while uploading insurance card.", "257": "Error:File type not supported. Please upload a proper file." }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Insurance Card Front",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}/front_page",
+      "description": "This API deletes the front page copy of the patient's insurance.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": { "status": 200, "body": { "code": 0, "message": "Insurance card copy front page deleted successfully." } }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Insurance Card Back",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}/back_page",
+      "description": "This API deletes the back page copy of the patient's insurance.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": { "status": 200, "body": { "code": 0, "message": "Insurance card copy back page deleted successfully.." } }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Change Insurance Status",
+      "method": "PUT",
+      "path": "/patients/{patient_id}/insurance/{insurance_id}/status",
+      "description": "This API is used to change the Insurance status of a patient.",
+      "headers": {},
+      "request": { "body": { "is_active": { "type": "boolean", "required": true } } },
+      "response": {
+        "success": { "status": 200, "body": { "code": "0", "message": "Insurance status updated successfully." } },
+        "errors": { "50116": "Insurance ID not found", "1049": "Insurance is already Active / Inactive" }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

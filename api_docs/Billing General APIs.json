@@ -1,0 +1,240 @@
+{
+  "apiName": "Billing General APIs",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Get Invoice Summary",
+      "method": "GET",
+      "path": "/invoices/summary",
+      "description": "API to get 'Total Invoice Amount' and 'Total Invoice Due' for a particular date period",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false,
+            "description": "If not given, data will be fetched for all facilities"
+          },
+          {
+            "name": "patient_id",
+            "type": "string",
+            "required": false,
+            "description": "If not given, data will be fetched for all patients"
+          },
+          {
+            "name": "date_name",
+            "type": "string",
+            "required": false,
+            "enum": ["invoice_date", "invoice_added_date"],
+            "default": "invoice_date"
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": true,
+            "format": "yyyy-mm-dd or yyyy-mm-dd hh:mm:ss"
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": true,
+            "format": "yyyy-mm-dd or yyyy-mm-dd hh:mm:ss"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "summary": {
+              "total_invoice_amount": "string",
+              "total_invoice_due": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Receipt Summary",
+      "method": "GET",
+      "path": "/receipts/summary",
+      "description": "API to get 'Total Receipt Amount' for a particular period",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "patient_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "date_name",
+            "type": "string",
+            "required": false,
+            "enum": ["receipt_date", "receipt_added_date"],
+            "default": "receipt_date"
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "summary": {
+              "total_receipt_amount": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Total Unused Amount",
+      "method": "GET",
+      "path": "/receipts/unusedamount",
+      "description": "API to fetch 'Total Unused Amount' available at present",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "patient_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "date_name",
+            "type": "string",
+            "required": false,
+            "enum": ["receipt_date", "receipt_added_date"],
+            "default": "receipt_date"
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": true
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "summary": {
+              "total_unused_amount": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Patient Balance",
+      "method": "GET",
+      "path": "/patients/{patient_id}/balance",
+      "description": "API to get balance details for a particular patient",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false,
+            "description": "If not given, Balance Due will be computed across facilities"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "balance_due": {
+              "patient_id": "string",
+              "facility_id": "string",
+              "currency_symbol": "string",
+              "patient_balance_due": "string",
+              "insurance_balance_due": "string",
+              "total_balance_due": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Billing Settings",
+      "method": "GET",
+      "path": "/billing/settings",
+      "description": "API to get value for a particular billing settings",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "setting_names",
+            "type": "string",
+            "required": true,
+            "description": "Comma-separated list of settings. e.g., 'CURRENCY_CODE,CURRENCY_SYMBOL'"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "settings": {
+              "CURRENCY_CODE": "string",
+              "CURRENCY_SYMBOL": "string",
+              "ENABLE_ITEMIZED_PAYMENTS": "boolean",
+              "AUTO_FILL_OUTSTANDING_INVOICES": "boolean"
+            }
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

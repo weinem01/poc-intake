@@ -1,0 +1,142 @@
+{
+  "apiName": "Create Invoice API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint and api_key in headers"
+  },
+  "endpoints": [
+    {
+      "name": "Create Invoice",
+      "method": "POST",
+      "path": "/invoices",
+      "description": "API to create an Invoice. Can be saved as a draft or approved.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "action": {
+            "type": "string",
+            "required": false,
+            "enum": ["save", "approve"],
+            "description": "If 'save', Invoice will be in 'Draft' status. If 'approve', Invoice will be approved."
+          },
+          "facility_id": { "type": "string", "required": true },
+          "patient_id": { "type": "string", "required": true },
+          "patient_full_name": { "type": "string", "required": false },
+          "invoice_date": { "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          "invoice_type": { "type": "string", "required": true, "enum": ["Invoice", "Credit Note"] },
+          "invoice_subtype": { "type": "string", "required": false, "enum": ["Procedure Invoice", "Product Invoice", "Lab Invoice", "Collective Invoice"] },
+          "apply_patient_credit": { "type": "boolean", "required": false },
+          "used_credit_amount": { "type": "string", "required": false },
+          "pay_invoice_in_full": { "type": "boolean", "required": false },
+          "pay_products_in_full": { "type": "boolean", "required": false },
+          "pay_copay_in_full": { "type": "boolean", "required": false },
+          "pay_non_covered_services": { "type": "boolean", "required": false },
+          "provider_id": { "type": "string", "required": false },
+          "provider_name": { "type": "string", "required": false },
+          "invoice_terms": { "type": "string", "required": false },
+          "invoice_notes": { "type": "string", "required": false },
+          "consultation_id": { "type": "string", "required": false },
+          "insurance_id": { "type": "string", "required": false, "description": "Applicable for Insurance enabled US Practices" },
+          "member_id": { "type": "string", "required": false, "description": "For external API calls only" },
+          "pricing_profile_id": { "type": "string", "required": false },
+          "procedures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_charge": { "type": "string" },
+                "item_quantity": { "type": "string" },
+                "code_id": { "type": "string" },
+                "discount_percentage": { "type": "string" },
+                "discount_amount": { "type": "string" },
+                "tax_name": { "type": "string" },
+                "tax_percentage": { "type": "string" },
+                "tax_name_2": { "type": "string" },
+                "tax_percentage_2": { "type": "string" },
+                "modifier_1": { "type": "string" },
+                "modifier_2": { "type": "string" },
+                "modifier_3": { "type": "string" },
+                "modifier_4": { "type": "string" },
+                "place_of_service": { "type": "string" },
+                "related_diagnosis_ids": { "type": "string" }
+              }
+            }
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_charge": { "type": "string" },
+                "item_quantity": { "type": "string" },
+                "product_id": { "type": "string" },
+                "inventory_id": { "type": "string" },
+                "cost_price": { "type": "string" },
+                "discount_percentage": { "type": "string" },
+                "discount_amount": { "type": "string" },
+                "tax_name": { "type": "string" },
+                "tax_percentage": { "type": "string" },
+                "tax_name_2": { "type": "string" },
+                "tax_percentage_2": { "type": "string" }
+              }
+            }
+          },
+          "labs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_charge": { "type": "string" },
+                "item_quantity": { "type": "string" },
+                "code_id": { "type": "string" },
+                "discount_percentage": { "type": "string" },
+                "discount_amount": { "type": "string" },
+                "tax_name": { "type": "string" },
+                "tax_percentage": { "type": "string" },
+                "tax_name_2": { "type": "string" },
+                "tax_percentage_2": { "type": "string" },
+                "modifier_1": { "type": "string" },
+                "modifier_2": { "type": "string" },
+                "modifier_3": { "type": "string" },
+                "modifier_4": { "type": "string" },
+                "place_of_service": { "type": "string" },
+                "related_diagnosis_ids": { "type": "string" }
+              }
+            }
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "payment_amount": { "type": "string" },
+                "payment_method": { "type": "string", "enum": ["Check", "Cash"] },
+                "reference_number": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Invoice created successfully.",
+            "invoice_id": "string"
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

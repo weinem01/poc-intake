@@ -1,0 +1,24 @@
+okay, let's start planning out the app. It will be a next.js front end using shadcn styling that will
+consist only of a basic chatbot interface. The application will require an "id" query parameter to
+be provided that is a base64 encoded string. The first step will be to decode this query string  
+variable and it will contain the mrn number for the patient who will be performing the intake. First,  
+the app will take the mrn number and then use it  with the list patients api (/patients?record_id=mrn)  
+and ensure that it returns a record. 
+
+Then, the application will access the poc_intake_sessions table in supabase and look at the intake field. If it's empty, it will assume that it's a new session, if it has data, it will use this data and take off where the chatbot left off. The intake field will be in the form of: {"intake_demographics":{intake demograhics data}, "intake_insurance":{intake insurance data}, "intake_weight_history":{intake weight history}, "intake_medical_history":{intake medical history} which will make it simple to determine where the user left off.
+
+If it's a new session, the chatbot will start by confirming the patient's last
+name and date of birth to make sure that the user is  the patient in question. if the user can't confirm this information, the chatbot will stop and won't continue. 
+
+It will then start the conversation by informing the patient that their name is Sage and they are here to help gather information to prepare for your upcoming visit at Pound of Cure Weight Loss. The conversation will take between 10-30 minutes and will require that they have their insurance card, driver's license, a list of their medications, information about any doctors that they see regularly and any other information you think our team would need to provide the best care. inform the user that they can stop at any time and return to the same link they were provided to continue the conversation. The chatbot should refer to the patient by name as much as possible and speak in the second person (you/your)
+
+After confirming the
+patient's identification, use the /patients data to populate as much of the intake_demographics.json
+schema. Then, The chatbot will proceed through the 4  intake files - intake_demographics first, 
+intake_insurance then intake_weight_history and finally intake_medical_history. Each of these json schemas will be converted to pydantic data models that will ensure that each field can be modified to meet the api definititions. 
+
+The back end will be a python fast-api application and will use a lang-chain ai agent using gpt41 mini that is attached to these tools: a payer list (https://ehr.charmtracker.com/api/ehr/v1/payers), add provider: POST - /api/ehr/v1/settings/directory/providers, some type of search tool to do an internet search for a provider name and contact info, GET - /api/ehr/v1/settings/directory/providers endpoint to find providers already in the database. This agent will work through each of the four sections. Every time the chatbot gathers information that can be used to populate a field in the schema, it will update the "intake" data from the supabase database and push the updated value back to the database. This way, every new piece of data is stored so that if the connection is lost, or the patient will be able to pick up where they left off.
+
+As each of the four schemas are completed, they trigger async, background updates of the EHR through the apis provided in the api_docs list. If there are any errors, or missing data, the chatbot should ask any additional questions to ensure that any deficiencies are corrected so the api can be updated. Finally, after completing all four schemas and completing all of the api calls, a concluding message is offered, thanking the user for his or her time and ensuring them that all of the information has been passed to the pound of cure weight loss team. Then ask for a rating of 1-5 for their enjoyment of the process (5 is the best) and any comments. All of this information, including updating "completed" to TRUE is sent to the supabase database and the window will close.
+
+let's use these colors: 4caf50, f46a25 and eef4f2

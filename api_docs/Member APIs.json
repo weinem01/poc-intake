@@ -1,0 +1,241 @@
+{
+  "apiName": "Member APIs",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint and api_key in headers"
+  },
+  "endpoints": [
+    {
+      "name": "List Members",
+      "method": "GET",
+      "path": "/members",
+      "description": "API to list members",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "Page number for pagination."
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Number of members per page."
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Sort order. Allowed Values - A (Ascending), D (Descending)."
+          },
+          {
+            "name": "sort_column",
+            "type": "string",
+            "required": false,
+            "description": "Column to sort by. Allowed Values - created_date, first_name, last_name, specialization, full_name."
+          },
+          {
+            "name": "full_name",
+            "type": "string",
+            "required": false,
+            "description": "Filter by full name. Variants like full_name_startswith and full_name_contains are available."
+          },
+          {
+            "name": "first_name",
+            "type": "string",
+            "required": false,
+            "description": "Filter by first name. Variants like first_name_startswith and first_name_contains are available."
+          },
+          {
+            "name": "last_name",
+            "type": "string",
+            "required": false,
+            "description": "Filter by last name. Variants like last_name_startswith and last_name_contains are available."
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": false,
+            "description": "Filter by state. Variants like state_startswith and state_contains are available."
+          },
+          {
+            "name": "city",
+            "type": "string",
+            "required": false,
+            "description": "Filter by city. Variants like city_startswith and city_contains are available."
+          },
+          {
+            "name": "zip_code",
+            "type": "string",
+            "required": false,
+            "description": "Filter by zip code. Variants like zip_code_startswith and zip_code_contains are available."
+          },
+          {
+            "name": "mobile",
+            "type": "string",
+            "required": false,
+            "description": "Filter by mobile number. Variants like mobile_startswith and mobile_contains are available."
+          },
+          {
+            "name": "home_phone",
+            "type": "string",
+            "required": false,
+            "description": "Filter by home phone. Variants like home_phone_startswith and home_phone_contains are available."
+          },
+          {
+            "name": "npi",
+            "type": "string",
+            "required": false,
+            "description": "Filter by NPI. Variants like npi_startswith and npi_contains are available."
+          },
+          {
+            "name": "specialization",
+            "type": "string",
+            "required": false,
+            "description": "Filter by specialization. Variants like specialization_startswith and specialization_contains are available."
+          },
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false,
+            "description": "Filter by facility IDs, separated by commas."
+          },
+          {
+            "name": "license_state",
+            "type": "string",
+            "required": false,
+            "description": "Filter by state license (e.g., 'New York')."
+          },
+          {
+            "name": "role_id",
+            "type": "integer",
+            "required": false,
+            "description": "Filter by role ID."
+          },
+          {
+            "name": "privilege",
+            "type": "string",
+            "required": false,
+            "description": "Pass 'sign_encounter' to get only members with sign encounter privilege (i.e., providers)."
+          },
+          {
+            "name": "department_id",
+            "type": "integer",
+            "required": false,
+            "description": "Filter by department ID."
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "members": [
+              {
+                "member_id": "string",
+                "home_phone": "string",
+                "country": "string",
+                "gender": "string",
+                "city": "string",
+                "prefix": "string",
+                "degree": "string",
+                "mobile": "string",
+                "last_name": "string",
+                "zip_code": "string",
+                "zuid": "string",
+                "is_member_photo_available": "boolean",
+                "full_name": "string",
+                "address_line2": "string",
+                "address_line1": "string",
+                "specialization": "string",
+                "created_date": "string",
+                "state": "string",
+                "first_name": "string",
+                "email": "string",
+                "introduction": "string",
+                "npi": "string",
+                "licensed_states": [
+                  {
+                    "state_name": "string",
+                    "state_code": "string"
+                  }
+                ]
+              }
+            ],
+            "page_context": {
+              "per_page": "string",
+              "sort_column": "string",
+              "applied_filter": "string",
+              "has_more_page": "boolean",
+              "page": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X GET /api/ehr/v1/members -H \"Authorization: Bearer {token}\" -H \"api_key: {api_key}\"",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "members": [
+            {
+              "member_id": "244000000002005",
+              "home_phone": "",
+              "country": "",
+              "gender": "",
+              "city": "",
+              "prefix": "Dr",
+              "degree": "",
+              "mobile": "1234567890",
+              "last_name": "Lawson",
+              "zip_code": "",
+              "zuid": "56375799",
+              "is_member_photo_available": "false",
+              "full_name": "Grace Lawson",
+              "address_line2": "",
+              "address_line1": "",
+              "specialization": "",
+              "created_date": "2018-11-23",
+              "state": "",
+              "first_name": "Grace",
+              "email": "grace.lawsonapi@yahoo.com",
+              "introduction": "",
+              "licensed_states": [
+                {
+                  "state_name": "New York",
+                  "state_code": "NY"
+                },
+                {
+                  "state_name": "Alabama",
+                  "state_code": "AL"
+                }
+              ]
+            }
+          ],
+          "page_context": {
+            "per_page": "50",
+            "sort_column": "created_date",
+            "applied_filter": "Status.Active",
+            "has_more_page": "false",
+            "page": "1",
+            "sort_order": "D"
+          }
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

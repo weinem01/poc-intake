@@ -1,0 +1,106 @@
+{
+  "apiName": "Card On File API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Get Card On File details",
+      "method": "GET",
+      "path": "/patients/{patient_id}/card_on_file",
+      "description": "This API is used to get the saved \"card on file\" details of a specific patient.",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "type": "string",
+            "required": true,
+            "description": "Unique identifier for the patient."
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": {
+              "patient_id": "string",
+              "patient_record_id": "string",
+              "patient_first_name": "string",
+              "patient_middle_name": "string",
+              "patient_last_name": "string",
+              "patient_full_name": "string",
+              "card_on_file": [
+                {
+                  "card_on_file_id": "string",
+                  "card_nick_name": "string",
+                  "card_last_four_digit": "string",
+                  "card_brand": "string",
+                  "card_expiry": "string",
+                  "name_on_card": "string",
+                  "last_successful_transaction_date": "string",
+                  "last_failed_transaction_date": "string",
+                  "last_failed_transaction_status": "string",
+                  "address": {
+                    "address_line1": "string",
+                    "address_line2": "string",
+                    "city": "string",
+                    "state": "string",
+                    "country": "string",
+                    "zip_code": "string"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X GET 'https://ehr.charmtracker.com/api/ehr/v1/patients/100001000000032095/card_on_file'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "data": {
+            "patient_id": "100001000000032095",
+            "patient_record_id": "PAT0004",
+            "patient_first_name": "Eugene",
+            "patient_middle_name": "D",
+            "patient_last_name": "Feltman",
+            "patient_full_name": "Eugene D Feltman",
+            "card_on_file": [
+              {
+                "card_on_file_id": "100001000000033005",
+                "card_nick_name": "Card 1",
+                "card_last_four_digit": "9996",
+                "card_brand": "VISA",
+                "card_expiry": "01/28",
+                "name_on_card": "Eugene Feltman",
+                "last_successful_transaction_date": "2022-11-06",
+                "last_failed_transaction_date": "2022-10-07",
+                "last_failed_transaction_status": "DECLINED",
+                "address": {
+                  "address_line1": "4869 Hurry Street",
+                  "address_line2": "",
+                  "city": "Stone Mountain",
+                  "state": "VA",
+                  "country": "US",
+                  "zip_code": "24533"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

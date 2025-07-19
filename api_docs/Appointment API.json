@@ -1,0 +1,254 @@
+{
+  "apiName": "Appointment API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint and api_key in headers"
+  },
+  "endpoints": [
+    {
+      "name": "Add Appointment",
+      "method": "POST",
+      "path": "/appointments",
+      "description": "API to add an appointment to a patient.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "patient_id": { "type": "integer", "required": true },
+          "facility_id": { "type": "integer", "required": true },
+          "member_id": { "type": "integer", "required": true },
+          "mode": { "type": "string", "required": true, "enum": ["Phone call", "In Person", "Video Consult"] },
+          "repetition": { "type": "string", "required": true, "enum": ["Single Date", "Period"] },
+          "appointment_status": { "type": "string", "required": true },
+          "start_date": { "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          "start_time": { "type": "string", "required": true, "format": "HH:MM AM/PM" },
+          "duration_in_minutes": { "type": "integer", "required": true },
+          "end_date": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "weekly_days": { "type": "array", "items": { "type": "string" }, "required": false },
+          "reason": { "type": "string", "required": false },
+          "message_to_patient": { "type": "string", "required": false },
+          "questionnaire": { "type": "array", "items": { "properties": { "questionnaire_id": { "type": "integer" } } }, "required": false },
+          "consent_forms": { "type": "array", "items": { "properties": { "file_id": { "type": "integer" } } }, "required": false },
+          "visit_type_id": { "type": "integer", "required": false },
+          "frequency": { "type": "string", "required": false, "enum": ["daily", "weekly"] },
+          "resource_id": { "type": "integer", "required": false },
+          "provider_double_booking": { "type": "string", "required": false, "enum": ["allow"] },
+          "resource_double_booking": { "type": "string", "required": false, "enum": ["allow"] },
+          "receipt_id": { "type": "integer", "required": false }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Appointment added successfully.",
+            "appointment": {
+              "appointment_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Reschedule an Appointment",
+      "method": "POST",
+      "path": "/appointment/{appointment_id}/reschedule",
+      "description": "The API to modify an already created appointment.",
+      "headers": { "Content-Type": "application/json", "Authorization": "Bearer {token}" },
+      "request": { "body": {} },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success" } } },
+      "examples": {}
+    },
+    {
+      "name": "Cancel an Appointment",
+      "method": "POST",
+      "path": "/appointments/{appointment_id}/cancel",
+      "description": "The API to cancel an appointment.",
+      "headers": { "Content-Type": "application/json", "Authorization": "Bearer {token}" },
+      "request": {
+        "body": {
+          "reason": { "type": "string", "required": true, "maxLength": 400 },
+          "delete_type": { "type": "string", "required": false, "enum": ["Current", "Entire"] }
+        }
+      },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "Appointment(s) cancelled successfully." } } },
+      "examples": {}
+    },
+    {
+      "name": "List Appointments",
+      "method": "GET",
+      "path": "/appointments",
+      "description": "API to list appointments in a facility.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {
+        "params": [
+          { "name": "start_date", "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          { "name": "end_date", "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          { "name": "facility_ids", "type": "string", "required": true, "description": "IDs separated by commas" },
+          { "name": "patient_id", "type": "integer", "required": false },
+          { "name": "member_ids", "type": "string", "required": false, "description": "IDs separated by commas" },
+          { "name": "status_ids", "type": "string", "required": false, "description": "IDs separated by commas or 'ALL'" },
+          { "name": "visit_type_ids", "type": "string", "required": false, "description": "IDs separated by commas" },
+          { "name": "modified_time", "type": "integer", "required": false, "description": "Supports variants like modified_time_greater_than" },
+          { "name": "sort_order", "type": "string", "required": false, "enum": ["A", "D"] },
+          { "name": "sort_column", "type": "string", "required": false, "enum": ["appointment_date"] },
+          { "name": "time_of_creation", "type": "integer", "required": false, "description": "Supports variants like time_of_creation_greater_than" },
+          { "name": "referral_source", "type": "string", "required": false },
+          { "name": "referral_specific_source", "type": "string", "required": false },
+          { "name": "page", "type": "integer", "required": false },
+          { "name": "per_page", "type": "integer", "required": false }
+        ]
+      },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "appointments": [], "page_context": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "Get Appointment Details",
+      "method": "GET",
+      "path": "/appointment/{appointment_id}",
+      "description": "API to fetch appointment details for a particular appointment.",
+      "headers": {},
+      "request": {},
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "output_string": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "Update Appointment Status",
+      "method": "POST",
+      "path": "/appointments/{appointment_id}/status",
+      "description": "API to update the status of the appointment.",
+      "headers": {},
+      "request": { "params": [{ "name": "status_id", "type": "integer", "required": true }] },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "Appointment status changed successfully" } } },
+      "examples": {}
+    },
+    {
+      "name": "List Visit Types",
+      "method": "GET",
+      "path": "/settings/visittypes",
+      "description": "API to list Visit Types.",
+      "headers": {},
+      "request": { "params": [{ "name": "page", "type": "integer" }, { "name": "per_page", "type": "integer" }] },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "visittypes": [], "page_context": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "List WorkFlow status",
+      "method": "GET",
+      "path": "/appointments/status",
+      "description": "API to list workflow status.",
+      "headers": {},
+      "request": {},
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "appointment_status": [] } } },
+      "examples": {}
+    },
+    {
+      "name": "Member Availability",
+      "method": "GET",
+      "path": "/members/{member_id}/availability",
+      "description": "API to list appointments slots available for a member.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "from_date", "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          { "name": "to_date", "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          { "name": "facility_id", "type": "integer", "required": true },
+          { "name": "visit_type_id", "type": "integer", "required": false },
+          { "name": "time_slot", "type": "integer", "required": false, "enum": [10, 15, 20, 30, 45, 60] },
+          { "name": "days_of_week", "type": "string", "required": false, "description": "0-6 for Sun-Sat" },
+          { "name": "session", "type": "string", "required": false, "enum": ["AM", "PM"] },
+          { "name": "is_online", "type": "boolean", "required": false }
+        ]
+      },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "availability": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "Get Join URL For Patient",
+      "method": "GET",
+      "path": "/appointments/{appointment_id}/joinurl",
+      "description": "API to get Video consult appointment join URL for the patient.",
+      "headers": {},
+      "request": {},
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "output_string": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "Member Appointment Preferences",
+      "method": "GET",
+      "path": "/member/{member_id}/bookingpreferences",
+      "description": "The API to get the appointment booking preferences of the member for the given facility.",
+      "headers": {},
+      "request": { "params": [{ "name": "facility_id", "type": "integer", "required": true }] },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "data": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "List Resources",
+      "method": "GET",
+      "path": "/resources",
+      "description": "API to list resources.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "facility_id", "type": "integer", "required": true },
+          { "name": "resource_name", "type": "string", "required": false },
+          { "name": "resource_name_startswith", "type": "string", "required": false },
+          { "name": "resource_name_contains", "type": "string", "required": false },
+          { "name": "page", "type": "integer", "required": false },
+          { "name": "per_page", "type": "integer", "required": false }
+        ]
+      },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "success", "resources": [], "page_context": {} } } },
+      "examples": {}
+    },
+    {
+      "name": "Add Appointment Request",
+      "method": "POST",
+      "path": "/appointments/requests",
+      "description": "API to add an appointment request.",
+      "headers": {},
+      "request": {
+        "body": {
+          "member_id": { "type": "integer", "required": true },
+          "facility_id": { "type": "integer", "required": true },
+          "date_choice_1": { "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          "start_time": { "type": "string", "required": true, "format": "HH:MM AM/PM" },
+          "end_time": { "type": "string", "required": true, "format": "HH:MM AM/PM" },
+          "reason": { "type": "string", "required": true },
+          "mode": { "type": "string", "required": true, "enum": ["In Person", "Phone Call", "Video Consult"] },
+          "patient_id": { "type": "integer", "required": false },
+          "record_id": { "type": "string", "required": false },
+          "date_choice_2": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "date_choice_3": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "visit_type_id": { "type": "integer", "required": false },
+          "first_name": { "type": "string", "required": false },
+          "last_name": { "type": "string", "required": false },
+          "dob": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "gender": { "type": "string", "required": false, "enum": ["male", "female", "unknown", "other"] },
+          "email": { "type": "string", "required": false },
+          "mobile": { "type": "integer", "required": false },
+          "address_line_1": { "type": "string", "required": false },
+          "address_line_2": { "type": "string", "required": false },
+          "city": { "type": "string", "required": false },
+          "state": { "type": "string", "required": false },
+          "country": { "type": "string", "required": false },
+          "postal_code": { "type": "string", "required": false },
+          "timezone": { "type": "string", "required": false }
+        }
+      },
+      "response": { "success": { "status": 200, "body": { "code": "0", "message": "Appointment requested successfully." } } },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

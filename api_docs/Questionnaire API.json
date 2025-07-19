@@ -1,0 +1,313 @@
+{
+  "apiName": "Questionnaire API",
+  "baseUrl": "https://apiehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Questionnaires",
+      "method": "GET",
+      "path": "/questionnaires",
+      "description": "The API to list questionnaires.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "questionnaires": [
+              {
+                "template_id": "string",
+                "questionnaire_name": "string",
+                "questionnaire_type": "string",
+                "member_id": "string",
+                "is_practice_questionnaire": "boolean",
+                "created_time": "integer"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://apiehr.charmtracker.com/api/ehr/v1/questionnaires'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "questionnaires": [
+            {
+              "template_id": "100003000000014001",
+              "questionnaire_name": "Test Questionnaire",
+              "questionnaire_type": "General Questionnaire",
+              "member_id": "100003000000000101",
+              "is_practice_questionnaire": "true",
+              "created_time": 1554713868281
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Questions in a Questionnaire",
+      "method": "GET",
+      "path": "/questionnaire/{questionnaire_id}",
+      "description": "The API to list questions in a questionnaire",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": [
+              {
+                "notes": "string",
+                "is_multi_choice": "boolean",
+                "is_deleted": "boolean",
+                "template_id": "integer",
+                "is_mandatory": "boolean",
+                "position": "integer",
+                "entry_id": "integer",
+                "notes_type": "string"
+              }
+            ]
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://apiehr.charmtracker.com/api/ehr/v1/questionnaire/100003000000014001'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "data": [
+            {
+              "notes": "test question 1",
+              "is_multi_choice": false,
+              "is_deleted": false,
+              "template_id": 100003000000014000,
+              "is_mandatory": false,
+              "position": 0,
+              "entry_id": 100003000000014000,
+              "notes_type": "Question"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Save Answers to Questionnaire",
+      "method": "POST",
+      "path": "/questionnaire/answers",
+      "description": "The API to save answers to a questionnaire.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "template_id": { "type": "integer", "required": true },
+          "patient_id": { "type": "integer", "required": true },
+          "provider_id": { "type": "integer", "required": false },
+          "facility_id": { "type": "integer", "required": true },
+          "member_id": { "type": "integer", "required": false },
+          "is_submitted": { "type": "boolean", "required": false },
+          "ques_map_id": { "type": "integer", "required": false },
+          "appointment_id": { "type": "integer", "required": false },
+          "answers": {
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "entry_id": { "type": "integer" },
+                "answer": { "type": "string" },
+                "multiple_answers": {
+                  "type": "array",
+                  "items": { "properties": { "answer": { "type": "string" } } }
+                },
+                "allergy_entries": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "allergen": { "type": "string" },
+                      "type": { "type": "string" },
+                      "severity": { "type": "string" },
+                      "reactions": { "type": "string" }
+                    }
+                  }
+                },
+                "medication_entries": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "medication": { "type": "string" },
+                      "intake_details": { "type": "string" }
+                    }
+                  }
+                },
+                "supplement_entries": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "supplement": { "type": "string" },
+                      "intake_details": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Questionnaire saved successfully.",
+            "questionnaire_details": {
+              "ques_map_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Save Signature to a Questionnaire",
+      "method": "POST",
+      "path": "/questionnaire/signature/{ques_map_id}/{entry_id}",
+      "description": "API to save signature to a Signature field in a questionnaire",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "multipart/form-data"
+      },
+      "request": {
+        "body": {
+          "file": {
+            "type": "file",
+            "required": true,
+            "description": "image with .png extension. Max size 2MB. Suggested Dimension: 675 x 300 px"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Questionnaire Signature saved successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Signature of a question in Questionnaire",
+      "method": "GET",
+      "path": "/questionnaire/signature/{ques_map_id}/{entry_id}",
+      "description": "API to fetch signature in a questionnaire",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "description": "Signature image will be written to the output"
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Fetch patient Questionnaires",
+      "method": "GET",
+      "path": "/patients/{patient_id}/questionnaires",
+      "description": "API to fetch the questionnaires of a patient.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {
+        "params": [
+          { "name": "appointment_id", "type": "integer", "required": false },
+          { "name": "questionnaire_name_startswith", "type": "string", "required": false },
+          { "name": "questionnaire_name_contains", "type": "string", "required": false }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "patient_questionnaires": [
+              {
+                "ques_map_id": "string",
+                "questionnaire_id": "string",
+                "appointment_id": "string",
+                "is_saved": "boolean",
+                "is_submitted": "boolean",
+                "questionnaire_name": "string",
+                "last_modified_time": "string"
+              }
+            ],
+            "page_context": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Fetch answers for a Questionnaire",
+      "method": "GET",
+      "path": "/questionnaire/answer/{ques_map_id}",
+      "description": "API to fetch the answers for a questionnaire using patient_ques_map_id",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "questionnaire_with_answers": {
+              "is_submitted": "boolean",
+              "patient_id": "string",
+              "questions": [
+                {
+                  "is_multi_choice": "boolean",
+                  "notes": "string",
+                  "is_deleted": "boolean",
+                  "answer": "string",
+                  "options": [ "string" ],
+                  "is_mandatory": "boolean",
+                  "position": "integer",
+                  "entry_id": "string",
+                  "notes_type": "string",
+                  "multiple_answers": [ { "answer": "string" } ],
+                  "from_scale": "integer",
+                  "to_scale": "integer"
+                }
+              ],
+              "template_id": "string",
+              "ques_map_id": "string",
+              "last_modified_time": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

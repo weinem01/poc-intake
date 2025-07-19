@@ -1,0 +1,498 @@
+{
+  "apiName": "Medical History API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint and api_key in headers"
+  },
+  "endpoints": [
+    {
+      "name": "List Procedures, Surgeries and Hospitalization",
+      "method": "GET",
+      "path": "/patients/{patient_id}/medicalhistory/procedure",
+      "description": "API to fetch the patient procedure, Surgeries and Hospitalization",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": [
+              {
+                "date_of_entry": "string",
+                "comments": "string",
+                "from_date": "string",
+                "to_date": "string",
+                "time_of_entry": "string",
+                "added_by": "string",
+                "procedure_id": "string",
+                "procedure": "string",
+                "procedure_type": "string",
+                "snomed_code": "string"
+              }
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Procedure, Surgeries and Hospitalization",
+      "method": "POST",
+      "path": "/patients/{patient_id}/medicalhistory/procedure",
+      "description": "The API to add patient procedure, Surgeries and Hospitalization",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "procedure_type": {
+            "type": "string",
+            "required": true,
+            "description": "type of the procedure. Allowed values: Procedure, Surgeries, Hospitalization, Other Events"
+          },
+          "procedure": {
+            "type": "string",
+            "required": true,
+            "description": "name of the procedure, max-length is 35"
+          },
+          "from_date": {
+            "type": "string",
+            "required": false,
+            "description": "date of the procedure occurred. Format: yyyy-mm-dd"
+          },
+          "to_date": {
+            "type": "string",
+            "required": false,
+            "description": "end date of the hospitalization or other events. Format: yyyy-mm-dd"
+          },
+          "procedure_notes": {
+            "type": "string",
+            "required": false,
+            "description": "notes to the procedure, max-length is 35"
+          },
+          "snomed_code": {
+            "type": "string",
+            "required": false,
+            "description": "SNOMED code of the procedure, max-length is 18"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Procedures added successfully.",
+            "data": {
+              "procedure_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Edit Procedure, Surgeries and Hospitalization",
+      "method": "PUT",
+      "path": "/patients/{patient_id}/medicalhistory/procedure/{procedure_id}",
+      "description": "The API to edit patient Procedure, Surgeries and Hospitalization",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "procedure_type": {
+            "type": "string",
+            "required": true,
+            "description": "type of the procedure. Allowed values: Procedure, Surgeries, Hospitalization, Other Events"
+          },
+          "from_date": {
+            "type": "string",
+            "required": false,
+            "description": "date of the procedure occurred. Format: yyyy-mm-dd"
+          },
+          "to_date": {
+            "type": "string",
+            "required": false,
+            "description": "end date of the surgery or other event. Format: yyyy-mm-dd"
+          },
+          "procedure_notes": {
+            "type": "string",
+            "required": false,
+            "description": "notes to the procedure, max-length is 35"
+          },
+          "snomed_code": {
+            "type": "string",
+            "required": false,
+            "description": "SNOMED code of the procedure, max-length is 18"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "patient procedure updated successfully"
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Procedure, Surgeries and Hospitalization",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/medicalhistory/procedure/{procedure_id}",
+      "description": "The API to delete patient Procedure, Surgeries and Hospitalization",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Procedures Deleted Successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Patient Past Medical History",
+      "method": "GET",
+      "path": "/patients/{patient_id}/medicalhistory/pastmedicalhistory",
+      "description": "The API to get the past medical history of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": {
+              "past_medical_history": "string",
+              "past_encounters": [
+                {
+                  "member_id": "string",
+                  "past_medical_history": "string",
+                  "appointment_date": "string",
+                  "encounter_id": "string"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Patient Past Medical History",
+      "method": "POST",
+      "path": "/patients/{patient_id}/medicalhistory/pastmedicalhistory",
+      "description": "The API to add patient Past Medical History",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "content": {
+            "type": "string",
+            "required": true,
+            "description": "Past medical history of the patient"
+          },
+          "is_html": {
+            "type": "boolean",
+            "required": false,
+            "description": "type of the content. True if the provided content is HTML(Default true)."
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Past Medical History added successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Patient Social History",
+      "method": "GET",
+      "path": "/patients/{patient_id}/medicalhistory/socialhistory",
+      "description": "The API to get the social history of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": {
+              "social_history": "string",
+              "past_encounters": [
+                {
+                  "member_id": "string",
+                  "appointment_date": "string",
+                  "encounter_id": "string",
+                  "past_family_and_social_history": "string"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Patient Social History",
+      "method": "POST",
+      "path": "/patients/{patient_id}/medicalhistory/socialhistory",
+      "description": "The API to add patient Social History",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "content": {
+            "type": "string",
+            "required": true,
+            "description": "Social history of the patient"
+          },
+          "is_html": {
+            "type": "boolean",
+            "required": false,
+            "description": "type of the content. True if the provided content is HTML(default true)."
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Social History added successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Patient Family History",
+      "method": "GET",
+      "path": "/patients/{patient_id}/medicalhistory/familyhistory",
+      "description": "The API to get patient family history",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": [
+              {
+                "has_dx_record": "boolean",
+                "is_deceased": "boolean",
+                "diagnosis_list": [
+                  {
+                    "date_of_entry": "string",
+                    "comments": "string",
+                    "diagnosis_id": "string",
+                    "diagnosis": "string"
+                  }
+                ],
+                "dob": "string",
+                "relationship": "string",
+                "age": "integer",
+                "family_history_id": "string"
+              }
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Patient Family History",
+      "method": "POST",
+      "path": "/patients/{patient_id}/medicalhistory/familyhistory",
+      "description": "The API to add patient family history",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "relationship": {
+            "type": "string",
+            "required": true,
+            "description": "Type of relationship to the patient. Allowed values: Natural Father, Natural Mother, Natural Brother, Natural Sister, Half Brother, Half Sister, Twin Brother, Twin Sister, Natural Son, Natural Daughter, Paternal grandfather, Paternal grandmother, Maternal grandfather, Maternal grandmother"
+          },
+          "is_deceased": {
+            "type": "boolean",
+            "required": true,
+            "description": "status of the family member if he/she is alive"
+          },
+          "age": {
+            "type": "integer",
+            "required": false,
+            "description": "age of the family member. Don't have to add if dob is provided."
+          },
+          "dob": {
+            "type": "string",
+            "required": false,
+            "description": "Data of birth of the family member. Format: yyyy-mm-dd"
+          },
+          "diagnosis": {
+            "type": "array",
+            "required": false,
+            "description": "Diagnosis list of the family member",
+            "items": {
+              "type": "object",
+              "properties": {
+                "diagnosis_id": {
+                  "type": "integer",
+                  "required": true
+                }
+              }
+            }
+          },
+          "comments": {
+            "type": "string",
+            "required": false,
+            "description": "notes of the active problems max-length 255"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Family History added successfully.",
+            "history": {
+              "family_history_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Edit Patient Family History",
+      "method": "PUT",
+      "path": "/patients/{patient_id}/medicalhistory/familyhistory/{history_id}",
+      "description": "The API to edit patient Family History",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "is_deceased": {
+            "type": "boolean",
+            "required": true,
+            "description": "status of the family member if he/she is alive"
+          },
+          "age": {
+            "type": "integer",
+            "required": false,
+            "description": "age of the family member. Don't have to add if dob is provided."
+          },
+          "dob": {
+            "type": "string",
+            "required": false,
+            "description": "Date of birth of the family member. Format: yyyy-mm-dd"
+          },
+          "diagnosis": {
+            "type": "array",
+            "required": false,
+            "description": "Diagnosis list of the family member",
+            "items": {
+              "type": "object",
+              "properties": {
+                "diagnosis_id": {
+                  "type": "integer",
+                  "required": true
+                }
+              } 
+            }
+          },
+          "comments": {
+            "type": "string",
+            "required": false,
+            "description": "notes of the active problems max-length 255"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Family History updated successfully"
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Patient Family History",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/medicalhistory/familyhistory/{history_id}",
+      "description": "The API to delete patient Family History",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Family History Deleted Successfully."
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

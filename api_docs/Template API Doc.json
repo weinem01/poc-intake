@@ -1,0 +1,261 @@
+{
+  "apiName": "Template API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Templates",
+      "method": "GET",
+      "path": "/templates",
+      "description": "The API to list templates.",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "template_type",
+            "type": "string",
+            "required": false,
+            "description": "Type of the template"
+          },
+          {
+            "name": "template_name_(startswith|contains)",
+            "type": "string",
+            "required": false,
+            "description": "Name of the template"
+          },
+          {
+            "name": "template_filter",
+            "type": "string",
+            "required": false,
+            "description": "Section of the template. Allowed values: all_templates, practice_templates, my_templates"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "Page number"
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Encounters per page"
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Sort ascending or descending. Allowed values: A, D"
+          },
+          {
+            "name": "sort_column",
+            "type": "string",
+            "required": false,
+            "description": "Sort fields with template name or created time. Allowed values: template_name, created_time"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "templates": [
+              {
+                "template_id": "string",
+                "template_name": "string",
+                "template_type": "string",
+                "member_id": "string",
+                "is_practice_template": "boolean",
+                "created_time": "integer"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://ehr.charmtracker.com/api/ehr/v1/templates'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "templates": [
+            {
+              "template_id": "1884000000094197",
+              "template_name": "Abdominal Pain",
+              "template_type": "Chief Complaints",
+              "member_id": "1884000000077039",
+              "is_practice_template": "false",
+              "created_time": 1285247417589
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List SOAP Template details",
+      "method": "GET",
+      "path": "/soap/templates",
+      "description": "The API to list details of the SOAP template.",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "template_ids",
+            "type": "string",
+            "required": true,
+            "description": "Template IDs with comma separated"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "soap_templates": [
+              {
+                "template_id": "string",
+                "template_name": "string",
+                "layout": "string",
+                "comments": "string",
+                "soap_templates_inner": [
+                  {
+                    "template_id": "string",
+                    "widget_id": "string",
+                    "position": "string",
+                    "soap_widgets": [
+                      {
+                        "widget_id": "string",
+                        "widget_name": "string",
+                        "widget_module": "string",
+                        "layout": "string",
+                        "soap_widget_entries": [
+                          {
+                            "entry_id": "string",
+                            "entry_name": "string",
+                            "entry_position": "string",
+                            "entry_type": "string",
+                            "custom_text": "string",
+                            "is_mandatory": "boolean"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://ehr.charmtracker.com/api/ehr/v1/soap/templates?template_ids=1884000000094197,1884000000117061'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "soap_templates": [
+            {
+              "template_id": "1884000000094197",
+              "template_name": "Abdominal Pain",
+              "layout": "TWO_COLUMNS",
+              "comments": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Adding template to SOAP Encounter",
+      "method": "POST",
+      "path": "/soap/encounters/{encounter_id}/template",
+      "description": "The API to add template to the soap encounter",
+      "headers": {
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "template_id": {
+            "type": "integer",
+            "required": false,
+            "description": "Template ID"
+          },
+          "position": {
+            "type": "integer",
+            "required": false,
+            "description": "Position of the template"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Soap template added successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X POST 'https://ehr.charmtracker.com/api/ehr/v1/soap/encounters/1884000018048047' -H 'Authorization: Bearer xxx' -d '{\"template_id\": \"1884000003413623\", \"position\": \"2\"}'",
+        "response": {
+          "code": "0",
+          "message": "Soap template added successfully."
+        }
+      }
+    },
+    {
+      "name": "Deleting template from SOAP Encounter",
+      "method": "DELETE",
+      "path": "/soap/encounters/{encounter_id}/template",
+      "description": "The API to delete template from the soap encounter",
+      "headers": {
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "template_id": {
+            "type": "integer",
+            "required": false,
+            "description": "Template ID"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Soap template deleted successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X POST 'https://ehr.charmtracker.com/api/ehr/v1/soap/encounters/1884000018048047' -H 'Authorization: Bearer xxx' -d '{\"template_id\": \"1884000003413623\"}'",
+        "response": {
+          "code": "0",
+          "message": "Soap template deleted successfully."
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

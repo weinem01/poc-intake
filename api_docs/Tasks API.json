@@ -1,0 +1,347 @@
+{
+  "apiName": "Tasks API",
+  "baseUrl": "https://apiehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Add New Task",
+      "method": "POST",
+      "path": "/tasks",
+      "description": "The API to add a new task.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "task": {
+            "type": "string",
+            "required": true,
+            "description": "Task (maximum size allowed is 500 characters)"
+          },
+          "owner_id": {
+            "type": "integer",
+            "required": true,
+            "description": "Member Identifier"
+          },
+          "priority": {
+            "type": "integer",
+            "required": true,
+            "description": "Task priority(Allowed values - \"0,1,2,3\"). 0-Low, 1-Medium, 2-High, 3-Critical"
+          },
+          "status": {
+            "type": "string",
+            "required": true,
+            "description": "Task status(Allowed values - \"Pending\", \"Completed\")"
+          },
+          "comments": {
+            "type": "string",
+            "required": false,
+            "description": "Comments (maximum size allowed is 500 characters)"
+          },
+          "due_date": {
+            "type": "string",
+            "required": false,
+            "description": "Task due date (in format YYYY-MM-DD)"
+          },
+          "reminder_options": {
+            "type": "string",
+            "required": false,
+            "description": "Time of reminder (Allowed values - \"On Due Date, 1 Day Before, 2 Days Before, 3 Days Before\"). If more than one value is to be given, each value should be separated by comma"
+          },
+          "tasklist": {
+            "type": "string",
+            "required": true,
+            "description": "Task Category(maximum size allowed is 100 characters)"
+          },
+          "patient_id": {
+            "type": "integer",
+            "required": false,
+            "description": "Patient Identifier"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Task added successfully.",
+            "data": {
+              "task": "string",
+              "task_id": "string"
+            }
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X POST -H \"Content-Type: application/json\" -H \"Authorization: Bearer zJAbWVkaWNhbG1pbmUuY29tOkFQSURIbW8yJA==\" -d '{\"task\":\"Check and review the charts daily\",\"priority\":\"2\",\"owner_id\":\"100001000000000101\",\"status\":\"Pending\",\"comments\":\"Please mark as completed after the task is over\",\"tasklist\":\"daily review\",\"due_date\":\"2021-03-22\",\"reminder_options\":\"On Due Date, 3 Days Before\",\"patient_id\":\"100001000000000595\"}' 'https://apiehr.charmtracker.com/api/ehr/v1/tasks'",
+        "response": {
+          "code": "0",
+          "message": "Task added successfully.",
+          "data": {
+            "task": "Check and review the charts daily",
+            "task_id": "100001000000018043"
+          }
+        }
+      }
+    },
+    {
+      "name": "Update Task",
+      "method": "PUT",
+      "path": "/tasks/{task_id}",
+      "description": "The API to update a task.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "task": {
+            "type": "string",
+            "required": true,
+            "description": "Task (maximum size allowed is 500 characters)"
+          },
+          "owner_id": {
+            "type": "integer",
+            "required": true,
+            "description": "Member Identifier"
+          },
+          "priority": {
+            "type": "integer",
+            "required": true,
+            "description": "Task priority(Allowed values - \"0,1,2,3\"). 0-Low, 1-Medium, 2-High, 3-Critical"
+          },
+          "status": {
+            "type": "string",
+            "required": true,
+            "description": "Task status(Allowed values - \"Pending\", \"Completed\")"
+          },
+          "comments": {
+            "type": "string",
+            "required": false,
+            "description": "Comments (maximum size allowed is 500 characters)"
+          },
+          "tasklist": {
+            "type": "string",
+            "required": true,
+            "description": "Task Category (maximum size allowed is 100 characters)"
+          },
+          "due_date": {
+            "type": "string",
+            "required": false,
+            "description": "Task due date (in format YYYY-MM-DD)"
+          },
+          "reminder_options": {
+            "type": "string",
+            "required": false,
+            "description": "Time of reminder (Allowed values - \"On Due Date, 1 Day Before, 2 Days Before, 3 Days Before\"). If more than one value is to be given, each value should be separated by comma"
+          },
+          "patient_id": {
+            "type": "integer",
+            "required": false,
+            "description": "Patient Identifier"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Task has been updated successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X PUT -H \"Content-Type: application/json\" -H \"Authorization: Bearer zJAbWVkaWNhbG1pbmUuY29tOkFQSURIbW8yJA==\" -d '{\"task\":\"Check and review the charts daily\",\"priority\":\"2\",\"owner_id\":\"100001000000000101\",\"status\":\"Pending\",\"comments\":\"Please mark as completed after the task is over\",\"tasklist\":\"daily review\",\"due_date\":\"2021-03-22\",\"reminder_options\":\"On Due Date,3 Days Before\",\"patient_id\":\"100001000000000595\"}' 'https://apiehr.charmtracker.com/api/ehr/v1/tasks/100001000000018043'",
+        "response": {
+          "code": "0",
+          "message": "Task has been updated successfully."
+        }
+      }
+    },
+    {
+      "name": "Fetch Tasks",
+      "method": "GET",
+      "path": "/tasks",
+      "description": "The API to fetch tasks",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "view",
+            "type": "string",
+            "required": false,
+            "description": "To filter tasks based on owner (Allowed values: All, MyTasks, AssignedToMe, AssignedByMe)"
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": false,
+            "description": "From date format (YYYY-MM-DD)"
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": false,
+            "description": "To date format (YYYY-MM-DD)"
+          },
+          {
+            "name": "tasklist",
+            "type": "string",
+            "required": false,
+            "description": "Task Category - To filter Tasks based on category (maximum size allowed is 100 characters)"
+          },
+          {
+            "name": "patient_id",
+            "type": "integer",
+            "required": false,
+            "description": "Patient Identifier"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "required": false,
+            "description": "To filter Tasks based on status (Allowed values: All, Pending, Completed)"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "Page number (Each page fetches 50 tasks)"
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Count per page"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "tasks": [
+              {
+                "owner": {
+                  "member_id": "string",
+                  "full_name": "string",
+                  "prefix": "string"
+                },
+                "reminders": [],
+                "time_of_creation": "integer",
+                "task": "string",
+                "patient": {
+                  "full_name": "string",
+                  "gender": "string",
+                  "patient_record_id": "string",
+                  "patient_id": "string"
+                },
+                "due_date": "string",
+                "task_id": "string",
+                "time_of_creation_date": "string",
+                "tasklist": {
+                  "tasklist": "string",
+                  "tasklist_id": "string"
+                },
+                "assigned_by": {
+                  "member_id": "string",
+                  "full_name": "string",
+                  "prefix": "string"
+                },
+                "priority": "string",
+                "status": "string"
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://apiehr.charmtracker.com/api/ehr/v1/tasks?status=Completed&view=MyTasks&tasklist=Meeting&patient_id=513000012126583'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "tasks": [
+            {
+              "owner": {
+                "member_id": "513000000004013",
+                "full_name": "David Antonio",
+                "prefix": "Dr"
+              },
+              "reminders": [],
+              "time_of_creation": 1573504686768,
+              "task": "Meeting",
+              "patient": {
+                "full_name": "Amy Criptoo",
+                "gender": "female",
+                "patient_record_id": "Jun15972",
+                "patient_id": "513000012126583"
+              },
+              "due_date": "2019-11-14",
+              "task_id": "513000013021001",
+              "time_of_creation_date": "Nov 11, 2019",
+              "tasklist": {
+                "tasklist": "Meeting",
+                "tasklist_id": "513000000056015"
+              },
+              "assigned_by": {
+                "member_id": "513000000004013",
+                "full_name": "David Antonio",
+                "prefix": "Dr"
+              },
+              "priority": "0",
+              "status": "Completed"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Change Task status",
+      "method": "PUT",
+      "path": "/tasks/{task_id}/status",
+      "description": "The API to change status of a task",
+      "headers": {},
+      "request": {
+        "body": {
+          "status": {
+            "type": "string",
+            "required": true,
+            "description": "Allowed values: Pending, Completed"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Task status updated successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X PUT 'https://apiehr.charmtracker.com/api/ehr/v1/tasks/513000013021001/status' -d '{\"status\":\"Pending\"}'",
+        "response": {
+          "code": "0",
+          "message": "Task status updated successfully."
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

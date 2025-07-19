@@ -1,0 +1,209 @@
+{
+  "apiName": "Facility API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint and api_key in headers"
+  },
+  "endpoints": [
+    {
+      "name": "List Facilities",
+      "method": "GET",
+      "path": "/facilities",
+      "description": "API to fetch the facilities in the practice.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false
+          },
+          {
+            "name": "filter_by",
+            "type": "string",
+            "required": false,
+            "description": "Filters facilities based on their status. Allowed Values: Status.All, Status.Active, Status.Inactive"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "facilities": [
+              {
+                "facility_id": "string",
+                "facility_name": "string",
+                "facility_code": "string",
+                "facility_status": "string",
+                "facility_timezone": "string",
+                "address_line1": "string",
+                "address_line2": "string",
+                "city": "string",
+                "state": "string",
+                "country": "string",
+                "zip_code": "string",
+                "mobile": "string",
+                "office_phone": "string",
+                "is_silhouette": "boolean"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "applied_filter": "string",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Facility",
+      "method": "POST",
+      "path": "/facilities",
+      "description": "The API to add a new facility",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "facility_name": { "type": "string", "required": true, "maxLength": 50 },
+          "facility_code": { "type": "string", "required": false },
+          "facility_timezone": { "type": "string", "required": false },
+          "address": {
+            "type": "object",
+            "required": true,
+            "properties": {
+              "line1": { "type": "string", "required": true, "maxLength": 35 },
+              "line2": { "type": "string", "required": false, "maxLength": 35 },
+              "city": { "type": "string", "required": true, "maxLength": 35 },
+              "state": { "type": "string", "required": true, "maxLength": 50 },
+              "country": { "type": "string", "required": true, "maxLength": 2 },
+              "zip_code": { "type": "string", "required": true, "maxLength": 5 },
+              "post_box": { "type": "integer", "required": false, "maxLength": 4 }
+            }
+          },
+          "contact_info": {
+            "type": "object",
+            "required": false,
+            "properties": {
+              "contact_person": { "type": "string", "maxLength": 50 },
+              "email_id": { "type": "string", "maxLength": 50 },
+              "landline": { "type": "string" },
+              "mobile": { "type": "string" },
+              "fax": { "type": "string" },
+              "web_url": { "type": "string" }
+            }
+          },
+          "npi": { "type": "string", "required": false, "maxLength": 10 },
+          "tax_id": { "type": "string", "required": false, "maxLength": 9 }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "New Facility successfully created",
+            "facility": {
+              "facility_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Update Facility",
+      "method": "PUT",
+      "path": "/facilities/{facility_id}",
+      "description": "The API to update a facility.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "facility_name": { "type": "string", "required": false, "maxLength": 50 },
+          "facility_code": { "type": "string", "required": false },
+          "facility_timezone": { "type": "string", "required": false },
+          "address": { "type": "object", "required": false },
+          "contact_info": { "type": "object", "required": false },
+          "npi": { "type": "string", "required": false, "maxLength": 10 },
+          "tax_id": { "type": "string", "required": false, "maxLength": 9 },
+          "facility_status": { "type": "string", "required": false, "enum": ["Enabled", "Disabled"] }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Facility Details updated Successfully"
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "List Timezones",
+      "method": "GET",
+      "path": "/timezones",
+      "description": "API to fetch the timezone identifiers",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "fetch_all_timezones",
+            "type": "boolean",
+            "required": false,
+            "description": "To fetch all the timezone list"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "result": {
+              "timezones": [
+                {
+                  "timezone_identifier": "string",
+                  "display_name": "string"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

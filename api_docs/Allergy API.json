@@ -1,0 +1,206 @@
+{
+  "apiName": "Allergy API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Get Patient Allergies",
+      "method": "GET",
+      "path": "/patients/{patient_id}/allergies",
+      "description": "API to get the allergies of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "encounter_id",
+            "type": "integer",
+            "required": false,
+            "description": "To filter a patient's allergies for a specific encounter"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "allergies": [
+              {
+                "patient_allergy_id": "string",
+                "allergen": "string",
+                "allergy_type": "string",
+                "severity": "string",
+                "reactions": "string",
+                "comments": "string",
+                "encounter_id": "string",
+                "is_active": "boolean"
+              }
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Patient Allergy",
+      "method": "POST",
+      "path": "/patients/{patient_id}/allergies",
+      "description": "The API to add allergies for Patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "application/json",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "allergen": {
+                "type": "string",
+                "required": true,
+                "maxLength": 100
+              },
+              "allergy_type": {
+                "type": "string",
+                "required": true,
+                "enum": ["Drug", "Food", "Environmental", "Others"]
+              },
+              "severity": {
+                "type": "string",
+                "required": false,
+                "enum": ["Severe", "Moderate", "Mild"]
+              },
+              "reactions": {
+                "type": "string",
+                "required": false,
+                "maxLength": 255
+              },
+              "is_active": {
+                "type": "boolean",
+                "required": true
+              },
+              "comments": {
+                "type": "string",
+                "required": false,
+                "maxLength": 255
+              },
+              "encounter_id": {
+                "type": "integer",
+                "required": false
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Allergies saved successfully.",
+            "allergies": [
+              {
+                "patient_allergy_id": "string",
+                "allergen": "string",
+                "allergy_type": "string",
+                "severity": "string",
+                "reactions": "string",
+                "comments": "string",
+                "is_active": "boolean"
+              }
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Update Patient Allergy",
+      "method": "PUT",
+      "path": "/patients/{patient_id}/allergies/{patient_allergy_id}",
+      "description": "The API to update allergy for Patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "application/json",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "allergen": {
+            "type": "string",
+            "required": true,
+            "maxLength": 100
+          },
+          "allergy_type": {
+            "type": "string",
+            "required": true,
+            "enum": ["Drug", "Food", "Environmental", "Others"]
+          },
+          "severity": {
+            "type": "string",
+            "required": false,
+            "enum": ["Severe", "Moderate", "Mild"]
+          },
+          "reactions": {
+            "type": "string",
+            "required": false,
+            "maxLength": 255
+          },
+          "is_active": {
+            "type": "boolean",
+            "required": true
+          },
+          "comments": {
+            "type": "string",
+            "required": false,
+            "maxLength": 255
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Allergy updated successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Patient Allergy",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/allergies/{patient_allergy_id}",
+      "description": "The API to delete allergy for Patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Allergy deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "apiName": "Medication API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Medications",
+      "method": "GET",
+      "path": "/patients/{patient_id}/medications",
+      "description": "The API to list medications.",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "encounter_id",
+            "type": "integer",
+            "required": false,
+            "description": "Encounter Identifier"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "Page number"
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Medications per page"
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Sort ascending (A) or descending (D)"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "medications": [
+              {
+                "patient_medication_id": "string",
+                "patient_id": "string",
+                "date_of_entry": "string",
+                "dosage_unit": "string",
+                "intake_rounte": "string",
+                "dispense": "string",
+                "refills": "string",
+                "dispense_unit": "string",
+                "drug_details_id": "string",
+                "generic_drug_name": "string",
+                "generic_product_name": "string",
+                "trade_name": "string",
+                "strength_description": "string",
+                "doseform_description": "string",
+                "encounter_id": "string",
+                "directions": "string",
+                "is_directions_edited": "boolean",
+                "manufacturing_type": "string",
+                "substitute_generic": "string",
+                "days_of_supply": "string"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://ehr.charmtracker.com/api/ehr/v1/patients/188400000002811/medications'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "medications": [
+            {
+              "patient_medication_id": "1884000023655067",
+              "patient_id": "188400000002811",
+              "date_of_entry": "2023-05-02",
+              "dosage_unit": "tablet(s)",
+              "intake_rounte": "oral",
+              "dispense": "90",
+              "refills": "3",
+              "dispense_unit": "C48542",
+              "drug_details_id": "1884000005904098",
+              "generic_drug_name": "pravastatin",
+              "generic_product_name": "pravastatin 40 mg oral tablet",
+              "trade_name": "Pravastatin Sodium",
+              "strength_description": "40 mg",
+              "doseform_description": "tablet",
+              "encounter_id": "1884000023611093",
+              "directions": "1 tablet(s) once a day in the evening for 90 Day(s), oral",
+              "is_directions_edited": "false",
+              "manufacturing_type": "Manufactured",
+              "substitute_generic": "1",
+              "days_of_supply": ""
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

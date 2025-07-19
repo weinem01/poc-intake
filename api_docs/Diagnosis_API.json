@@ -1,0 +1,148 @@
+{
+  "apiName": "Diagnosis API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Add Diagnosis for Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/diagnoses",
+      "description": "The API to create diagnosis for Patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "application/json"
+      },
+      "request": {
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "required": true },
+              "code": { "type": "string", "required": true },
+              "code_type": { "type": "string", "required": true },
+              "status": { "type": "string", "required": false, "enum": ["Active", "Inactive", "Resolved"] },
+              "comments": { "type": "string", "required": false },
+              "from_date": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+              "to_date": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+              "encounter_id": { "type": "integer", "required": false },
+              "diagnosis_order": { "type": "integer", "required": false }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Diagnoses saved successfully.",
+            "patient_diagnoses": [
+              {
+                "patient_diagnosis_id": "string",
+                "diagnosis_name": "string",
+                "code": "string",
+                "code_type": "string",
+                "from_date": "string",
+                "to_date": "string",
+                "comments": "string",
+                "status": "string",
+                "diagnosis_id": "string",
+                "encounter_id": "string"
+              }
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Diagnosis for Patient",
+      "method": "GET",
+      "path": "/patients/{patient_id}/diagnoses",
+      "description": "This API is to get the list of diagnosis a patient has.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "application/json"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "encounter_id",
+            "type": "integer",
+            "required": false,
+            "description": "To filter a patient's diagnosis for a specific encounter"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "patient_diagnoses": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Diagnosis for Patient",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/diagnoses/{patient_diagnosis_id}",
+      "description": "The API to delete diagnosis for Patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "application/json"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Diagnosis deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Update Diagnosis for Patient",
+      "method": "PUT",
+      "path": "/patients/{patient_id}/diagnoses/{patient_diagnosis_id}",
+      "description": "The API to update diagnosis for Patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "content-type": "application/json"
+      },
+      "request": {
+        "body": {
+          "status": { "type": "string", "required": false, "enum": ["Active", "Inactive", "Resolved"] },
+          "comments": { "type": "string", "required": false },
+          "from_date": { "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          "to_date": { "type": "string", "required": false, "format": "YYYY-MM-DD" }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Diagnosis updated successfully.",
+            "patient_diagnoses": []
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

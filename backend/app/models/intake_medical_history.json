@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medical History",
+  "type": "object",
+  "properties": {
+    "currentMedications": {
+      "type": "array",
+      "description": "Current medications - will be added via Medication API",
+      "items": {
+        "type": "object",
+        "properties": {
+          "medicationName": {
+            "type": "string",
+            "description": "Generic or trade name - maps to generic_drug_name/trade_name"
+          },
+          "strength": {
+            "type": "string",
+            "description": "Medication strength - maps to strength_description"
+          },
+          "directions": {
+            "type": "string",
+            "description": "How patient takes it - maps to directions field"
+          }
+        }
+      }
+    },
+    "allergies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "allergen": {
+            "type": "string",
+            "description": "What patient is allergic to"
+          },
+          "reaction": {
+            "type": "string",
+            "description": "Type of reaction"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["Mild", "Moderate", "Severe"]
+          }
+        }
+      }
+    },
+    "PMHx": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Epilepsy or Seizures", "Cancer", "Diverticulitis", "Stomach Ulcers",
+          "Ulcerative Colitis or Crohn's Disease", "Hepatitis", "History of Pancreatitis",
+          "Anemia or Blood Disorders", "Blood Clots", "COPD", "Thyroid Disease",
+          "Medullary Thyroid Cancer", "Glaucoma", "Autoimmune condition",
+          "Other Mental Health Diagnosis", "None of the Above"
+        ]
+      }
+    },
+    "PMHxObesityComorbid": {
+      "type": "array",
+      "description": "Obesity-related conditions - kept for specialty practice needs",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Diabetes", "Pre-Diabetes", "PCOS", "High Blood Pressure", "High Cholesterol",
+          "Atrial Fibrillation", "Congestive Heart Failure", "History of Stroke",
+          "History of Heart Attack", "Sleep Apnea", "Fatty Liver Disease", "Heartburn/GERD",
+          "Arthritis", "Depression", "Anxiety", "Asthma", "Chronic Kidney Disease",
+          "None of the Above"
+        ]
+      }
+    },
+    "familyHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "familyMember": {
+            "type": "string",
+            "enum": [
+              "Mother", "Father", "Daughter", "Son", "Brother", "Sister",
+              "Maternal Grandmother", "Maternal Grandfather",
+              "Paternal Grandmother", "Paternal Grandfather"
+            ]
+          },
+          "medicalProblem": {
+            "type": "string"
+          }
+        },
+        "required": ["familyMember", "medicalProblem"]
+      }
+    },
+    "pastSurgicalHistory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "surgeryType": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          }
+        },
+        "required": ["surgeryType", "year"]
+      }
+    },
+    "specificConditions": {
+      "type": "object",
+      "properties": {
+        "gerdHeartburn": {
+          "type": "object",
+          "properties": {
+            "hasGerd": {
+              "type": "boolean",
+              "description": "Whether patient has been diagnosed with GERD/heartburn"
+            },
+            "gerdDetails": {
+              "type": "string",
+              "description": "Open-ended information about GERD severity, medications used, and whether controlled by medications - maps to Diagnosis API comments field"
+            }
+          }
+        },
+        "pancreatitis": {
+          "type": "object",
+          "properties": {
+            "hasPancreatitis": {
+              "type": "boolean",
+              "description": "Whether patient has ever been diagnosed with pancreatitis"
+            },
+            "numberOfAttacks": {
+              "type": "integer",
+              "description": "Number of pancreatitis attacks if diagnosed"
+            },
+            "cause": {
+              "type": "string",
+              "description": "What caused the pancreatitis (e.g., gallstones, alcohol, medications, etc.)"
+            }
+          }
+        }
+      }
+    },
+    "socialHistory": {
+      "type": "object",
+      "required": ["smokingSummary", "alcoholSummary", "drugSummary"],
+      "properties": {
+        "smokingSummary": {
+          "type": "string",
+          "description": "AI-generated summary of smoking history including current use, past use, concerns, quit attempts, etc."
+        },
+        "alcoholSummary": {
+          "type": "string",
+          "description": "AI-generated summary of alcohol use including current patterns, past use, concerns about relationship with alcohol, etc."
+        },
+        "marijuanaSummary": {
+          "type": "string",
+          "description": "AI-generated summary of marijuana use including current use, frequency, medical vs recreational, etc."
+        },
+        "drugSummary": {
+          "type": "string",
+          "description": "AI-generated summary of drug use including current use, past use, recovery status, etc."
+        },
+        "employmentStatus": {
+          "type": "string",
+          "enum": ["Employed", "Unemployed", "Full-Time Student", "Part-Time Student", "Retired"]
+        },
+        "financialSituation": {
+          "type": "string",
+          "description": "Open-ended response to: 'Is there anything you'd like to share about your financial situation?'"
+        },
+        "employmentDetails": {
+          "type": "string",
+          "description": "Open-ended response about employment status, job satisfaction, work-related stress, etc."
+        },
+        "educationBackground": {
+          "type": "string",
+          "description": "Open-ended response about education level and background"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,385 @@
+{
+  "apiName": "Care Team APIs",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Add Provider to Referral Directory",
+      "method": "POST",
+      "path": "/settings/directory/providers",
+      "description": "This API is used to add a new provider to the referral directory.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}",
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {
+          "first_name": { "type": "string", "required": true, "maxLength": 35 },
+          "last_name": { "type": "string", "required": true, "maxLength": 35 },
+          "middle_name": { "type": "string", "required": false, "maxLength": 35 },
+          "prefix": { "type": "string", "required": false, "maxLength": 10 },
+          "email": { "type": "string", "required": false, "maxLength": 50 },
+          "phone": { "type": "integer", "required": false },
+          "phone_extn": { "type": "integer", "required": false },
+          "fax": { "type": "integer", "required": false },
+          "website": { "type": "string", "required": false, "maxLength": 150 },
+          "direct_address": { "type": "string", "required": false, "maxLength": 50 },
+          "speciality": { "type": "string", "required": false, "maxLength": 75 },
+          "about": { "type": "string", "required": false, "maxLength": 600 },
+          "practice_name": { "type": "string", "required": false, "maxLength": 100 },
+          "address_line1": { "type": "string", "required": false, "maxLength": 35 },
+          "address_line2": { "type": "string", "required": false, "maxLength": 35 },
+          "city": { "type": "string", "required": false, "maxLength": 35 },
+          "state": { "type": "string", "required": false, "maxLength": 35 },
+          "country": { "type": "string", "required": false, "maxLength": 2 },
+          "zip_code": { "type": "string", "required": false, "maxLength": 10 },
+          "post_box": { "type": "integer", "required": false, "maxLength": 4 },
+          "npi": { "type": "string", "required": false, "maxLength": 10 }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Provider added successfully.",
+            "provider_details": {
+              "provider_id": "string",
+              "first_name": "string",
+              "last_name": "string",
+              "middle_name": "string",
+              "prefix": "string",
+              "speciality": "string",
+              "emailld": "string",
+              "mobile": "string",
+              "practice_name": "string",
+              "about_provider": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Update Provider in Referral Directory",
+      "method": "PUT",
+      "path": "/settings/directory/providers/{provider_id}",
+      "description": "This API is used update provider in referral directory.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}",
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {}
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Provider updated successfully.",
+            "provider_details": {
+              "provider_id": "string",
+              "first_name": "string",
+              "last_name": "string",
+              "middle_name": "string",
+              "prefix": "string",
+              "speciality": "string",
+              "emailld": "string",
+              "mobile": "string",
+              "practice_name": "string",
+              "about_provider": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Search provider in Referral directory",
+      "method": "GET",
+      "path": "/settings/directory/providers",
+      "description": "This API can be used to search for a provider in referral directory.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          { "name": "provider_id", "type": "integer", "required": false },
+          { "name": "first_name", "type": "string", "required": false },
+          { "name": "last_name", "type": "string", "required": false },
+          { "name": "middle_name", "type": "string", "required": false },
+          { "name": "npi", "type": "string", "required": false },
+          { "name": "email", "type": "string", "required": false },
+          { "name": "speciality", "type": "string", "required": false },
+          { "name": "mobile", "type": "string", "required": false },
+          { "name": "practice_name", "type": "string", "required": false }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "providers": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Provider from Referral Directory",
+      "method": "DELETE",
+      "path": "/settings/directory/providers/{provider_id}",
+      "description": "This API is used to delete provider from Referral Directory.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Provider deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Primary Care Physician to Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/careteam/pcp",
+      "description": "This API is used to add Primary care physician to a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          { "name": "provider_id", "type": "integer", "required": true }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Primary Care Physician added successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Primary Care Physician of Patient",
+      "method": "GET",
+      "path": "/patients/{patient_id}/careteam/pcp",
+      "description": "This API is used to get Primary Care Physician of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Primary Care Physician of Patient",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/careteam/pcp",
+      "description": "This API is used to delete Primary care physician of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Primary Care Physician deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Referring Provider to Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/careteam/rp",
+      "description": "This API is used to add Referring Provider to a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          { "name": "provider_id", "type": "integer", "required": true }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Referring Provider added successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Referring Provider of Patient",
+      "method": "GET",
+      "path": "/patients/{patient_id}/careteam/rp",
+      "description": "This API is used to get Referring Provider of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Referring Provider of Patient",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/careteam/rp",
+      "description": "This API is used to delete Referring Provider of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Referring Provider deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add In-house Care Team Member to Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/careteam/inhouse",
+      "description": "This API is used to add In-house Care Team member to a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}",
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "member_id": { "type": "integer", "required": true }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient In-house care team member added successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get In-house Care Team Member of Patient",
+      "method": "GET",
+      "path": "/patients/{patient_id}/careteam/inhouse",
+      "description": "This API is used to get In-house Care Team member of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete In-house Care Team member of Patient",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/careteam/inhouse",
+      "description": "This API is used to delete In-house Care Team member of a patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}",
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "member_id": { "type": "integer", "required": true }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient In-house care team member deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "apiName": "Questionnaire API with SOAP Widgets",
+  "baseUrl": "https://apiehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Questions in a Questionnaire",
+      "method": "GET",
+      "path": "/questionnaire/{questionnaire_id}",
+      "description": "The API to list questions in a questionnaire",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "data": [
+              {
+                "notes": "string",
+                "is_multi_choice": "boolean",
+                "is_deleted": "boolean",
+                "label_style": {
+                  "font_weight": "string",
+                  "text_decoration": "string",
+                  "font_size": "integer",
+                  "font_style": "string",
+                  "text_align": "string"
+                },
+                "template_id": "string",
+                "is_mandatory": "boolean",
+                "position": "integer",
+                "entry_id": "string",
+                "notes_type": "string",
+                "options": ["string"],
+                "soap_widget": {
+                  "soap_widget_id": "string",
+                  "soap_template_id": "string",
+                  "entries": [
+                    {
+                      "soap_entry_name": "string",
+                      "soap_entry_type": "string",
+                      "soap_entry_id": "string",
+                      "is_mandatory": "boolean",
+                      "OPTIONS": "string",
+                      "soap_entry_position": "integer"
+                    }
+                  ],
+                  "soap_widget_name": "string",
+                  "soap_widget_module": "string"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://apiehr.charmtracker.com/api/ehr/v1/questionnaire/100003000000014001'",
+        "response": {}
+      }
+    },
+    {
+      "name": "Save Answers to Questionnaire",
+      "method": "POST",
+      "path": "/questionnaire/answers",
+      "description": "The API to save answers to a questionnaire.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "template_id": { "type": "integer", "required": true },
+          "patient_id": { "type": "integer", "required": true },
+          "provider_id": { "type": "integer", "required": false },
+          "facility_id": { "type": "integer", "required": true },
+          "member_id": { "type": "integer", "required": false },
+          "is_submitted": { "type": "boolean", "required": false },
+          "ques_map_id": { "type": "integer", "required": false },
+          "appointment_id": { "type": "integer", "required": false },
+          "answers": {
+            "type": "array",
+            "required": true,
+            "items": {
+              "type": "object",
+              "properties": {
+                "entry_id": { "type": "integer" },
+                "answer": { "type": "string" },
+                "multiple_answers": {
+                  "type": "array",
+                  "items": { "properties": { "answer": { "type": "string" } } }
+                },
+                "allergy_entries": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "allergen": { "type": "string" },
+                      "type": { "type": "string" },
+                      "severity": { "type": "string" },
+                      "reactions": { "type": "string" }
+                    }
+                  }
+                },
+                "medication_entries": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "medication": { "type": "string" },
+                      "intake_details": { "type": "string" }
+                    }
+                  }
+                },
+                "supplement_entries": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "supplement": { "type": "string" },
+                      "intake_details": { "type": "string" }
+                    }
+                  }
+                },
+                "soap_entries": {
+                  "type": "object",
+                  "properties": {
+                    "soap_widget_id": { "type": "integer" },
+                    "soap_template_id": { "type": "integer" },
+                    "soap_widget_answers": {
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "soap_entry_id": { "type": "integer" },
+                          "soap_entry_value": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Questionnaire saved successfully.",
+            "questionnaire_details": {
+              "ques_map_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Fetch answers for a Questionnaire",
+      "method": "GET",
+      "path": "/questionnaire/answer/{ques_map_id}",
+      "description": "API to fetch the answers for a questionnaire using patient_ques_map_id",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "questionnaire_with_answers": {
+              "last_modified_time": "string",
+              "is_submitted": "boolean",
+              "patient_id": "string",
+              "questions": [
+                {
+                  "font_weight": "string",
+                  "text_decoration": "string",
+                  "is_multi_choice": "boolean",
+                  "notes": "string",
+                  "is_deleted": "boolean",
+                  "font_size": "integer",
+                  "is_mandatory": "boolean",
+                  "position": "integer",
+                  "font_style": "string",
+                  "entry_id": "string",
+                  "notes_type": "string",
+                  "text_align": "string",
+                  "allergy_entries": [],
+                  "medication_entries": [],
+                  "soap_widget": {
+                    "soap_template_id": "string",
+                    "entries": [
+                      {
+                        "soap_entry_answer": "string",
+                        "soap_entry_name": "string",
+                        "soap_entry_type": "string",
+                        "soap_entry_id": "string",
+                        "is_mandatory": "boolean",
+                        "OPTIONS": "string",
+                        "soap_entry_position": "integer"
+                      }
+                    ],
+                    "soap_widget_name": "string",
+                    "soap_widget_module": "string"
+                  },
+                  "answer": "string"
+                }
+              ],
+              "template_id": "string",
+              "ques_map_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

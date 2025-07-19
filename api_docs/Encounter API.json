@@ -1,0 +1,359 @@
+{
+  "apiName": "Encounter API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Encounters",
+      "method": "GET",
+      "path": "/encounters",
+      "description": "The API to list encounters.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "member_id", "type": "integer", "required": false },
+          { "name": "patient_id", "type": "integer", "required": false },
+          { "name": "filter_by", "type": "string", "required": false, "enum": ["Status.Signed", "Status.Unsigned", "Status.All"] },
+          { "name": "facility_id", "type": "integer", "required": false },
+          { "name": "approved_time_(greater_than|less_than|greater_equals|less_equals)", "type": "integer", "required": false },
+          { "name": "time_of_creation_(greater_than|less_than|greater_equals|less_equals)", "type": "integer", "required": false },
+          { "name": "start_date", "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          { "name": "end_date", "type": "string", "required": false, "format": "YYYY-MM-DD" },
+          { "name": "page", "type": "integer", "required": false },
+          { "name": "per_page", "type": "integer", "required": false },
+          { "name": "sort_order", "type": "string", "required": false, "enum": ["A", "D"] }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "encounters": [],
+            "page_context": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Encounter",
+      "method": "GET",
+      "path": "/encounters/{encounter_id}",
+      "description": "The API to get encounter data (For Quick, Brief, Comprehensive encounters).",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "encounter": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Export Chart Note as PDF",
+      "method": "GET",
+      "path": "/encounters/{encounter_id}/file",
+      "description": "The API to export chart note as PDF.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "member_id", "type": "integer", "required": false },
+          { "name": "patient_id", "type": "integer", "required": true }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "description": "Chart Note PDF will be written to the output"
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Export Chart Note as PDF (New Format)",
+      "method": "GET",
+      "path": "/encounter/{encounter_id}/pdf",
+      "description": "The API to export chart note as PDF in new format which includes rich text.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "description": "Chart Note PDF will be written to the output"
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Create Encounter from Appointment",
+      "method": "POST",
+      "path": "/appointments/{appointment_id}/encounter",
+      "description": "The API to create encounter from Appointment.",
+      "headers": { "content-type": "application/json" },
+      "request": {
+        "body": {
+          "chart_type": { "type": "string", "required": true, "enum": ["Quick", "Brief", "Comprehensive", "SOAP", "QuickRx"] }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Encounter started successfully.",
+            "encounter": { "encounter_id": "string" }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Create Encounter for a Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/encounter",
+      "description": "The API to create encounter for Patient without Appointment.",
+      "headers": { "content-type": "application/json" },
+      "request": {
+        "body": {
+          "chart_type": { "type": "string", "required": true, "enum": ["Quick", "Brief", "Comprehensive", "SOAP", "QuickRx"] },
+          "provider_id": { "type": "integer", "required": true },
+          "encounter_mode": { "type": "string", "required": true, "enum": ["In Person", "Phone Call", "Video Consult"] },
+          "date": { "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          "time": { "type": "string", "required": false, "format": "hh:mm A" },
+          "visittype_id": { "type": "integer", "required": false },
+          "facility_id": { "type": "integer", "required": false }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Encounter started successfully.",
+            "encounter": { "encounter_id": "string" }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Save Encounter",
+      "method": "POST",
+      "path": "/patients/{patient_id}/encounters/{encounter_id}/save",
+      "description": "The API to save data in the encounter.",
+      "headers": {},
+      "request": {
+        "body": {
+          "chief_complaints": { "type": "string" },
+          "symptoms": { "type": "string" },
+          "physical_examination": { "type": "string" },
+          "treatment_notes": { "type": "string" },
+          "self_notes": { "type": "string" },
+          "patient_notes": { "type": "string" },
+          "lifestyle": { "type": "string" },
+          "diets": { "type": "string" },
+          "assessment_notes": { "type": "string" },
+          "psychotherapy_notes": { "type": "string" },
+          "followup_notes": { "type": "string" },
+          "present_illness_history": { "type": "string" },
+          "family_social_history": { "type": "string" },
+          "review_of_systems": { "type": "string" },
+          "past_medical_history": { "type": "string" },
+          "condition_related_to": { "type": "string" },
+          "accident_place": { "type": "string" },
+          "is_html": { "type": "string", "enum": ["Yes", "No"] }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Encounter notes saved successfully" }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Sign Encounter",
+      "method": "POST",
+      "path": "/patients/{patient_id}/encounters/{encounter_id}/sign",
+      "description": "The API to sign encounter.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Encounter signed successfully.",
+            "encounter": { "encounter_id": "string" }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Handouts",
+      "method": "POST",
+      "path": "/encounters/handouts/{file_id}",
+      "description": "The API to get handouts file.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "description": "Handouts file will be written to the output"
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Unlock Encounter",
+      "method": "POST",
+      "path": "/encounters/{encounter_id}/unlock",
+      "description": "The API to unlock signed encounter.",
+      "headers": { "content-type": "application/json" },
+      "request": {
+        "body": {
+          "reason": { "type": "string", "required": true }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Chart note unlocked successfully" }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get SOAP Encounter",
+      "method": "GET",
+      "path": "/soap/encounters/{encounter_id}",
+      "description": "The API to get encounter details for unsigned SOAP consultation.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "soap_encounter": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Template to SOAP Encounter",
+      "method": "POST",
+      "path": "/soap/encounters/{encounter_id}/template",
+      "description": "The API to add template to the soap encounter.",
+      "headers": {},
+      "request": {
+        "body": {
+          "template_id": { "type": "integer", "required": false },
+          "position": { "type": "integer", "required": false }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Soap template added successfully." }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Template from SOAP Encounter",
+      "method": "DELETE",
+      "path": "/soap/encounters/{encounter_id}/template",
+      "description": "The API to delete template from the soap encounter.",
+      "headers": {},
+      "request": {
+        "body": {
+          "template_id": { "type": "integer", "required": false }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Soap template deleted successfully." }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Save SOAP Encounter",
+      "method": "POST",
+      "path": "/soap/encounters/{encounter_id}",
+      "description": "The API to save data in the soap encounter.",
+      "headers": {},
+      "request": {
+        "body": {
+          "chief_complaints": { "type": "string", "required": false },
+          "entries": { "type": "object", "required": false }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Soap note saved successfully." }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Change Encounter Provider",
+      "method": "POST",
+      "path": "/encounter/{encounter_id}/provider",
+      "description": "The API to change the provider of an encounter.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "member_id", "type": "integer", "required": true }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Provider changed successfully" }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Change Encounter Visit Type",
+      "method": "POST",
+      "path": "/encounter/{encounter_id}/visit_type",
+      "description": "The API to change the visit type of an encounter.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "visittype_id", "type": "integer", "required": true }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": { "code": "0", "message": "Visit Type changed successfully" }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Simplified Patient Demographics",
+  "type": "object",
+  "required": ["firstName", "lastName", "dateOfBirth", "gender", "email", "phone"],
+  "properties": {
+    "firstName": { 
+      "type": "string", 
+      "maxLength": 35,
+      "description": "Patient's first name"
+    },
+    "middleName": { 
+      "type": "string", 
+      "maxLength": 35,
+      "description": "Patient's middle name (optional)"
+    },
+    "lastName": { 
+      "type": "string", 
+      "maxLength": 35,
+      "description": "Patient's last name"
+    },
+    "dateOfBirth": { 
+      "type": "string", 
+      "format": "date",
+      "description": "Format: YYYY-MM-DD"
+    },
+    "gender": { 
+      "type": "string", 
+      "enum": ["male", "female", "other", "unknown"],
+      "description": "Aligns with API values"
+    },
+    "email": { 
+      "type": "string", 
+      "format": "email",
+      "maxLength": 100
+    },
+    "phone": {
+      "type": "object",
+      "properties": {
+        "mobile": { 
+          "type": "string", 
+          "maxLength": 15,
+          "description": "Mobile phone number"
+        },
+        "home": { 
+          "type": "string", 
+          "maxLength": 15,
+          "description": "Home phone number" 
+        },
+        "work": { 
+          "type": "string", 
+          "maxLength": 15,
+          "description": "Work phone number"
+        },
+        "workExtension": { 
+          "type": "string", 
+          "maxLength": 4,
+          "description": "Work phone extension"
+        },
+        "preferred": {
+          "type": "string",
+          "enum": ["mobile", "home", "work"],
+          "description": "Preferred contact number"
+        }
+      },
+      "required": ["mobile"]
+    },
+    "address": {
+      "type": "object",
+      "required": ["addressLine1", "city", "state", "country", "zipCode"],
+      "properties": {
+        "addressLine1": { 
+          "type": "string", 
+          "maxLength": 35 
+        },
+        "addressLine2": { 
+          "type": "string", 
+          "maxLength": 35 
+        },
+        "city": { 
+          "type": "string", 
+          "maxLength": 35 
+        },
+        "state": { 
+          "type": "string", 
+          "maxLength": 50,
+          "description": "Full state name (e.g., 'New Jersey')"
+        },
+        "country": { 
+          "type": "string", 
+          "maxLength": 2,
+          "default": "us",
+          "description": "2-letter country code"
+        },
+        "zipCode": { 
+          "type": "string", 
+          "maxLength": 10,
+          "description": "Postal/ZIP code"
+        }
+      }
+    },
+    "emergencyContact": {
+      "type": "object",
+      "required": ["name", "phone"],
+      "properties": {
+        "name": { 
+          "type": "string", 
+          "maxLength": 70,
+          "description": "Emergency contact person's full name"
+        },
+        "phone": { 
+          "type": "string", 
+          "maxLength": 10,
+          "description": "Emergency contact phone"
+        },
+        "phoneExtension": { 
+          "type": "string", 
+          "maxLength": 4,
+          "description": "Extension if applicable"
+        }
+      }
+    },
+    "communicationPreferences": {
+      "type": "object",
+      "properties": {
+        "preferredMethod": { 
+          "type": "string", 
+          "enum": ["email", "phone", "text", "portal"],
+          "description": "How patient prefers to be contacted"
+        },
+        "emailNotifications": { 
+          "type": "boolean", 
+          "default": true 
+        },
+        "textNotifications": { 
+          "type": "boolean", 
+          "default": true 
+        },
+        "voiceNotifications": { 
+          "type": "boolean", 
+          "default": true 
+        }
+      }
+    },
+    "additionalInfo": {
+      "type": "object",
+      "properties": {
+        "language": { 
+          "type": "string", 
+          "maxLength": 100,
+          "default": "English" 
+        },
+        "maritalStatus": { 
+          "type": "string", 
+          "enum": ["Single", "Married", "Other"],
+          "description": "API only supports these three values"
+        },
+        "employmentStatus": { 
+          "type": "string", 
+          "enum": ["Employed", "Full-Time Student", "Part-Time Student", "Unemployed", "Retired"],
+          "description": "Employment status options from API"
+        }
+      }
+    },
+    "careTeamProviders": {
+      "type": "array",
+      "description": "Referring or treating providers - will be looked up via /settings/directory/providers API",
+      "items": {
+        "type": "object",
+        "properties": {
+          "providerName": {
+            "type": "string",
+            "description": "Name of provider as patient provided it"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 15,
+            "description": "Provider phone number if available"
+          },
+          "specialty": {
+            "type": "string",
+            "description": "Provider specialty (e.g., Primary Care, Cardiologist, etc.)"
+          },
+          "practiceName": {
+            "type": "string",
+            "description": "Name of practice/clinic"
+          },
+          "providerId": {
+            "type": "integer",
+            "description": "Provider ID from /settings/directory/providers API - resolved by AI agent"
+          },
+          "relationshipType": {
+            "type": "string",
+            "enum": ["Primary Care Physician", "Referring Provider", "Treating Specialist", "Other"],
+            "description": "Relationship to patient care"
+          },
+          "isPrimaryCarePhysician": {
+            "type": "boolean",
+            "description": "Whether this is the patient's PCP - maps to /patients/{patient_id}/careteam/pcp API"
+          }
+        }
+      }
+    }
+  }
+}

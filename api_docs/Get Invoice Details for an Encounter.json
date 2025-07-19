@@ -1,0 +1,128 @@
+{
+  "apiName": "Get Invoice Details for an Encounter API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Get Invoice Details for an Encounter",
+      "method": "GET",
+      "path": "/encounter/{encounter_id}/invoices",
+      "description": "This API will fetch details of Invoices created for the given Encounter.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "encounter_id",
+            "in": "path",
+            "type": "integer",
+            "required": true,
+            "description": "Unique identifier of the Encounter. Max length 19."
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "invoices": [
+              {
+                "invoice_id": "string",
+                "invoice_number": "string",
+                "invoice_type": "string",
+                "invoice_date": "string",
+                "invoice_added_date": "string",
+                "invoice_updated_date": "string",
+                "invoice_amount": "string",
+                "invoice_status": "string",
+                "invoice_generated_by": "string",
+                "is_available_credit_used": "boolean",
+                "total_payment_amount": "string",
+                "total_invoice_payment_amount": "string",
+                "total_writeoff_amount": "string",
+                "total_adjustment_amount": "string",
+                "invoice_due": "string",
+                "invoice_provider_name": "string",
+                "invoice_provider_id": "string",
+                "invoice_terms": "string",
+                "invoice_notes": "string",
+                "encounter_date": "string",
+                "encounter_id": "string",
+                "insurance_id": "string",
+                "pricing_profile_id": "string",
+                "patient_details": {
+                  "patient_id": "string",
+                  "patient_first_name": "string",
+                  "patient_middle_name": "string",
+                  "patient_last_name": "string",
+                  "patient_full_name": "string",
+                  "patient_record_id": "string",
+                  "patient_gender": "string",
+                  "patient_dob": "string",
+                  "address_details": {
+                    "address_line_1": "string",
+                    "address_line_2": "string",
+                    "city": "string",
+                    "state": "string",
+                    "country": "string",
+                    "zip_code": "string"
+                  }
+                },
+                "facility_details": {
+                  "facility_id": "string",
+                  "facility_name": "string",
+                  "facility_code": "string"
+                },
+                "insurance_details": {
+                  "insurance_id": "string",
+                  "insurance_name": "string",
+                  "insurance_number": "string",
+                  "insurance_type": "string",
+                  "payer_name": "string",
+                  "payer_id": "string"
+                },
+                "procedures": [],
+                "products": [],
+                "payments": [],
+                "writeoff": [],
+                "adjustments": [],
+                "patient_responsibility": []
+              }
+            ]
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X GET 'https://ehr.charmtracker.com/api/ehr/v1/encounter/100000000000005905/invoices' -H 'Authorization: Bearer {token}' -H 'api_key: {api_key}'",
+        "response": {
+          "code": 0,
+          "message": "success",
+          "invoices": [
+            {
+              "invoice_id": "100000000000011001",
+              "invoice_number": "INV6",
+              "invoice_type": "Invoice",
+              "invoice_date": "2020-05-30",
+              "invoice_added_date": "2020-05-30",
+              "invoice_updated_date": "2020-05-30",
+              "invoice_amount": "262.0",
+              "invoice_status": "Paid",
+              "invoice_generated_by": "Dr. Steven Antonio"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

@@ -1,0 +1,266 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Weight History and Management",
+  "type": "object",
+  "properties": {
+    "currentVitals": {
+      "type": "object",
+      "required": ["height", "weight"],
+      "properties": {
+        "height": {
+          "type": "object",
+          "required": ["feet", "inches"],
+          "properties": {
+            "feet": {
+              "type": "integer",
+              "description": "Height in feet - maps to Vitals API"
+            },
+            "inches": {
+              "type": "integer",
+              "description": "Additional inches - maps to Vitals API"
+            }
+          }
+        },
+        "weight": {
+          "type": "number",
+          "description": "Current weight in pounds - maps to Vitals API"
+        }
+      }
+    },
+    "weightHistory": {
+      "type": "object",
+      "properties": {
+        "maxEverWeighed": {
+          "type": "number",
+          "description": "Highest weight patient has ever been"
+        },
+        "ageAtMaxWeight": {
+          "type": "integer",
+          "description": "Age when patient reached maximum weight"
+        },
+        "maxWeightLostByDieting": {
+          "type": "number",
+          "description": "Most weight ever lost through dieting"
+        }
+      }
+    },
+    "dietHistory": {
+      "type": "object",
+      "properties": {
+        "pastDietsTried": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of diets or weight loss methods patient has tried"
+        },
+        "weightGainFactors": {
+          "type": "object",
+          "properties": {
+            "weightGainingMedications": {
+              "type": "string",
+              "description": "Details about medications that may have caused weight gain"
+            },
+            "injuries": {
+              "type": "string",
+              "description": "Details about injuries that affected weight/activity"
+            },
+            "chronicStressOrDepression": {
+              "type": "string",
+              "description": "Information about stress or depression impact on weight"
+            },
+            "processedFoodAddictions": {
+              "type": "string",
+              "description": "Specific processed foods patient feels addicted to"
+            },
+            "pregnancy": {
+              "type": "string",
+              "description": "Weight gain related to pregnancy"
+            },
+            "menopause": {
+              "type": "string",
+              "description": "Weight changes related to menopause"
+            },
+            "sugarContainingBeverages": {
+              "type": "string",
+              "description": "Details about soda, sweet coffee/tea consumption"
+            },
+            "alcohol": {
+              "type": "string",
+              "description": "Alcohol consumption impact on weight"
+            },
+            "artificialSweetener": {
+              "type": "string",
+              "description": "Use of artificial sweeteners"
+            },
+            "quittingSmoking": {
+              "type": "string",
+              "description": "Weight gain related to smoking cessation"
+            },
+            "genetics": {
+              "type": "string",
+              "description": "Family history of weight issues"
+            },
+            "nightShiftWork": {
+              "type": "string",
+              "description": "Impact of night shift work on weight"
+            },
+            "childhoodTrauma": {
+              "type": "string",
+              "description": "Childhood trauma affecting eating patterns"
+            }
+          }
+        },
+        "strugglesWithDiet": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Challenges patient faces with eating/dieting"
+        },
+        "typicalDayEating": {
+          "type": "object",
+          "properties": {
+            "breakfast": {
+              "type": "string",
+              "description": "What patient typically eats for breakfast"
+            },
+            "lunch": {
+              "type": "string",
+              "description": "What patient typically eats for lunch"
+            },
+            "dinner": {
+              "type": "string",
+              "description": "What patient typically eats for dinner"
+            },
+            "snacksDesserts": {
+              "type": "string",
+              "description": "Typical snacks and desserts"
+            },
+            "beverages": {
+              "type": "string",
+              "description": "What patient typically drinks"
+            }
+          }
+        }
+      }
+    },
+    "exerciseInformation": {
+      "type": "string",
+      "description": "Open-ended information about patient's desire and ability to exercise, current activity level, limitations, preferences"
+    },
+    "weightLossMedicationHistory": {
+      "type": "object",
+      "properties": {
+        "glp1Medications": {
+          "type": "object",
+          "properties": {
+            "hasTriedGlp1": {
+              "type": "boolean",
+              "description": "Whether patient has tried GLP-1 medications"
+            },
+            "tirzepatide": {
+              "type": "object",
+              "properties": {
+                "hasTried": {
+                  "type": "boolean"
+                },
+                "brandNames": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["Zepbound", "Mounjaro"]
+                  }
+                },
+                "highestDose": {
+                  "type": "string",
+                  "description": "Highest dose tried (e.g., '15mg weekly')"
+                },
+                "treatmentDuration": {
+                  "type": "string",
+                  "description": "How long patient was on medication"
+                },
+                "weightLost": {
+                  "type": "number",
+                  "description": "Amount of weight lost in pounds"
+                }
+              }
+            },
+            "semaglutide": {
+              "type": "object",
+              "properties": {
+                "hasTried": {
+                  "type": "boolean"
+                },
+                "brandNames": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["Wegovy", "Ozempic"]
+                  }
+                },
+                "highestDose": {
+                  "type": "string",
+                  "description": "Highest dose tried (e.g., '2.4mg weekly')"
+                },
+                "treatmentDuration": {
+                  "type": "string",
+                  "description": "How long patient was on medication"
+                },
+                "weightLost": {
+                  "type": "number",
+                  "description": "Amount of weight lost in pounds"
+                }
+              }
+            }
+          }
+        },
+        "otherWeightLossMedications": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Other weight loss medications tried"
+        }
+      }
+    },
+    "bariatricSurgeryHistory": {
+      "type": "object",
+      "properties": {
+        "hasBariatricSurgeryHistory": {
+          "type": "boolean",
+          "description": "Whether patient has had bariatric surgery"
+        },
+        "surgeryYear": {
+          "type": "integer",
+          "description": "Year of bariatric surgery"
+        },
+        "surgeryType": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Type(s) of bariatric surgery performed"
+        },
+        "preSurgeryWeight": {
+          "type": "number",
+          "description": "Weight before surgery"
+        },
+        "lowestWeightAfterSurgery": {
+          "type": "number",
+          "description": "Lowest weight achieved after surgery"
+        }
+      }
+    },
+    "treatmentPreferences": {
+      "type": "object",
+      "properties": {
+        "treatmentApproach": {
+          "type": "string",
+          "enum": ["Surgical", "Non-surgical", "Both", "Undecided"],
+          "description": "Patient's preference for treatment approach"
+        }
+      }
+    }
+  }
+}

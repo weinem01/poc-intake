@@ -1,0 +1,502 @@
+{
+  "apiName": "Message API",
+  "baseUrl": "https://apiehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Messages List",
+      "method": "GET",
+      "path": "/messages",
+      "description": "The API to list the messages.",
+      "headers": {
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "section",
+            "type": "string",
+            "required": true,
+            "description": "Allowed Values: inbox, sent, trash, folder/sent_from_rcm"
+          },
+          {
+            "name": "sub_section",
+            "type": "string",
+            "required": false,
+            "description": "Allowed Values: from_patients, from_members"
+          },
+          {
+            "name": "related_patient_id",
+            "type": "integer",
+            "required": false,
+            "description": "Filter the messages with the given patient id"
+          },
+          {
+            "name": "received_time_(greater_than|less_than|greater_equals|less_equals)",
+            "type": "integer",
+            "required": false,
+            "description": "Filter chart note with received time"
+          },
+          {
+            "name": "folder_id",
+            "type": "integer",
+            "required": false,
+            "description": "Filter the messages with the given folder id"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Allowed Values - A, D. A - Ascending; D - Descending."
+          },
+          {
+            "name": "sort_column",
+            "type": "string",
+            "required": false,
+            "description": "Allowed Value - created_time"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "messages": [
+              {
+                "message_id": "string",
+                "date": "string",
+                "subject": "string",
+                "type": "string",
+                "has_attachments": "boolean",
+                "related_patient_id": "string",
+                "related_patient_name": "string",
+                "related_patient_record_id": "string",
+                "sender_details": {
+                  "sender_id": "string",
+                  "sender_name": "string"
+                },
+                "receiver_details": {
+                  "receiver_id": "string",
+                  "receiver_name": "string"
+                },
+                "status": "string",
+                "is_replied": "boolean",
+                "is_forwarded": "boolean",
+                "folder_id": "string",
+                "folder_name": "string"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "View Message",
+      "method": "GET",
+      "path": "/messages/{message_id}",
+      "description": "The API to view the message details",
+      "headers": {
+        "Authorization": "Bearer {token}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "message_detail": {
+              "is_replied": "boolean",
+              "is_forwarded": "boolean",
+              "message_id": "string",
+              "date": "string",
+              "subject": "string",
+              "related_patient_id": "string",
+              "related_patient_name": "string",
+              "related_patient_record_id": "string",
+              "content": "string",
+              "sender": {
+                "sender_id": "string",
+                "sender_name": "string",
+                "sender_type": "string"
+              },
+              "receivers": {
+                "patients": [],
+                "members": [
+                  {
+                    "member_name": "string",
+                    "member_id": "string"
+                  }
+                ]
+              },
+              "attachments": []
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Message Attachment",
+      "method": "GET",
+      "path": "/messages/attachments/{attachment_id}",
+      "description": "The API to get the message attachment",
+      "headers": {
+        "Authorization": "Bearer {token}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "description": "Returns the attachment file"
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Message Attachment",
+      "method": "DELETE",
+      "path": "/messages/attachments/{attachment_id}",
+      "description": "The API to delete the message attachment.",
+      "headers": {
+        "Authorization": "Bearer {token}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Message(s) deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Send Message",
+      "method": "POST",
+      "path": "/messages",
+      "description": "The API used to send a message",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}"
+      },
+      "request": {
+        "body": {
+          "subject": { "type": "string", "required": false, "maxLength": 255 },
+          "related_patient_id": { "type": "integer", "required": false },
+          "facility_id": { "type": "integer", "required": true },
+          "content": { "type": "string", "required": false },
+          "receivers": {
+            "type": "object",
+            "properties": {
+              "patients": {
+                "type": "array",
+                "items": { "properties": { "patient_id": { "type": "integer" } } }
+              },
+              "members": {
+                "type": "array",
+                "items": { "properties": { "member_id": { "type": "integer" } } }
+              }
+            }
+          },
+          "attachments": {
+            "type": "array",
+            "items": { "properties": { "attachment_id": { "type": "integer" } } }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Message sent successfully"
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Upload Message attachment",
+      "method": "POST",
+      "path": "/messages/attachments/file",
+      "description": "The API to upload a message attachment file.",
+      "headers": { "content-type": "multipart/form-data" },
+      "request": {
+        "body": {
+          "file": { "type": "file", "required": true, "description": "Max file size - 20MB" }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Attachment added successfully.",
+            "attachment": {
+              "attachment_id": "string",
+              "attachment_name": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Message Member Signature",
+      "method": "GET",
+      "path": "/messages/signature",
+      "description": "The API to view member's message signature.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "member_signature": {
+              "is_signature_enabled": "boolean",
+              "signature_content": "string"
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Mark Message as Read",
+      "method": "POST",
+      "path": "/messages/{message_id}/read",
+      "description": "The API to mark message read",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Message has been marked as read"
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Mark Message as Unread",
+      "method": "POST",
+      "path": "/messages/{message_id}/unread",
+      "description": "The API to mark message as unread",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Message has been marked as unread"
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Draft Messages List",
+      "method": "GET",
+      "path": "/drafts",
+      "description": "The API to list draft messages.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {
+        "params": [
+          { "name": "page", "type": "integer", "required": false },
+          { "name": "per_page", "type": "integer", "required": false },
+          { "name": "sort_order", "type": "string", "required": false, "description": "A or D" },
+          { "name": "sort_column", "type": "string", "required": false, "description": "created_time" }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "drafts": [],
+            "page_context": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Message Folders List",
+      "method": "GET",
+      "path": "/messages/folders",
+      "description": "The API to list message folders.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {
+        "params": [
+          { "name": "page", "type": "integer", "required": false },
+          { "name": "per_page", "type": "integer", "required": false }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "folders": [],
+            "page_context": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "View Draft Message",
+      "method": "GET",
+      "path": "/drafts/{message_id}",
+      "description": "The API to view draft message.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "draft_detail": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Draft Message",
+      "method": "DELETE",
+      "path": "/drafts/{message_id}",
+      "description": "The API to delete draft message.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Draft deleted successfully."
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Unread Messages count",
+      "method": "GET",
+      "path": "/messages/count",
+      "description": "The API to view unread messages count.",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "message_count": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Create a draft Message",
+      "method": "POST",
+      "path": "/drafts",
+      "description": "The API to create a draft message.",
+      "headers": { "Content-Type": "application/json", "Authorization": "Bearer {token}" },
+      "request": { "body": {} },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Draft saved successfully",
+            "draft": { "draft_id": "string" }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Update a draft Message",
+      "method": "PUT",
+      "path": "/drafts/{draft_id}",
+      "description": "The API used to update a draft message.",
+      "headers": { "Content-Type": "application/json", "Authorization": "Bearer {token}" },
+      "request": { "body": {} },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Draft saved successfully",
+            "draft": { "draft_id": "string" }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add multiple attachments Message",
+      "method": "POST",
+      "path": "/messages/attachments",
+      "description": "The API to add multiple message attachment",
+      "headers": { "Authorization": "Bearer {token}" },
+      "request": {
+        "params": [
+          { "name": "file_ids", "type": "string", "required": true, "description": "IDs separated by commas" }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Attachments(s) added successfully",
+            "attachments": []
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

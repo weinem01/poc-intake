@@ -1,0 +1,206 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Simplified Insurance Information",
+  "type": "object",
+  "properties": {
+    "primaryInsurance": {
+      "type": "object",
+      "required": ["insuranceType", "planId", "policyHolder"],
+      "properties": {
+        "insuranceType": {
+          "type": "string",
+          "enum": ["MEDICARE", "MEDICAID", "TRICARE", "GROUP HEALTH PLAN", "OTHER"],
+          "description": "Type of insurance coverage"
+        },
+        "planName": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Insurance plan name"
+        },
+        "planId": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Insurance plan ID/Policy number"
+        },
+        "groupNumber": {
+          "type": "string",
+          "maxLength": 30,
+          "description": "Policy group number"
+        },
+        "practicePayerId": {
+          "type": "integer",
+          "description": "Practice payer ID from /payers API"
+        },
+        "payerName": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Insurance company name"
+        },
+        "employer": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Employer name (if group plan)"
+        },
+        "validFrom": {
+          "type": "string",
+          "format": "date",
+          "description": "Coverage start date (YYYY-MM-DD)"
+        },
+        "validTo": {
+          "type": "string",
+          "format": "date",
+          "description": "Coverage end date (YYYY-MM-DD)"
+        },
+        "policyHolder": {
+          "type": "object",
+          "required": ["relationship", "firstName", "lastName", "dateOfBirth", "gender"],
+          "properties": {
+            "relationship": {
+              "type": "string",
+              "enum": ["Self", "Spouse", "Child", "Other"],
+              "description": "Relationship to patient"
+            },
+            "firstName": {
+              "type": "string",
+              "maxLength": 35,
+              "description": "Policy holder's first name"
+            },
+            "lastName": {
+              "type": "string",
+              "maxLength": 35,
+              "description": "Policy holder's last name"
+            },
+            "dateOfBirth": {
+              "type": "string",
+              "format": "date",
+              "description": "Policy holder's DOB (YYYY-MM-DD)"
+            },
+            "gender": {
+              "type": "string",
+              "enum": ["male", "female", "unknown"],
+              "description": "Policy holder's gender"
+            }
+          }
+        },
+        "insuranceCards": {
+          "type": "object",
+          "properties": {
+            "frontImageUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL/path to front of insurance card"
+            },
+            "backImageUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL/path to back of insurance card"
+            }
+          }
+        }
+      }
+    },
+    "secondaryInsurance": {
+      "type": "object",
+      "properties": {
+        "hasSecondary": {
+          "type": "boolean",
+          "description": "Whether patient has secondary insurance"
+        },
+        "insuranceType": {
+          "type": "string",
+          "enum": ["MEDICARE", "MEDICAID", "TRICARE", "GROUP HEALTH PLAN", "OTHER"]
+        },
+        "planName": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "planId": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "groupNumber": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "payerName": {
+          "type": "string",
+          "maxLength": 150
+        },
+        "policyHolder": {
+          "type": "object",
+          "properties": {
+            "relationship": {
+              "type": "string",
+              "enum": ["Self", "Spouse", "Child", "Other"]
+            },
+            "firstName": {
+              "type": "string",
+              "maxLength": 35
+            },
+            "lastName": {
+              "type": "string",
+              "maxLength": 35
+            },
+            "dateOfBirth": {
+              "type": "string",
+              "format": "date"
+            },
+            "gender": {
+              "type": "string",
+              "enum": ["male", "female", "unknown"]
+            }
+          }
+        },
+        "insuranceCards": {
+          "type": "object",
+          "properties": {
+            "frontImageUrl": {
+              "type": "string",
+              "format": "uri"
+            },
+            "backImageUrl": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      }
+    },
+    "pharmacyCard": {
+      "type": "object",
+      "properties": {
+        "hasSeparatePharmacy": {
+          "type": "boolean",
+          "description": "Whether patient has separate pharmacy coverage"
+        },
+        "frontImageUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "backImageUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "identificationDocuments": {
+      "type": "object",
+      "properties": {
+        "driversLicense": {
+          "type": "object",
+          "properties": {
+            "hasDriversLicense": {
+              "type": "boolean",
+              "description": "Whether patient has a driver's license for ID verification"
+            },
+            "imageUrl": {
+              "type": "string",
+              "format": "uri",
+              "description": "URL/path to driver's license image - maps to Patient API photo upload endpoints"
+            }
+          }
+        }
+      }
+    }
+  }
+}

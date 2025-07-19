@@ -1,0 +1,285 @@
+{
+  "apiName": "Invoice APIs",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint and api_key in headers"
+  },
+  "endpoints": [
+    {
+      "name": "Create Invoice",
+      "method": "POST",
+      "path": "/invoices",
+      "description": "API to create an Invoice.",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "action": { "type": "string", "required": false, "enum": ["save", "approve"], "description": "'save' for Draft, 'approve' to approve." },
+          "facility_id": { "type": "string", "required": true },
+          "patient_id": { "type": "string", "required": true },
+          "patient_full_name": { "type": "string", "required": false },
+          "invoice_date": { "type": "string", "required": true, "format": "YYYY-MM-DD" },
+          "invoice_type": { "type": "string", "required": true, "enum": ["Invoice", "Credit Note"] },
+          "invoice_subtype": { "type": "string", "required": false, "enum": ["Procedure Invoice", "Product Invoice", "Lab Invoice", "Collective Invoice"] },
+          "apply_patient_credit": { "type": "boolean", "required": false },
+          "used_credit_amount": { "type": "string", "required": false },
+          "pay_invoice_in_full": { "type": "boolean", "required": false },
+          "pay_products_in_full": { "type": "boolean", "required": false },
+          "pay_copay_in_full": { "type": "boolean", "required": false },
+          "pay_non_covered_services": { "type": "boolean", "required": false },
+          "provider_id": { "type": "string", "required": false },
+          "provider_name": { "type": "string", "required": false },
+          "invoice_terms": { "type": "string", "required": false },
+          "invoice_notes": { "type": "string", "required": false },
+          "consultation_id": { "type": "string", "required": false },
+          "insurance_id": { "type": "string", "required": false, "description": "Applicable for Insurance enabled US Practices" },
+          "member_id": { "type": "string", "required": false, "description": "For external API calls only" },
+          "pricing_profile_id": { "type": "string", "required": false },
+          "procedures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_charge": { "type": "string" },
+                "item_quantity": { "type": "string" },
+                "code_id": { "type": "string" },
+                "discount_percentage": { "type": "string" },
+                "discount_amount": { "type": "string" },
+                "tax_name": { "type": "string" },
+                "tax_percentage": { "type": "string" },
+                "tax_name_2": { "type": "string" },
+                "tax_percentage_2": { "type": "string" },
+                "modifier_1": { "type": "string" },
+                "modifier_2": { "type": "string" },
+                "modifier_3": { "type": "string" },
+                "modifier_4": { "type": "string" },
+                "place_of_service": { "type": "string" },
+                "related_diagnosis_ids": { "type": "string" }
+              }
+            }
+          },
+          "products": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_charge": { "type": "string" },
+                "item_quantity": { "type": "string" },
+                "product_id": { "type": "string" },
+                "inventory_id": { "type": "string" },
+                "cost_price": { "type": "string" },
+                "discount_percentage": { "type": "string" },
+                "discount_amount": { "type": "string" },
+                "tax_name": { "type": "string" },
+                "tax_percentage": { "type": "string" },
+                "tax_name_2": { "type": "string" },
+                "tax_percentage_2": { "type": "string" }
+              }
+            }
+          },
+          "labs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "item_charge": { "type": "string" },
+                "item_quantity": { "type": "string" },
+                "code_id": { "type": "string" },
+                "discount_percentage": { "type": "string" },
+                "discount_amount": { "type": "string" },
+                "tax_name": { "type": "string" },
+                "tax_percentage": { "type": "string" },
+                "tax_name_2": { "type": "string" },
+                "tax_percentage_2": { "type": "string" },
+                "modifier_1": { "type": "string" },
+                "modifier_2": { "type": "string" },
+                "modifier_3": { "type": "string" },
+                "modifier_4": { "type": "string" },
+                "place_of_service": { "type": "string" },
+                "related_diagnosis_ids": { "type": "string" }
+              }
+            }
+          },
+          "payments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "payment_amount": { "type": "string" },
+                "payment_method": { "type": "string", "enum": ["Check", "Cash"] },
+                "reference_number": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Update Invoice",
+      "method": "PUT",
+      "path": "/invoices/{invoice_id}",
+      "description": "API to update an Invoice.",
+      "headers": {},
+      "request": {
+        "body": {
+          "release_excess_payment": { "type": "boolean", "description": "Applicable for Update API only. Releases excess payment as Unused Payment." }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Cancel Invoice",
+      "method": "PUT",
+      "path": "/invoices/{invoice_id}/cancel",
+      "description": "API to cancel an Invoice.",
+      "headers": {},
+      "request": {
+        "body": {
+          "cancel_comments": { "type": "string" }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Delete Draft Invoice",
+      "method": "DELETE",
+      "path": "/invoices/{invoice_id}",
+      "description": "API to delete a draft Invoice.",
+      "headers": {},
+      "request": {},
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Delete Credit Note",
+      "method": "DELETE",
+      "path": "/creditnote/{credit_note_id}",
+      "description": "API to delete a Credit Note.",
+      "headers": {},
+      "request": {},
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Get Invoice Details",
+      "method": "GET",
+      "path": "/invoices/{invoice_id}",
+      "description": "API to fetch details of an Invoice.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "invoice": {}
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Get Invoice Details for an Encounter",
+      "method": "GET",
+      "path": "/encounter/{encounter_id}/invoices",
+      "description": "API to fetch details of Invoice(s) for an Encounter.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "invoices": []
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Download Invoice PDF",
+      "method": "GET",
+      "path": "/billing/invoice/{invoice_id}/download",
+      "description": "API to get Invoice PDF.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "file_type", "type": "string", "required": true, "value": "INVOICE_PDF" }
+        ]
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Add Payment to Invoice",
+      "method": "POST",
+      "path": "/invoices/{invoice_id}/transactions",
+      "description": "API to apply payment, write-off and adjustment to items of an Invoice.",
+      "headers": {},
+      "request": {
+        "body": {}
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Update Payment to Invoice",
+      "method": "PUT",
+      "path": "/invoices/{invoice_id}/transactions/{transaction_id}",
+      "description": "API to update payment, write-off and adjustment to items of an Invoice.",
+      "headers": {},
+      "request": {
+        "body": {}
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Invoices List",
+      "method": "GET",
+      "path": "/invoices",
+      "description": "API to fetch a list of Invoices.",
+      "headers": {},
+      "request": {
+        "params": [
+          { "name": "facility_id", "type": "string", "required": false },
+          { "name": "patient_id", "type": "string", "required": false },
+          { "name": "invoice_number", "type": "string", "required": false },
+          { "name": "invoice_type", "type": "string", "required": false, "enum": ["Invoice", "Credit Note"] },
+          { "name": "date_name", "type": "string", "required": false, "enum": ["invoice_date", "invoice_added_date", "invoice_updated_date"] },
+          { "name": "from_date", "type": "string", "required": true },
+          { "name": "to_date", "type": "string", "required": true },
+          { "name": "start_index", "type": "integer", "required": false },
+          { "name": "count", "type": "integer", "required": false },
+          { "name": "is_ascending", "type": "boolean", "required": false },
+          { "name": "invoice_status", "type": "string", "required": false, "enum": ["Paid", "Partially Paid", "Unpaid", "Outstanding", "All", "Draft", "All With Draft_Invoices"] }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "invoices": []
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "apiName": "Procedure APIs - Encounter",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Fetch Procedures in Encounter",
+      "method": "GET",
+      "path": "/patients/{patient_id}/encounters/{encounter_id}/procedures",
+      "description": "This API can be used to fetch the procedures added in a particular Encounter.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "procedures": [
+              {
+                "code_id": "string",
+                "code_name": "string",
+                "code_number": "string",
+                "code_type": "string",
+                "item_charge": "string",
+                "item_quantity": "string",
+                "consultation_cpt_map_id": "string",
+                "modifier_1": "string",
+                "modifier_2": "string",
+                "modifier_3": "string",
+                "modifier_4": "string",
+                "place_of_service": "string",
+                "related_diagnosis_ids": [
+                  "integer"
+                ],
+                "tax_id": "string",
+                "tax_name": "string",
+                "tax_percentage": "string",
+                "tax_id_2": "string",
+                "tax_name_2": "string",
+                "tax_percentage_2": "string"
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X GET 'https://ehr2.charmtracker.com/api/ehr/v1/patients/{patient_id}/encounters/{encounter_id}/procedures'",
+        "response": {
+          "code": 0,
+          "message": "success",
+          "procedures": [
+            {
+              "code_id": "100000000000011007",
+              "code_name": "Level 1 - New Patient Office Visit 10 mins",
+              "code_number": "99201",
+              "code_type": "Procedure",
+              "item_charge": "210.0",
+              "item_quantity": "1",
+              "consultation_cpt_map_id": "100000000000011027",
+              "modifier_1": "25",
+              "modifier_2": "FH",
+              "modifier_3": "",
+              "modifier_4": "",
+              "place_of_service": "11",
+              "related_diagnosis_ids": [
+                100000000000083738,
+                100000000000097382
+              ],
+              "tax_id": "100000000000003783",
+              "tax_name": "Sales Tax",
+              "tax_percentage": "10.0",
+              "tax_id_2": "100000000000003928",
+              "tax_name_2": "Additional Sales Tax",
+              "tax_percentage_2": "10.0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add/Update Procedures to Encounter",
+      "method": "POST",
+      "path": "/patients/{patient_id}/encounters/{encounter_id}/procedures",
+      "description": "This API can be used to add new procedures to an Encounter as well as updating an existing Procedure. If an existing Procedure in the Encounter needs to be updated, pass value for 'consultation_cpt_map_id'. If not, it will be taken as a new Procedure to the Encounter.",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {
+          "procedures": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "consultation_cpt_map_id": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Required to update an existing procedure."
+                },
+                "code_id": {
+                  "type": "string",
+                  "required": true
+                },
+                "item_charge": {
+                  "type": "string",
+                  "required": true
+                },
+                "item_quantity": {
+                  "type": "string",
+                  "required": true
+                },
+                "modifier_1": {
+                  "type": "string",
+                  "required": false
+                },
+                "modifier_2": {
+                  "type": "string",
+                  "required": false
+                },
+                "modifier_3": {
+                  "type": "string",
+                  "required": false
+                },
+                "modifier_4": {
+                  "type": "string",
+                  "required": false
+                },
+                "place_of_service": {
+                  "type": "string",
+                  "required": false
+                },
+                "claim_comments": {
+                  "type": "string",
+                  "required": false
+                },
+                "related_diagnosis_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+            "status": 200,
+            "body": {
+                "code": 0,
+                "message": "Procedures added/updated successfully."
+            }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Delete Procedure from Encounter",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/encounters/{encounter_id}/procedures/{consultation_cpt_map_id}",
+      "description": "API to delete a Procedure from an Encounter",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+            "status": 200,
+            "body": {
+                "code": 0,
+                "message": "Procedure deleted successfully."
+            }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

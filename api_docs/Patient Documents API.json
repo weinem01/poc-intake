@@ -1,0 +1,299 @@
+{
+  "apiName": "Patient Documents API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Upload Document",
+      "method": "POST",
+      "path": "/patients/{patient_id}/documents",
+      "description": "The API to upload documents to a patient. The request should be multipart/form-data, with a 'data' field containing a JSON object and a 'file' field for the upload.",
+      "headers": {
+        "Content-Type": "multipart/form-data"
+      },
+      "request": {
+        "body": {
+          "data": {
+            "type": "object",
+            "required": true,
+            "properties": {
+              "provider_id": {
+                "type": "integer",
+                "required": true,
+                "description": "Member uploading the file"
+              },
+              "reviewer_id": {
+                "type": "integer",
+                "required": false,
+                "description": "Member who wants to review the file"
+              },
+              "encounter_id": {
+                "type": "integer",
+                "required": false,
+                "description": "File has to map with consultation"
+              },
+              "date": {
+                "type": "string",
+                "required": true,
+                "description": "Date of the file (YYYY-MM-DD)"
+              },
+              "file_type": {
+                "type": "string",
+                "required": true,
+                "description": "Type of file"
+              },
+              "file_name": {
+                "type": "string",
+                "required": false,
+                "description": "Name of file"
+              },
+              "comments": {
+                "type": "string",
+                "required": false,
+                "description": "Comments about the file"
+              }
+            }
+          },
+          "file": {
+            "type": "file",
+            "required": true,
+            "description": "File to be uploaded (Max file size is 20 MB)"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Document added successfully.",
+            "document": {
+              "file_id": "string",
+              "file_name": "string",
+              "date": "string",
+              "file_type": "string",
+              "encounter_id": "string",
+              "reviewer_id": "string",
+              "comments": "string",
+              "patient_id": "string",
+              "provider_id": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X POST 'https://<domain>/api/ehr/v1/patients/100001000000005997/documents?data={\"date\": \"2020-02-02\", \"file_type\": \"Image\", \"provider_id\": 100001000000000101}' -H 'Content-Type: multipart/form-data' -F file=@/home/Pictures/AnalyticsPricing.png",
+        "response": {
+          "code": "0",
+          "message": "Document added successfully.",
+          "document": {
+            "file_id": "100001000000035039",
+            "file_name": "Analytics Pricing.png",
+            "date": "2020-02-02",
+            "file_type": "Image",
+            "encounter_id": "",
+            "reviewer_id": "",
+            "comments": "",
+            "patient_id": "100001000000005997",
+            "provider_id": "100001000000000101"
+          }
+        }
+      }
+    },
+    {
+      "name": "List Patient Documents",
+      "method": "GET",
+      "path": "/patients/{patient_id}/documents",
+      "description": "The api to list all documents of the patient",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "filter_type",
+            "type": "string",
+            "required": false,
+            "description": "Filter the documents by file type"
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Sort the documents by date in ascending (A) or descending (D) order"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "To show the documents list in a particular page while navigation"
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Limit the number of document shown in a page"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "documents": [
+              {
+                "file_id": "string",
+                "file_name": "string",
+                "date": "string",
+                "file_type": "string",
+                "patient_id": "string"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X GET 'https://<domain>/api/ehr/v1/patients/100001000000005997/documents'",
+        "response": {}
+      }
+    },
+    {
+      "name": "List Documents Across Patients",
+      "method": "GET",
+      "path": "/documents",
+      "description": "List documents across different patients",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "added_time_greater_than",
+            "type": "integer",
+            "required": false,
+            "description": "Filters documents that were added after the given timestamp"
+          },
+          {
+            "name": "added_time_less_than",
+            "type": "integer",
+            "required": false,
+            "description": "Filters documents that were added before the given timestamp"
+          },
+          {
+            "name": "added_time_greater_equals",
+            "type": "integer",
+            "required": false,
+            "description": "Filters documents that were added on or after the given timestamp"
+          },
+          {
+            "name": "added_time_less_equals",
+            "type": "integer",
+            "required": false,
+            "description": "Filters documents that were added on or before the given timestamp"
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Sort the documents by date in ascending (A) or descending (D) order"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "To show the documents list in a particular page while navigation"
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Limit the number of document shown in a page"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "documents": [
+              {
+                "file_id": "string",
+                "file_name": "string",
+                "date": "string",
+                "file_type": "string",
+                "patient_id": "string"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "sort_column": "string",
+              "sort_order": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X GET 'https://<domain>/api/ehr/v1/documents?added_time_greater_equals=1595356200000&added_time_less_equals=1622745000000'",
+        "response": {}
+      }
+    },
+    {
+      "name": "Get Patient File",
+      "method": "GET",
+      "path": "/patients/{patient_id}/documents/{file_id}/file",
+      "description": "API to get the file content of a document.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "description": "Returns the raw file content."
+        }
+      },
+      "examples": {
+        "request": "curl -X GET https://<domain>/api/ehr/v1/patients/100001000000005997/documents/100001000000035039/file",
+        "response": {}
+      }
+    },
+    {
+      "name": "Delete Document",
+      "method": "DELETE",
+      "path": "/images/results/{file_id}",
+      "description": "API to delete the document.",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Document deleted successfully."
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -X DELETE https://<domain>/api/ehr/v1/images/results/100001000000014035",
+        "response": {
+          "code": "0",
+          "message": "Document deleted successfully."
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

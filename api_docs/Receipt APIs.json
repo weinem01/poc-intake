@@ -1,0 +1,521 @@
+{
+  "apiName": "Receipt APIs",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "Add Receipt",
+      "method": "POST",
+      "path": "/receipts",
+      "description": "API to add Receipt and apply payment to Invoices",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "is_patient_payment": {
+            "type": "boolean",
+            "required": true
+          },
+          "receipt_date": {
+            "type": "string",
+            "required": true,
+            "format": "YYYY-MM-DD"
+          },
+          "receipt_amount": {
+            "type": "string",
+            "required": true
+          },
+          "payment_method": {
+            "type": "string",
+            "required": true
+          },
+          "facility_id": {
+            "type": "string",
+            "required": true
+          },
+          "patient_id": {
+            "type": "string",
+            "required": false
+          },
+          "provider_id": {
+            "type": "string",
+            "required": false
+          },
+          "reference_number": {
+            "type": "string",
+            "required": false
+          },
+          "check_number": {
+            "type": "string",
+            "required": false
+          },
+          "description": {
+            "type": "string",
+            "required": false
+          },
+          "invoices": {
+            "type": "array",
+            "required": false,
+            "items": {
+              "type": "object",
+              "properties": {
+                "invoice_id": { "type": "string" },
+                "payment_to": { "type": "string", "enum": ["Invoice", "Claim"] },
+                "payment_amount": { "type": "string" },
+                "adjustment_amount": { "type": "string" },
+                "adjustment_type": { "type": "string" },
+                "writeoff_amount": { "type": "string" },
+                "writeoff_type": { "type": "string" },
+                "pat_res_amount": { "type": "string" },
+                "pat_res_type": { "type": "string" },
+                "transaction_comments": { "type": "string" },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item_id": { "type": "string" },
+                      "item_payment_amount": { "type": "string" },
+                      "item_adjustment_amount": { "type": "string" },
+                      "item_adjustment_type": { "type": "string" },
+                      "item_writeoff_amount": { "type": "string" },
+                      "item_writeoff_type": { "type": "string" },
+                      "item_pat_res_amount_1": { "type": "string" },
+                      "item_pat_res_type_1": { "type": "string" },
+                      "item_pat_res_amount_2": { "type": "string" },
+                      "item_pat_res_type_2": { "type": "string" },
+                      "is_item_denied": { "type": "boolean" },
+                      "item_comments": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "receipt": {
+              "receipt_id": "string",
+              "receipt_number": "string",
+              "receipt_date": "string",
+              "patient_id": "string",
+              "facility_id": "string",
+              "receipt_amount": "number",
+              "payment_method": "string"
+            }
+          }
+        }
+      },
+      "examples": {
+        "request": "curl -i -X POST -H \"Content-Type: application/json\" -H \"Authorization: Bearer xxx\" -H \"api_key:xxx\" -d '{\"is_patient_payment\": \"true\", \"receipt_date\": \"2020-05-13\", \"receipt_amount\": \"100.00\", \"payment_method\": \"Check\", \"facility_id\": \"100027000000000161\", \"patient_id\": \"100027000000000289\", \"provider_id\": \"100027000000000101\"}' 'https://<domain_name>/api/ehr/v1/receipts'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "receipt":{
+            "receipt_id": "100027000000008005",
+            "receipt_number": "1",
+            "receipt_date": "2020-05-13",
+            "patient_id": "100027000000000289",
+            "facility_id": "100027000000000161",
+            "receipt_amount": 100.0,
+            "payment_method": "Cheque"
+          }
+        }
+      }
+    },
+    {
+      "name": "Update Receipt",
+      "method": "PUT",
+      "path": "/receipts/{receipt_id}",
+      "description": "API to update Receipt details and its applied Payments",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "is_patient_payment": { "type": "boolean" },
+          "receipt_date": { "type": "string", "format": "YYYY-MM-DD" },
+          "receipt_amount": { "type": "string" },
+          "payment_method": { "type": "string" },
+          "facility_id": { "type": "string" },
+          "patient_id": { "type": "string" },
+          "provider_id": { "type": "string" },
+          "reference_number": { "type": "string" },
+          "check_number": { "type": "string" },
+          "description": { "type": "string" },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "invoice_id": { "type": "string" },
+                "transaction_id": { "type": "string", "description": "Applicable for Update API" },
+                "payment_to": { "type": "string", "enum": ["Invoice", "Claim"] },
+                "payment_amount": { "type": "string" },
+                "adjustment_amount": { "type": "string" },
+                "adjustment_type": { "type": "string" },
+                "writeoff_amount": { "type": "string" },
+                "writeoff_type": { "type": "string" },
+                "pat_res_amount": { "type": "string" },
+                "pat_res_type": { "type": "string" },
+                "transaction_comments": { "type": "string" },
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "item_id": { "type": "string" },
+                      "item_payment_amount": { "type": "string" },
+                      "item_adjustment_amount": { "type": "string" },
+                      "item_adjustment_type": { "type": "string" },
+                      "item_writeoff_amount": { "type": "string" },
+                      "item_writeoff_type": { "type": "string" },
+                      "item_pat_res_amount_1": { "type": "string" },
+                      "item_pat_res_type_1": { "type": "string" },
+                      "item_pat_res_amount_2": { "type": "string" },
+                      "item_pat_res_type_2": { "type": "string" },
+                      "is_item_denied": { "type": "boolean" },
+                      "item_comments": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Void Receipt",
+      "method": "PUT",
+      "path": "/receipts/{receipt_id}/void",
+      "description": "API to void a Receipt",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "request": {
+        "body": {
+          "void_comments": {
+            "type": "string"
+          }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Get Receipt Details",
+      "method": "GET",
+      "path": "/receipts/{receipt_id}",
+      "description": "API to fetch details of a Receipt",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "receipt": {
+              "receipt_id": "string",
+              "receipt_number": "string",
+              "receipt_amount": "string",
+              "payment_method": "string",
+              "receipt_date": "string",
+              "receipt_added_date": "string",
+              "receipt_updated_date": "string",
+              "reference_number": "string",
+              "check_number": "string",
+              "description": "string",
+              "is_patient_payment": "boolean",
+              "is_recurring_receipt": "boolean",
+              "is_voided": "boolean",
+              "total_applied_payment_amount": "string",
+              "total_refund_amount": "string",
+              "unused_amount": "string",
+              "patient_details": {
+                "patient_id": "string",
+                "patient_record_id": "string",
+                "patient_gender": "string",
+                "patient_first_name": "string",
+                "patient_dob": "string",
+                "patient_middle_name": "string",
+                "patient_full_name": "string",
+                "patient_last_name": "string"
+              },
+              "facility_details": {
+                "facility_id": "string",
+                "facility_name": "string",
+                "facility_code": "string"
+              },
+              "void_details": {
+                "voided_by": "string",
+                "void_comments": "string"
+              },
+              "invoices_paid": [
+                {
+                  "payment_id": "string",
+                  "payment_amount": "string",
+                  "payment_to": "string",
+                  "payment_added_date": "string",
+                  "payment_updated_date": "string",
+                  "invoice_number": "string",
+                  "invoice_date": "string",
+                  "invoice_id": "string",
+                  "invoice_amount": "string",
+                  "invoice_status": "string",
+                  "is_deleted": "boolean",
+                  "reference_payment_id": "string"
+                }
+              ],
+              "refunds": [
+                {
+                  "refund_id": "string",
+                  "refund_amount": "string",
+                  "refund_method": "string",
+                  "refund_date": "string",
+                  "refund_added_date": "string",
+                  "refund_updated_date": "string",
+                  "refunded_by": "string",
+                  "refund_reference_number": "string",
+                  "refund_comments": "string"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Download Receipt PDF",
+      "method": "GET",
+      "path": "/billing/receipt/{receipt_id}/download",
+      "description": "API to download a receipt as a PDF",
+      "headers": {},
+      "request": {},
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "List Receipts",
+      "method": "GET",
+      "path": "/receipts",
+      "description": "API to fetch details of Receipts",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "patient_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "receipt_number",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "date_name",
+            "type": "string",
+            "required": false,
+            "enum": ["receipt_date", "receipt_added_date", "receipt_updated_date"]
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "start_index",
+            "type": "integer",
+            "required": false
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "receipts": [
+              {}
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "List Write-offs",
+      "method": "GET",
+      "path": "/writeoffs",
+      "description": "API to fetch details of write-offs done in a given date period",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "date_name",
+            "type": "string",
+            "required": false,
+            "enum": ["writeoff_date", "writeoff_added_date", "writeoff_updated_date"]
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "start_index",
+            "type": "integer",
+            "required": false
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "writeoffs": [
+              {}
+            ]
+          }
+        }
+      },
+      "examples": {}
+    },
+    {
+      "name": "Add Refund",
+      "method": "POST",
+      "path": "/receipts/{receipt_id}/refunds",
+      "description": "API to refund amount from a Receipt",
+      "headers": {},
+      "request": {
+        "body": {
+          "refund_amount": { "type": "string" },
+          "refund_date": { "type": "string", "format": "YYYY-MM-DD" },
+          "refund_method": { "type": "string" },
+          "refund_to": { "type": "string", "enum": ["Patient", "Insurance"] },
+          "refund_reference_number": { "type": "string" },
+          "refund_comments": { "type": "string" },
+          "member_id": { "type": "string" }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "Update Refund",
+      "method": "PUT",
+      "path": "/receipts/{receipt_id}/refunds/{refund_id}",
+      "description": "API to update refund details of a Receipt",
+      "headers": {},
+      "request": {
+        "body": {
+          "refund_amount": { "type": "string" },
+          "refund_date": { "type": "string", "format": "YYYY-MM-DD" },
+          "refund_method": { "type": "string" },
+          "refund_to": { "type": "string", "enum": ["Patient", "Insurance"] },
+          "refund_reference_number": { "type": "string" },
+          "refund_comments": { "type": "string" },
+          "member_id": { "type": "string" }
+        }
+      },
+      "response": {},
+      "examples": {}
+    },
+    {
+      "name": "List Refunds",
+      "method": "GET",
+      "path": "/refunds",
+      "description": "API to fetch details of refunds issued in a given date period",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": false
+          },
+          {
+            "name": "date_name",
+            "type": "string",
+            "required": false,
+            "enum": ["refund_date", "refund_added_date", "refund_updated_date"]
+          },
+          {
+            "name": "from_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "to_date",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "start_index",
+            "type": "integer",
+            "required": false
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": 0,
+            "message": "success",
+            "refunds": [
+              {}
+            ]
+          }
+        }
+      },
+      "examples": {}
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

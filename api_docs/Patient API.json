@@ -1,0 +1,2623 @@
+{
+  "apiName": "Patient API",
+  "baseUrl": "https://apiehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Patients",
+      "method": "GET",
+      "path": "/patients",
+      "description": "API to fetch the patients from the practice.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "params": [
+          {
+            "name": "facility_id",
+            "type": "string",
+            "required": true,
+            "description": "Long values separated by comma, or the string 'ALL'. Filters patient records that were mapped to any of the facilities in the given facility IDs. If 'ALL' is passed, then patients from all the facilities will be fetched."
+          },
+          {
+            "name": "full_name_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose full name starts with given string"
+          },
+          {
+            "name": "full_name_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose full name contains given string"
+          },
+          {
+            "name": "full_name",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose full name matches the given string"
+          },
+          {
+            "name": "first_name_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose first name starts with given string"
+          },
+          {
+            "name": "first_name_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose first name contains given string"
+          },
+          {
+            "name": "first_name",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose first name matches the given string"
+          },
+          {
+            "name": "last_name_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose last name starts with given string"
+          },
+          {
+            "name": "last_name_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose last name contains given string"
+          },
+          {
+            "name": "last_name",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose last name matches the given string"
+          },
+          {
+            "name": "record_id_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Record ID starts with given string"
+          },
+          {
+            "name": "record_id_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Record ID contains given string"
+          },
+          {
+            "name": "record_id",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patient whose Record ID matches the given string"
+          },
+          {
+            "name": "category_id",
+            "type": "integer",
+            "required": false,
+            "description": "Filters the patients whose category belongs to the given Category ID"
+          },
+          {
+            "name": "gender",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients with the given gender. Allowed Values: male, female, unknown, other"
+          },
+          {
+            "name": "dob",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose Date of Birth equals to the given string. Format: yyyy-mm-dd"
+          },
+          {
+            "name": "email_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Email starts with given string"
+          },
+          {
+            "name": "email_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Email contains given string"
+          },
+          {
+            "name": "email",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patient whose email matches the given string"
+          },
+          {
+            "name": "mobile_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Mobile Number starts with given string"
+          },
+          {
+            "name": "mobile_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Mobile Number contains given string"
+          },
+          {
+            "name": "mobile",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose mobile matches the given string"
+          },
+          {
+            "name": "home_phone_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Home Phone starts with given string"
+          },
+          {
+            "name": "home_phone_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Home Phone contains given string"
+          },
+          {
+            "name": "home_phone",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patient whose Home Phone matches the given string"
+          },
+          {
+            "name": "work_phone_startswith",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Work Phone starts with given string"
+          },
+          {
+            "name": "work_phone_contains",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patients whose Work Phone contains given string"
+          },
+          {
+            "name": "work_phone",
+            "type": "string",
+            "required": false,
+            "description": "Filters the patient whose Work Phone matches the given string"
+          },
+          {
+            "name": "created_date_start",
+            "type": "string",
+            "required": false,
+            "description": "Filters patient records that were created on or after given string. Format: yyyy-mm-dd"
+          },
+          {
+            "name": "created_date_end",
+            "type": "string",
+            "required": false,
+            "description": "Filters patient records that were created on or before given string. Format: yyyy-mm-dd"
+          },
+          {
+            "name": "filter_by",
+            "type": "string",
+            "required": false,
+            "description": "Filters patient records based on their status. Allowed Values: Status.All, Status.Active, Status.Inactive"
+          },
+          {
+            "name": "modified_time_greater_than",
+            "type": "integer",
+            "required": false,
+            "description": "Filters patients that were modified after the given timestamp"
+          },
+          {
+            "name": "modified_time_less_than",
+            "type": "integer",
+            "required": false,
+            "description": "Filters patients that were modified before the given timestamp"
+          },
+          {
+            "name": "modified_time_greater_equals",
+            "type": "integer",
+            "required": false,
+            "description": "Filters patients that were modified on or after the given timestamp"
+          },
+          {
+            "name": "modified_time_less_equals",
+            "type": "integer",
+            "required": false,
+            "description": "Filters patients that were modified on or before the given timestamp"
+          },
+          {
+            "name": "is_phr_account_available",
+            "type": "boolean",
+            "required": false,
+            "description": "Filters patients with or without phr account."
+          },
+          {
+            "name": "gender_identity",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose Gender Identity is equal to the given string."
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose state is equal to the given string."
+          },
+          {
+            "name": "city",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose city is equal to the given string."
+          },
+          {
+            "name": "country",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose country is equal to the given string."
+          },
+          {
+            "name": "postal_code",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose zip code/postal code is equal to the given string."
+          },
+          {
+            "name": "county",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose county is equal to the given string."
+          },
+          {
+            "name": "district",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose district is equal to the given string."
+          },
+          {
+            "name": "age_greater_equals",
+            "type": "integer",
+            "required": false,
+            "description": "Filters patients whose age is equal or greater than the given number."
+          },
+          {
+            "name": "age_lesser_equals",
+            "type": "integer",
+            "required": false,
+            "description": "Filters patients whose age is equal or less than the given number."
+          },
+          {
+            "name": "patient_ids",
+            "type": "string",
+            "required": false,
+            "description": "Long values separated by comma. Filters patients whose patient identifier is in the given list."
+          },
+          {
+            "name": "blood_group",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose blood group is equal to the given string."
+          },
+          {
+            "name": "language",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose language is equal to the given string."
+          },
+          {
+            "name": "maritalStatus",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose marital status is equal to the given string. Allowed Values: Single, Married, Other"
+          },
+          {
+            "name": "source",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose source is equal to the given string."
+          },
+          {
+            "name": "category",
+            "type": "string",
+            "required": false,
+            "description": "Filters patients whose category is equal to the given string"
+          },
+          {
+            "name": "sort_order",
+            "type": "string",
+            "required": false,
+            "description": "Allowed Values - A, D. A - Ascending; D - Descending."
+          },
+          {
+            "name": "sort_column",
+            "type": "string",
+            "required": false,
+            "description": "Allowed Value - created_time|first_name|last_name|full_name|record_id"
+          },
+          {
+            "name": "page",
+            "type": "integer",
+            "required": false,
+            "description": "Page number"
+          },
+          {
+            "name": "per_page",
+            "type": "integer",
+            "required": false,
+            "description": "Number of records per page"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "patients": [
+              {
+                "patient_id": "string",
+                "first_name": "string",
+                "last_name": "string",
+                "full_name": "string",
+                "dob": "string",
+                "dob_format": "string",
+                "is_auto_calculated_dob": "boolean",
+                "record_id": "string",
+                "language": "string",
+                "created_time": "string",
+                "created_date": "string",
+                "next_visit_date": "string",
+                "appointment_id": "string",
+                "active": "boolean",
+                "gender": "string",
+                "gender_identity": "string",
+                "email": "string",
+                "mobile": "string",
+                "home_phone": "string",
+                "work_phone": "string",
+                "work_phone_extn": "string",
+                "preferred_communication": "string",
+                "primary_phone": "string",
+                "is_silhouette": "boolean",
+                "phr_login_id": "string",
+                "account_type": "string",
+                "blood_group": "string",
+                "last_modified_time": "integer",
+                "address_line1": "string",
+                "address_line2": "string",
+                "city": "string",
+                "state": "string",
+                "country": "string",
+                "postal_code": "string",
+                "county": "string",
+                "district": "string",
+                "marital_status": "string",
+                "source": "string",
+                "category": "string",
+                "custom_field_value": "string"
+              }
+            ],
+            "page_context": {
+              "page": "string",
+              "per_page": "string",
+              "has_more_page": "boolean",
+              "applied_filter": "string",
+              "sort_column": "string",
+              "sort_order": "string",
+              "search_criteria": [
+                {
+                  "column_name": "string",
+                  "search_text": "string",
+                  "comparator": "string"
+                }
+              ]
+            }
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X GET 'http://apiehr.charmtracker.com/api/ehr/v1/patients?facility_id=1884000000374011,1884000000375191&full_name_contains=taylor&dob=1954-12-02' -H 'Authorization: Bearer xxxxxxxx' -H 'Cache-Control: no-cache' -H 'api_key: 0cfb26f7b312632b1e8d12ac4733572a'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "patients": [
+            {
+              "patient_id": "1884000000028001",
+              "first_name": "Mary",
+              "last_name": "Taylor",
+              "full_name": "Mary Taylor",
+              "dob": "1954-12-02",
+              "dob_format": "Dec 02, 1954",
+              "is_auto_calculated_dob": "false",
+              "record_id": "ChA001",
+              "language": "English",
+              "created_time": "2009-11-17T19:04:16+0530",
+              "created_date": "2009-11-17",
+              "next_visit_date": "",
+              "appointment_id": "",
+              "active": "true",
+              "gender": "female",
+              "gender_identity": "",
+              "email": "marytaylor@charmhealth.com",
+              "mobile": "3333333333",
+              "home_phone": "2222222222",
+              "work_phone": "1111111111",
+              "work_phone_extn": "9999",
+              "preferred_communication": "Phone",
+              "primary_phone": "",
+              "is_silhouette": "false",
+              "phr_login_id": "marylogin",
+              "account_type": "Patients with PHR account",
+              "blood_group": "B+",
+              "last_modified_time": 1592377672848,
+              "address_line1": "East Lohman Avenue",
+              "address_line2": "Council Oak Road",
+              "city": "Beaverton",
+              "state": "Alabama",
+              "country": "us",
+              "postal_code": "11223",
+              "county": "",
+              "district": "",
+              "marital_status": "Single",
+              "source": "Providers",
+              "category": "Family Planning",
+              "custom_field_value": ""
+            }
+          ],
+          "page_context": {
+            "page": "1",
+            "per_page": "50",
+            "has_more_page": "false",
+            "applied_filter": "Status.Active",
+            "sort_column": "created_time",
+            "sort_order": "D",
+            "search_criteria": [
+              {
+                "column_name": "full_name",
+                "search_text": "taylor",
+                "comparator": "contains"
+              },
+              {
+                "column_name": "dob",
+                "search_text": "1954-12-02",
+                "comparator": "equal"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "Get Patient Details",
+      "method": "GET",
+      "path": "/patients/{patient_id}",
+      "description": "The API to get the details of a patient",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "patient": {
+              "patient_id": "string",
+              "record_id": "string",
+              "first_name": "string",
+              "middle_name": "string",
+              "last_name": "string",
+              "full_name": "string",
+              "dob": "string",
+              "is_auto_calculated_dob": "boolean",
+              "gender": "string",
+              "gender_identity": "string",
+              "nick_name": "string",
+              "suffix": "string",
+              "maiden_name": "string",
+              "deceased": "boolean",
+              "last_modified_time": "integer",
+              "dod": "string",
+              "cause_of_death": "string",
+              "facilities": [
+                {
+                  "facility_id": "string"
+                }
+              ],
+              "id_qualifiers": [],
+              "primary_contact_details": {},
+              "address_line1": "string",
+              "address_line2": "string",
+              "area": "string",
+              "city": "string",
+              "state": "string",
+              "county": "string",
+              "country": "string",
+              "zip_code": "string",
+              "district": "string",
+              "mobile": "string",
+              "home_phone": "string",
+              "work_phone": "string",
+              "work_phone_extn": "string",
+              "email": "string",
+              "primary_phone": "string",
+              "preferred_communication": "string",
+              "cargiver_first_name": "string",
+              "cargiver_last_name": "string",
+              "fax": "string",
+              "time_zone": "string",
+              "emergency_contact_name": "string",
+              "emergency_contact_number": "string",
+              "emergency_contact_number_extn": "string",
+              "caregivers": [
+                {
+                  "type": "string",
+                  "first_name": "string",
+                  "middle_name": "string",
+                  "last_name": "string",
+                  "dob": "string",
+                  "gender": "string",
+                  "ssn": "string",
+                  "relationship": "string",
+                  "same_as_patient_contact": "boolean",
+                  "address": {
+                    "address_line1": "string",
+                    "address_line2": "string",
+                    "city": "string",
+                    "state": "string",
+                    "country": "string",
+                    "zip_code": "string"
+                  },
+                  "contact": {
+                    "mobile": "string",
+                    "home_phone": "string",
+                    "work_phone": "string",
+                    "work_phone_extn": "string",
+                    "email": "string"
+                  }
+                }
+              ],
+              "guarantor": {
+                "first_name": "string",
+                "middle_name": "string",
+                "last_name": "string",
+                "dob": "string",
+                "gender": "string",
+                "ssn": "string",
+                "relationship": "string",
+                "address": {
+                  "address_line1": "string",
+                  "address_line2": "string",
+                  "city": "string",
+                  "state": "string",
+                  "country": "string",
+                  "zip_code": "string"
+                },
+                "contact": {
+                  "mobile": "string",
+                  "home_phone": "string",
+                  "work_phone": "string",
+                  "work_phone_extn": "string",
+                  "email": "string"
+                }
+              },
+              "email_notification": "boolean",
+              "text_notification": "boolean",
+              "voice_notification": "boolean",
+              "blood_group": "string",
+              "language": "string",
+              "race": "string",
+              "ethnicity": "string",
+              "smoking_status": "string",
+              "marital_status": "string",
+              "employment_status": "string",
+              "sexual_orientation": "string",
+              "mother_first_name": "string",
+              "mother_last_name": "string",
+              "birth_order": "string",
+              "categories": [
+                {
+                  "category_id": "string"
+                }
+              ],
+              "introduction": "string",
+              "custom_field_1": "string",
+              "custom_field_2": "string",
+              "custom_field_3": "string",
+              "custom_field_4": "string",
+              "custom_field_5": "string",
+              "source_name": "string",
+              "source_value": "string",
+              "payment_source": "string",
+              "payment_start_date": "string",
+              "payment_end_date": "string",
+              "is_active": "boolean",
+              "is_phr_available": "boolean",
+              "is_silhouette": "boolean",
+              "referred_source": "string",
+              "referred_specific_source": "string",
+              "about_patient": "string"
+            }
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X GET http://apiehr.charmtracker.com/api/ehr/v1/patients/1884000000128001 -H 'Authorization: Bearer xxxxxxxx' -H 'Cache-Control: no-cache' -H 'api_key: 0cfb26f7b333662a1e8d72ac4733572a'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "patient": {
+            "patient_id": "1884000000128001",
+            "record_id": "ChA001",
+            "first_name": "Mary",
+            "middle_name": "",
+            "last_name": "Taylor",
+            "full_name": "Mary Taylor"
+          }
+        }
+      }
+    },
+    {
+      "name": "Add a Patient",
+      "method": "POST",
+      "path": "/patients",
+      "description": "The API to add a new patient to CHARM",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "Content-Type": "application/json",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "first_name": {
+            "type": "string",
+            "required": true,
+            "description": "First name of the patient max-length is 35"
+          },
+          "last_name": {
+            "type": "string",
+            "required": true,
+            "description": "Last name of the patient max-length is 35"
+          },
+          "gender": {
+            "type": "string",
+            "required": true,
+            "description": "Gender of the patient. Allowed Values: male, female, unknown, other"
+          },
+          "dob": {
+            "type": "string",
+            "required": true,
+            "description": "Date of birth of patient. Format: yyyy-mm-dd. Required if age is not given"
+          },
+          "age": {
+            "type": "integer",
+            "required": true,
+            "description": "Age of the patient. Required if dob is not given"
+          },
+          "facilities": {
+            "type": "array",
+            "required": true,
+            "description": "Patient facilities list.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "facility_id": {
+                  "type": "integer",
+                  "required": true,
+                  "description": "Facility ID for which the patient is to be mapped."
+                }
+              }
+            }
+          },
+          "middle_name": {
+            "type": "string",
+            "required": false,
+            "description": "Middle name of the patient max-length is 35"
+          },
+          "record_id": {
+            "type": "string",
+            "required": false,
+            "description": "Patient Record ID max-length is 20. Required if update patient API is called. Else optional for add patient API."
+          },
+          "gender_identity": {
+            "type": "string",
+            "required": false,
+            "description": "Gender Identity of the patient max-length is 100"
+          },
+          "nick_name": {
+            "type": "string",
+            "required": false,
+            "description": "Nick name of the patient max-length is 35"
+          },
+          "suffix": {
+            "type": "string",
+            "required": false,
+            "description": "Suffix of the patient max-length is 20"
+          },
+          "maiden_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient maiden name max-length is 35"
+          },
+          "deceased": {
+            "type": "boolean",
+            "required": false,
+            "description": "Is patient deceased or not"
+          },
+          "dod": {
+            "type": "string",
+            "required": false,
+            "description": "Date of death if deceased. Format: yyyy-mm-dd"
+          },
+          "cause_of_death": {
+            "type": "string",
+            "required": false,
+            "description": "Cause of death if deceased. max-length is 35"
+          },
+          "linked_patient_id": {
+            "type": "integer",
+            "required": false,
+            "description": "Patient ID of the linked patient."
+          },
+          "id_qualifiers": {
+            "type": "array",
+            "required": false,
+            "description": "Values of Patient IDs.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id_qualifier": {
+                  "type": "integer",
+                  "required": true,
+                  "description": "ID Qualifier Number"
+                },
+                "id_of_patient": {
+                  "type": "string",
+                  "required": true,
+                  "description": "ID Qualifier Value max-length is 20"
+                }
+              }
+            }
+          },
+          "address": {
+            "type": "object",
+            "required": false,
+            "description": "Patient address.",
+            "properties": {
+              "address_line1": {
+                "type": "string",
+                "required": false,
+                "description": "Address Line 1 max-length is 35"
+              },
+              "address_line2": {
+                "type": "string",
+                "required": false,
+                "description": "Address Line 2 max-length is 35"
+              },
+              "area": {
+                "type": "string",
+                "required": false,
+                "description": "Area max-length is 100"
+              },
+              "city": {
+                "type": "string",
+                "required": false,
+                "description": "City max-length is 35"
+              },
+              "state": {
+                "type": "string",
+                "required": false,
+                "description": "State max-length is 50 (Pass entire State value. Ex: \"New Jersey\")"
+              },
+              "county_code": {
+                "type": "string",
+                "required": false,
+                "description": "County Code max-length is 20"
+              },
+              "country": {
+                "type": "string",
+                "required": true,
+                "description": "Country max-length is 2"
+              },
+              "zip_code": {
+                "type": "string",
+                "required": false,
+                "description": "Zip Code max-length is 10"
+              },
+              "post_box": {
+                "type": "integer",
+                "required": false,
+                "description": "Post Box No max-length is 4"
+              },
+              "district": {
+                "type": "string",
+                "required": false,
+                "description": "District max-length is 50"
+              }
+            }
+          },
+          "mobile": {
+            "type": "string",
+            "required": false,
+            "description": "Patient mobile number max-length is 15"
+          },
+          "home_phone": {
+            "type": "string",
+            "required": false,
+            "description": "Patient home phone number max-length is 15"
+          },
+          "work_phone": {
+            "type": "string",
+            "required": false,
+            "description": "Patient work phone number max-length is 15"
+          },
+          "work_phone_extn": {
+            "type": "string",
+            "required": false,
+            "description": "Work phone extension number max-length is 4"
+          },
+          "email": {
+            "type": "string",
+            "required": false,
+            "description": "Email address of patient max-length is 100"
+          },
+          "primary_phone": {
+            "type": "string",
+            "required": false,
+            "description": "Primary phone preference. Allowed Values: Home Phone, Mobile Phone, Work Phone"
+          },
+          "emergency_contact_name": {
+            "type": "string",
+            "required": false,
+            "description": "Emergency Contact Person Name max-length is 70"
+          },
+          "emergency_contact_number": {
+            "type": "string",
+            "required": false,
+            "description": "Emergency Contact Person Number max-length is 10"
+          },
+          "emergency_extn": {
+            "type": "string",
+            "required": false,
+            "description": "Emergency contact number extension max-length is 4"
+          },
+          "caregivers": {
+            "type": "array",
+            "required": false,
+            "description": "Patient caregivers information.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "middle_name": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 35"
+                },
+                "last_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "dob": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Format: yyyy-mm-dd"
+                },
+                "gender": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Allowed Values: male, female, unknown, other"
+                },
+                "ssn": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 20"
+                },
+                "relationship": {
+                  "type": "string",
+                  "required": true,
+                  "description": "Relationship with patient max-length is 20"
+                },
+                "same_as_patient_contact": {
+                  "type": "boolean",
+                  "required": false,
+                  "description": "True if caregiver contact details are same as patient contact details."
+                },
+                "contact": {
+                  "type": "object",
+                  "required": false,
+                  "properties": {
+                    "mobile": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Mobile number"
+                    },
+                    "home_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Home phone number"
+                    },
+                    "work_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone number"
+                    },
+                    "work_phone_extn": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone extension number"
+                    },
+                    "email": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Email address"
+                    }
+                  }
+                },
+                "address": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "address_line1": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 1 max-length is 35"
+                    },
+                    "address_line2": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 2 max-length is 35"
+                    },
+                    "area": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Area max-length is 100"
+                    },
+                    "city": {
+                      "type": "string",
+                      "required": false,
+                      "description": "City max-length is 35"
+                    },
+                    "state": {
+                      "type": "string",
+                      "required": false,
+                      "description": "State max-length is 50 (Pass entire State value. Ex: \"New Jersey\")"
+                    },
+                    "county_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "County Code max-length is 20"
+                    },
+                    "country": {
+                      "type": "string",
+                      "required": true,
+                      "description": "Country max-length is 2"
+                    },
+                    "zip_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Zip Code max-length is 10"
+                    },
+                    "post_box": {
+                      "type": "integer",
+                      "required": false,
+                      "description": "Post Box No max-length is 4"
+                    },
+                    "district": {
+                      "type": "string",
+                      "required": false,
+                      "description": "District max-length is 50"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "guarantor": {
+            "type": "array",
+            "required": false,
+            "description": "Patient guarantor information.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "middle_name": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 35"
+                },
+                "last_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "dob": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Format: yyyy-mm-dd"
+                },
+                "gender": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Allowed Values: male, female, unknown, other"
+                },
+                "ssn": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 20"
+                },
+                "relationship": {
+                  "type": "string",
+                  "required": true,
+                  "description": "Relationship with patient max-length is 20"
+                },
+                "contact": {
+                  "type": "object",
+                  "required": false,
+                  "properties": {
+                    "mobile": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Mobile number"
+                    },
+                    "home_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Home phone number"
+                    },
+                    "work_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone number"
+                    },
+                    "work_phone_extn": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone extension number"
+                    },
+                    "email": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Email address"
+                    }
+                  }
+                },
+                "address": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "address_line1": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 1 max-length is 35"
+                    },
+                    "address_line2": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 2 max-length is 35"
+                    },
+                    "area": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Area max-length is 100"
+                    },
+                    "city": {
+                      "type": "string",
+                      "required": false,
+                      "description": "City max-length is 35"
+                    },
+                    "state": {
+                      "type": "string",
+                      "required": false,
+                      "description": "State max-length is 50 (Pass entire State value. Ex: \"New Jersey\")"
+                    },
+                    "county_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "County Code max-length is 20"
+                    },
+                    "country": {
+                      "type": "string",
+                      "required": true,
+                      "description": "Country max-length is 2"
+                    },
+                    "zip_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Zip Code max-length is 10"
+                    },
+                    "post_box": {
+                      "type": "integer",
+                      "required": false,
+                      "description": "Post Box No max-length is 4"
+                    },
+                    "district": {
+                      "type": "string",
+                      "required": false,
+                      "description": "District max-length is 50"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "preferred_communication": {
+            "type": "string",
+            "required": false,
+            "description": "Patient preferred mode of communication. Allowed Values: CHARM PHR, Email, Phone, Fax, Mail"
+          },
+          "email_notification": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to receive email notifications or not."
+          },
+          "text_notification": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to receive text notifications or not."
+          },
+          "voice_notification": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to receive voice notifications or not."
+          },
+          "blood_group": {
+            "type": "string",
+            "required": false,
+            "description": "Patient Blood Group. Allowed Values: unknown, B+, B-, O+, O-, A+, A-, A1+, A1-, A2+, A2-, AB+, AB-, A1B+, A1B-, A2B+, A2B-"
+          },
+          "language": {
+            "type": "string",
+            "required": false,
+            "description": "Patient language max-length is 100"
+          },
+          "race": {
+            "type": "string",
+            "required": false,
+            "description": "Patient race"
+          },
+          "ethnicity": {
+            "type": "string",
+            "required": false,
+            "description": "Patient ethnicity"
+          },
+          "smoking_status": {
+            "type": "string",
+            "required": false,
+            "description": "Smoking status of patient. Allowed Values: Current every day smoker, Current some day smoker, Former Smoker, Never Smoker, Smoker, current status unknown, Unknown if ever smoked, Heavy tobacco smoker, Light tobacco smoker"
+          },
+          "marital_status": {
+            "type": "string",
+            "required": false,
+            "description": "Marital status of patient. Allowed Values: Single, Married, Other"
+          },
+          "employment_status": {
+            "type": "string",
+            "required": false,
+            "description": "Employment status of patient. Allowed Values: Employed, Full-Time Student, Part-Time Student, Unemployed, Retired"
+          },
+          "sexual_orientation": {
+            "type": "string",
+            "required": false,
+            "description": "Patient Sexual Orientation max-length is 250"
+          },
+          "mother_first_name": {
+            "type": "string",
+            "required": false,
+            "description": "Mother's maiden first name max-length is 35"
+          },
+          "mother_last_name": {
+            "type": "string",
+            "required": false,
+            "description": "Mother's maiden last name max-length is 35"
+          },
+          "is_multiple_birth": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether multiple birth or not"
+          },
+          "birth_order": {
+            "type": "integer",
+            "required": false,
+            "description": "Birth order in case of multiple birth"
+          },
+          "categories": {
+            "type": "array",
+            "required": false,
+            "description": "List of categories to which patient belongs.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category_id": {
+                  "type": "integer",
+                  "required": true,
+                  "description": "Category ID"
+                }
+              }
+            }
+          },
+          "introduction": {
+            "type": "string",
+            "required": false,
+            "description": "Information about patient max-length is 600"
+          },
+          "custom_field_1": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 1 max-length is 250"
+          },
+          "custom_field_2": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 2 max-length is 250"
+          },
+          "custom_field_3": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 3 max-length is 250"
+          },
+          "custom_field_4": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 4 max-length is 250"
+          },
+          "custom_field_5": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 5 max-length is 250"
+          },
+          "source_name": {
+            "type": "string",
+            "required": false,
+            "description": "Source from which patient come to know about the practice max-length is 100"
+          },
+          "source_value": {
+            "type": "string",
+            "required": false,
+            "description": "Specific source name for the source. max-length is 100"
+          },
+          "payment_source": {
+            "type": "string",
+            "required": false,
+            "description": "Patient payment source mode. max-length is 200"
+          },
+          "payment_start_date": {
+            "type": "string",
+            "required": false,
+            "description": "Payment source valid from date. Format: yyyy-mm-dd"
+          },
+          "payment_end_date": {
+            "type": "string",
+            "required": false,
+            "description": "Payment source valid till date. Format: yyyy-mm-dd"
+          },
+          "rep_first_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient representative first name. max-length is 35"
+          },
+          "rep_last_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient representative last name. max-length is 35"
+          },
+          "send_phr_invite": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to send PHR invitation or not."
+          },
+          "duplicate_check": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to check for duplicate patient before adding."
+          },
+          "update_specific_details": {
+            "type": "boolean",
+            "required": false,
+            "description": "Used to update only the values sent in the request. Applies only to Update Patient API"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient saved successfully.",
+            "patient": {
+              "patient_id": "string",
+              "record_id": "string",
+              "first_name": "string",
+              "middle_name": "string",
+              "last_name": "string",
+              "full_name": "string",
+              "dob": "string",
+              "is_auto_calculated_dob": "boolean",
+              "gender": "string",
+              "gender_identity": "string",
+              "nick_name": "string",
+              "suffix": "string",
+              "maiden_name": "string",
+              "deceased": "boolean",
+              "dod": "string",
+              "cause_of_death": "string",
+              "facilities": [
+                {
+                  "facility_id": "string"
+                }
+              ],
+              "id_qualifiers": [],
+              "primary_contact_details": {},
+              "address_line1": "string",
+              "address_line2": "string",
+              "area": "string",
+              "city": "string",
+              "state": "string",
+              "county": "string",
+              "country": "string",
+              "zip_code": "string",
+              "district": "string",
+              "mobile": "string",
+              "home_phone": "string",
+              "work_phone": "string",
+              "work_phone_extn": "string",
+              "email": "string",
+              "primary_phone": "string",
+              "preferred_communication": "string",
+              "emergency_contact_name": "string",
+              "emergency_contact_number": "string",
+              "emergency_contact_number_extn": "string",
+              "caregivers": [
+                {
+                  "type": "string",
+                  "first_name": "string",
+                  "middle_name": "string",
+                  "last_name": "string",
+                  "dob": "string",
+                  "gender": "string",
+                  "ssn": "string",
+                  "relationship": "string",
+                  "same_as_patient_contact": "boolean",
+                  "address": {
+                    "address_line1": "string",
+                    "address_line2": "string",
+                    "city": "string",
+                    "state": "string",
+                    "country": "string",
+                    "zip_code": "string"
+                  },
+                  "contact": {
+                    "mobile": "string",
+                    "home_phone": "string",
+                    "work_phone": "string",
+                    "work_phone_extn": "string",
+                    "email": "string"
+                  }
+                }
+              ],
+              "guarantor": {
+                "first_name": "string",
+                "middle_name": "string",
+                "last_name": "string",
+                "dob": "string",
+                "gender": "string",
+                "ssn": "string",
+                "relationship": "string",
+                "address": {
+                  "address_line1": "string",
+                  "address_line2": "string",
+                  "city": "string",
+                  "state": "string",
+                  "country": "string",
+                  "zip_code": "string"
+                },
+                "contact": {
+                  "mobile": "string",
+                  "home_phone": "string",
+                  "work_phone": "string",
+                  "work_phone_extn": "string",
+                  "email": "string"
+                }
+              },
+              "email_notification": "boolean",
+              "text_notification": "boolean",
+              "voice_notification": "boolean",
+              "blood_group": "string",
+              "language": "string",
+              "race": "string",
+              "ethnicity": "string",
+              "smoking_status": "string",
+              "marital_status": "string",
+              "employment_status": "string",
+              "sexual_orientation": "string",
+              "mother_first_name": "string",
+              "mother_last_name": "string",
+              "birth_order": "string",
+              "categories": [],
+              "introduction": "string",
+              "custom_field_1": "string",
+              "custom_field_2": "string",
+              "custom_field_3": "string",
+              "custom_field_4": "string",
+              "custom_field_5": "string",
+              "source_name": "string",
+              "source_value": "string",
+              "payment_source": "string",
+              "payment_start_date": "string",
+              "payment_end_date": "string",
+              "is_active": "boolean",
+              "is_silhouette": "boolean"
+            }
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X POST https://ehr.charmtracker.com/api/ehr/v1/patients -H 'Authorization: Bearer xxxxxxxx' -H 'Cache-Control: no-cache' -H 'Content-Type: application/json' -H 'api_key: 0cfb26f7b333762b1e6d74ac4732572a' -d '{\"duplicate_check\":\"true\",\"first_name\":\"Alison\",\"last_name\":\" Alise\",\"dob\":\"2001-01-01\",\"gender\":\"female\",\"facilities\":[{\"facility_id\":\"1884000000375191\"}],\"address\":{\"country\":\"us\",\"state\":\"New Jersey\"},\"email_notification\":\"true\",\"text_notification\":\"true\", \"voice_notification\":\"true\",\"send_phr_invite\":\"false\"}'",
+        "response": {
+          "code": "0",
+          "message": "Patient saved successfully.",
+          "patient": {
+            "patient_id": "1884000016504003",
+            "record_id": "PAT0001",
+            "first_name": "Alison",
+            "middle_name": "",
+            "last_name": "Alise",
+            "full_name": "Alison Alise",
+            "dob": "2001-01-01"
+          }
+        }
+      }
+    },
+    {
+      "name": "Update A Patient",
+      "method": "PUT",
+      "path": "/patients/{patient_id}",
+      "description": "API to update patient demographics",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "Content-Type": "application/json",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "first_name": {
+            "type": "string",
+            "required": true,
+            "description": "First name of the patient max-length is 35"
+          },
+          "last_name": {
+            "type": "string",
+            "required": true,
+            "description": "Last name of the patient max-length is 35"
+          },
+          "gender": {
+            "type": "string",
+            "required": true,
+            "description": "Gender of the patient. Allowed Values: male, female, unknown, other"
+          },
+          "dob": {
+            "type": "string",
+            "required": true,
+            "description": "Date of birth of patient. Format: yyyy-mm-dd. Required if age is not given"
+          },
+          "age": {
+            "type": "integer",
+            "required": true,
+            "description": "Age of the patient. Required if dob is not given"
+          },
+          "facilities": {
+            "type": "array",
+            "required": true,
+            "description": "Patient facilities list.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "facility_id": {
+                  "type": "integer",
+                  "required": true,
+                  "description": "Facility ID for which the patient is to be mapped."
+                }
+              }
+            }
+          },
+          "middle_name": {
+            "type": "string",
+            "required": false,
+            "description": "Middle name of the patient max-length is 35"
+          },
+          "record_id": {
+            "type": "string",
+            "required": false,
+            "description": "Patient Record ID max-length is 20. Required if update patient API is called. Else optional for add patient API."
+          },
+          "gender_identity": {
+            "type": "string",
+            "required": false,
+            "description": "Gender Identity of the patient max-length is 100"
+          },
+          "nick_name": {
+            "type": "string",
+            "required": false,
+            "description": "Nick name of the patient max-length is 35"
+          },
+          "suffix": {
+            "type": "string",
+            "required": false,
+            "description": "Suffix of the patient max-length is 20"
+          },
+          "maiden_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient maiden name max-length is 35"
+          },
+          "deceased": {
+            "type": "boolean",
+            "required": false,
+            "description": "Is patient deceased or not"
+          },
+          "dod": {
+            "type": "string",
+            "required": false,
+            "description": "Date of death if deceased. Format: yyyy-mm-dd"
+          },
+          "cause_of_death": {
+            "type": "string",
+            "required": false,
+            "description": "Cause of death if deceased. max-length is 35"
+          },
+          "linked_patient_id": {
+            "type": "integer",
+            "required": false,
+            "description": "Patient ID of the linked patient."
+          },
+          "id_qualifiers": {
+            "type": "array",
+            "required": false,
+            "description": "Values of Patient IDs.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id_qualifier": {
+                  "type": "integer",
+                  "required": true,
+                  "description": "ID Qualifier Number"
+                },
+                "id_of_patient": {
+                  "type": "string",
+                  "required": true,
+                  "description": "ID Qualifier Value max-length is 20"
+                }
+              }
+            }
+          },
+          "address": {
+            "type": "object",
+            "required": false,
+            "description": "Patient address.",
+            "properties": {
+              "address_line1": {
+                "type": "string",
+                "required": false,
+                "description": "Address Line 1 max-length is 35"
+              },
+              "address_line2": {
+                "type": "string",
+                "required": false,
+                "description": "Address Line 2 max-length is 35"
+              },
+              "area": {
+                "type": "string",
+                "required": false,
+                "description": "Area max-length is 100"
+              },
+              "city": {
+                "type": "string",
+                "required": false,
+                "description": "City max-length is 35"
+              },
+              "state": {
+                "type": "string",
+                "required": false,
+                "description": "State max-length is 50 (Pass entire State value. Ex: \"New Jersey\")"
+              },
+              "county_code": {
+                "type": "string",
+                "required": false,
+                "description": "County Code max-length is 20"
+              },
+              "country": {
+                "type": "string",
+                "required": true,
+                "description": "Country max-length is 2"
+              },
+              "zip_code": {
+                "type": "string",
+                "required": false,
+                "description": "Zip Code max-length is 10"
+              },
+              "post_box": {
+                "type": "integer",
+                "required": false,
+                "description": "Post Box No max-length is 4"
+              },
+              "district": {
+                "type": "string",
+                "required": false,
+                "description": "District max-length is 50"
+              }
+            }
+          },
+          "mobile": {
+            "type": "string",
+            "required": false,
+            "description": "Patient mobile number max-length is 15"
+          },
+          "home_phone": {
+            "type": "string",
+            "required": false,
+            "description": "Patient home phone number max-length is 15"
+          },
+          "work_phone": {
+            "type": "string",
+            "required": false,
+            "description": "Patient work phone number max-length is 15"
+          },
+          "work_phone_extn": {
+            "type": "string",
+            "required": false,
+            "description": "Work phone extension number max-length is 4"
+          },
+          "email": {
+            "type": "string",
+            "required": false,
+            "description": "Email address of patient max-length is 100"
+          },
+          "primary_phone": {
+            "type": "string",
+            "required": false,
+            "description": "Primary phone preference. Allowed Values: Home Phone, Mobile Phone, Work Phone"
+          },
+          "emergency_contact_name": {
+            "type": "string",
+            "required": false,
+            "description": "Emergency Contact Person Name max-length is 70"
+          },
+          "emergency_contact_number": {
+            "type": "string",
+            "required": false,
+            "description": "Emergency Contact Person Number max-length is 10"
+          },
+          "emergency_extn": {
+            "type": "string",
+            "required": false,
+            "description": "Emergency contact number extension max-length is 4"
+          },
+          "caregivers": {
+            "type": "array",
+            "required": false,
+            "description": "Patient caregivers information.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "middle_name": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 35"
+                },
+                "last_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "dob": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Format: yyyy-mm-dd"
+                },
+                "gender": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Allowed Values: male, female, unknown, other"
+                },
+                "ssn": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 20"
+                },
+                "relationship": {
+                  "type": "string",
+                  "required": true,
+                  "description": "Relationship with patient max-length is 20"
+                },
+                "same_as_patient_contact": {
+                  "type": "boolean",
+                  "required": false,
+                  "description": "True if caregiver contact details are same as patient contact details."
+                },
+                "contact": {
+                  "type": "object",
+                  "required": false,
+                  "properties": {
+                    "mobile": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Mobile number"
+                    },
+                    "home_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Home phone number"
+                    },
+                    "work_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone number"
+                    },
+                    "work_phone_extn": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone extension number"
+                    },
+                    "email": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Email address"
+                    }
+                  }
+                },
+                "address": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "address_line1": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 1 max-length is 35"
+                    },
+                    "address_line2": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 2 max-length is 35"
+                    },
+                    "area": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Area max-length is 100"
+                    },
+                    "city": {
+                      "type": "string",
+                      "required": false,
+                      "description": "City max-length is 35"
+                    },
+                    "state": {
+                      "type": "string",
+                      "required": false,
+                      "description": "State max-length is 50 (Pass entire State value. Ex: \"New Jersey\")"
+                    },
+                    "county_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "County Code max-length is 20"
+                    },
+                    "country": {
+                      "type": "string",
+                      "required": true,
+                      "description": "Country max-length is 2"
+                    },
+                    "zip_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Zip Code max-length is 10"
+                    },
+                    "post_box": {
+                      "type": "integer",
+                      "required": false,
+                      "description": "Post Box No max-length is 4"
+                    },
+                    "district": {
+                      "type": "string",
+                      "required": false,
+                      "description": "District max-length is 50"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "guarantor": {
+            "type": "array",
+            "required": false,
+            "description": "Patient guarantor information.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "middle_name": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 35"
+                },
+                "last_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "max-length is 35"
+                },
+                "dob": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Format: yyyy-mm-dd"
+                },
+                "gender": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Allowed Values: male, female, unknown, other"
+                },
+                "ssn": {
+                  "type": "string",
+                  "required": false,
+                  "description": "max-length is 20"
+                },
+                "relationship": {
+                  "type": "string",
+                  "required": true,
+                  "description": "Relationship with patient max-length is 20"
+                },
+                "contact": {
+                  "type": "object",
+                  "required": false,
+                  "properties": {
+                    "mobile": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Mobile number"
+                    },
+                    "home_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Home phone number"
+                    },
+                    "work_phone": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone number"
+                    },
+                    "work_phone_extn": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Work phone extension number"
+                    },
+                    "email": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Email address"
+                    }
+                  }
+                },
+                "address": {
+                  "type": "object",
+                  "required": true,
+                  "properties": {
+                    "address_line1": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 1 max-length is 35"
+                    },
+                    "address_line2": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Address Line 2 max-length is 35"
+                    },
+                    "area": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Area max-length is 100"
+                    },
+                    "city": {
+                      "type": "string",
+                      "required": false,
+                      "description": "City max-length is 35"
+                    },
+                    "state": {
+                      "type": "string",
+                      "required": false,
+                      "description": "State max-length is 50 (Pass entire State value. Ex: \"New Jersey\")"
+                    },
+                    "county_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "County Code max-length is 20"
+                    },
+                    "country": {
+                      "type": "string",
+                      "required": true,
+                      "description": "Country max-length is 2"
+                    },
+                    "zip_code": {
+                      "type": "string",
+                      "required": false,
+                      "description": "Zip Code max-length is 10"
+                    },
+                    "post_box": {
+                      "type": "integer",
+                      "required": false,
+                      "description": "Post Box No max-length is 4"
+                    },
+                    "district": {
+                      "type": "string",
+                      "required": false,
+                      "description": "District max-length is 50"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "preferred_communication": {
+            "type": "string",
+            "required": false,
+            "description": "Patient preferred mode of communication. Allowed Values: CHARM PHR, Email, Phone, Fax, Mail"
+          },
+          "email_notification": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to receive email notifications or not."
+          },
+          "text_notification": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to receive text notifications or not."
+          },
+          "voice_notification": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to receive voice notifications or not."
+          },
+          "blood_group": {
+            "type": "string",
+            "required": false,
+            "description": "Patient Blood Group. Allowed Values: unknown, B+, B-, O+, O-, A+, A-, A1+, A1-, A2+, A2-, AB+, AB-, A1B+, A1B-, A2B+, A2B-"
+          },
+          "language": {
+            "type": "string",
+            "required": false,
+            "description": "Patient language max-length is 100"
+          },
+          "race": {
+            "type": "string",
+            "required": false,
+            "description": "Patient race"
+          },
+          "ethnicity": {
+            "type": "string",
+            "required": false,
+            "description": "Patient ethnicity"
+          },
+          "smoking_status": {
+            "type": "string",
+            "required": false,
+            "description": "Smoking status of patient. Allowed Values: Current every day smoker, Current some day smoker, Former Smoker, Never Smoker, Smoker, current status unknown, Unknown if ever smoked, Heavy tobacco smoker, Light tobacco smoker"
+          },
+          "marital_status": {
+            "type": "string",
+            "required": false,
+            "description": "Marital status of patient. Allowed Values: Single, Married, Other"
+          },
+          "employment_status": {
+            "type": "string",
+            "required": false,
+            "description": "Employment status of patient. Allowed Values: Employed, Full-Time Student, Part-Time Student, Unemployed, Retired"
+          },
+          "sexual_orientation": {
+            "type": "string",
+            "required": false,
+            "description": "Patient Sexual Orientation max-length is 250"
+          },
+          "mother_first_name": {
+            "type": "string",
+            "required": false,
+            "description": "Mother's maiden first name max-length is 35"
+          },
+          "mother_last_name": {
+            "type": "string",
+            "required": false,
+            "description": "Mother's maiden last name max-length is 35"
+          },
+          "is_multiple_birth": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether multiple birth or not"
+          },
+          "birth_order": {
+            "type": "integer",
+            "required": false,
+            "description": "Birth order in case of multiple birth"
+          },
+          "categories": {
+            "type": "array",
+            "required": false,
+            "description": "List of categories to which patient belongs.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category_id": {
+                  "type": "integer",
+                  "required": true,
+                  "description": "Category ID"
+                }
+              }
+            }
+          },
+          "introduction": {
+            "type": "string",
+            "required": false,
+            "description": "Information about patient max-length is 600"
+          },
+          "custom_field_1": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 1 max-length is 250"
+          },
+          "custom_field_2": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 2 max-length is 250"
+          },
+          "custom_field_3": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 3 max-length is 250"
+          },
+          "custom_field_4": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 4 max-length is 250"
+          },
+          "custom_field_5": {
+            "type": "string",
+            "required": false,
+            "description": "Value of Custom Field 5 max-length is 250"
+          },
+          "source_name": {
+            "type": "string",
+            "required": false,
+            "description": "Source from which patient come to know about the practice max-length is 100"
+          },
+          "source_value": {
+            "type": "string",
+            "required": false,
+            "description": "Specific source name for the source. max-length is 100"
+          },
+          "payment_source": {
+            "type": "string",
+            "required": false,
+            "description": "Patient payment source mode. max-length is 200"
+          },
+          "payment_start_date": {
+            "type": "string",
+            "required": false,
+            "description": "Payment source valid from date. Format: yyyy-mm-dd"
+          },
+          "payment_end_date": {
+            "type": "string",
+            "required": false,
+            "description": "Payment source valid till date. Format: yyyy-mm-dd"
+          },
+          "rep_first_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient representative first name. max-length is 35"
+          },
+          "rep_last_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient representative last name. max-length is 35"
+          },
+          "send_phr_invite": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to send PHR invitation or not."
+          },
+          "duplicate_check": {
+            "type": "boolean",
+            "required": false,
+            "description": "Whether to check for duplicate patient before adding."
+          },
+          "update_specific_details": {
+            "type": "boolean",
+            "required": false,
+            "description": "Used to update only the values sent in the request. Applies only to Update Patient API"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient details updated successfully",
+            "patient": {
+              "patient_id": "string",
+              "record_id": "string",
+              "first_name": "string",
+              "middle_name": "string",
+              "last_name": "string",
+              "full_name": "string",
+              "dob": "string",
+              "is_auto_calculated_dob": "boolean",
+              "gender": "string",
+              "gender_identity": "string",
+              "nick_name": "string",
+              "suffix": "string",
+              "maiden_name": "string",
+              "deceased": "boolean",
+              "dod": "string",
+              "cause_of_death": "string",
+              "facilities": [
+                {
+                  "facility_id": "string"
+                }
+              ],
+              "id_qualifiers": [],
+              "primary_contact_details": {
+                "address_line1": "string",
+                "address_line2": "string",
+                "area": "string",
+                "city": "string",
+                "state": "string",
+                "county": "string",
+                "country": "string",
+                "zip_code": "string",
+                "district": "string",
+                "mobile": "string",
+                "home_phone": "string",
+                "work_phone": "string",
+                "work_phone_extn": "string"
+              },
+              "email": "string",
+              "primary_phone": "string",
+              "preferred_communication": "string",
+              "emergency_contact_name": "string",
+              "emergency_contact_number": "string",
+              "emergency_contact_number_extn": "string",
+              "caregivers": [
+                {
+                  "type": "string",
+                  "first_name": "string",
+                  "middle_name": "string",
+                  "last_name": "string",
+                  "dob": "string",
+                  "gender": "string",
+                  "ssn": "string",
+                  "relationship": "string",
+                  "same_as_patient_contact": "boolean",
+                  "address": {
+                    "address_line1": "string",
+                    "address_line2": "string",
+                    "city": "string",
+                    "state": "string",
+                    "country": "string",
+                    "zip_code": "string"
+                  },
+                  "contact": {
+                    "mobile": "string",
+                    "home_phone": "string",
+                    "work_phone": "string",
+                    "work_phone_extn": "string",
+                    "email": "string"
+                  }
+                }
+              ],
+              "guarantor": {
+                "first_name": "string",
+                "middle_name": "string",
+                "last_name": "string",
+                "dob": "string",
+                "gender": "string",
+                "ssn": "string",
+                "relationship": "string",
+                "address": {
+                  "address_line1": "string",
+                  "address_line2": "string",
+                  "city": "string",
+                  "state": "string",
+                  "country": "string",
+                  "zip_code": "string"
+                },
+                "contact": {
+                  "mobile": "string",
+                  "home_phone": "string",
+                  "work_phone": "string",
+                  "work_phone_extn": "string",
+                  "email": "string"
+                }
+              },
+              "email_notification": "boolean",
+              "text_notification": "boolean",
+              "voice_notification": "boolean",
+              "blood_group": "string",
+              "language": "string",
+              "race": "string",
+              "ethnicity": "string",
+              "smoking_status": "string",
+              "marital_status": "string",
+              "employment_status": "string",
+              "sexual_orientation": "string",
+              "mother_first_name": "string",
+              "mother_last_name": "string",
+              "birth_order": "string",
+              "categories": [],
+              "introduction": "string",
+              "custom_field_1": "string",
+              "custom_field_2": "string",
+              "custom_field_3": "string",
+              "custom_field_4": "string",
+              "custom_field_5": "string",
+              "source_name": "string",
+              "source_value": "string",
+              "payment_source": "string",
+              "payment_start_date": "string",
+              "payment_end_date": "string",
+              "is_active": "boolean",
+              "is_silhouette": "boolean",
+              "referred_source": "string",
+              "referred_specific_source": "string",
+              "about_patient": "string",
+              "category": "string"
+            }
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X PUT https://apiehr.charmtracker.com/api/ehr/v1/patients/1884000016504003 -H 'Authorization: Bearer 1000.355f84572e8ca1008606047bef2d29ef.d12088ac290d9785af0b14edaf843b60' -H 'Cache-Control: no-cache' -H 'Content-Type: application/json' -H 'api_key: 0cfb26f7b333662a1e8d72ac4733572a' -d '{\"duplicate_check\":\"true\",\"first_name\":\"Alison\",\"last_name\":\" Alise\",\"dob\":\"2002-02-02\",\"gender\":\"female\",\"facilities\":[{\"facility_id\":\"1884000000375191\"}],\"address\":{\"country\":\"us\",\"state\":\"New Jersey\"},\"email_notification\":\"true\",\"text_notification\":\"true\",\"voice_notification\":\"true\",\"send_phr_invite\":\"false\",\"record_id\":\"PAT0001\"}'",
+        "response": {
+          "code": "0",
+          "message": "Patient details updated successfully",
+          "patient": {
+            "patient_id": "1884000016504003",
+            "record_id": "PAT0001",
+            "first_name": "Alison",
+            "middle_name": "",
+            "last_name": "Alise",
+            "full_name": "Alison Alise",
+            "dob": "2002-02-02"
+          }
+        }
+      }
+    },
+    {
+      "name": "Deactivate a Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/inactive",
+      "description": "API to deactivate a patient record.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient has been inactivated successfully"
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X POST https://apiehr.charmtracker.com/api/ehr/v1/patients/1884000016504003/inactive -H 'Authorization: Bearer xxxxxx' -H 'Cache-Control: no-cache' -H 'api_key: 0cfb36f7b446662a1e8d72ac4733572a'",
+        "response": {
+          "code": "0",
+          "message": "Patient has been inactivated successfully"
+        }
+      }
+    },
+    {
+      "name": "Activate a Patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/active",
+      "description": "API to activate a patient record.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient has been activated successfully"
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -X POST https://ehr.charmtracker.com/api/ehr/v1/patients/1884000016504003/active -H 'Authorization: Bearer xxxxxx' -H 'Cache-Control: no-cache' -H 'api_key: 0cfb15f7b337672a1e3d72bc4733972a'",
+        "response": {
+          "code": "0",
+          "message": "Patient has been activated successfully"
+        }
+      }
+    },
+    {
+      "name": "Send PHR Invitation to a patient",
+      "method": "POST",
+      "path": "/patients/{patient_id}/invitations",
+      "description": "API to send PHR invitation email to patient.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "Cache-Control": "no-cache",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "email": {
+            "type": "string",
+            "required": true,
+            "description": "email id to which the invitation need to be sent."
+          },
+          "rep_first_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient representative first name. max-length is 35"
+          },
+          "rep_last_name": {
+            "type": "string",
+            "required": false,
+            "description": "Patient representative last name. max-length is 35"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Invitation has been sent successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -L -X POST 'https://ehr.charmtracker.com/api/ehr/v1/patients/1884000010600855/invitations' -H 'Authorization: Bearer xxxxxx' -H 'Cache-Control: no-cache' -H 'api_key: 0cfb15f7b337672a1e3d72bc4733972a' --data-raw '{\"email\": \"testpatient@test.com\"}'",
+        "response": {
+          "code": "0",
+          "message": "Invitation has been sent successfully."
+        }
+      }
+    },
+    {
+      "name": "Categories List",
+      "method": "GET",
+      "path": "/category",
+      "description": "API to fetch the list of categories in the practice.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "categories": [
+              {
+                "id": "string",
+                "name": "string"
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -L -X GET 'https://ehr.charmtracker.com/api/ehr/v1/category' -H 'Authorization: Bearer 1000.32464f777a12dc73e2f1234137d3b692.79e37e2eaf5fd7da7b8a1da684f9f14c' -H 'api_key: 0b286141f2c87839ddcddd0c56e52575'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "categories": [
+            {
+              "id": "1884000000000715",
+              "name": "Test Category"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add New Category",
+      "method": "POST",
+      "path": "/category",
+      "description": "API to fetch the list of categories in the practice.",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "data": {
+            "type": "array",
+            "required": true,
+            "description": "JSONArray of categories",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "New patient category name that needs to be added."
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient category added successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -L -X POST 'https://ehr2.charmtracker.com/api/ehr/v1/category' -H 'Authorization: Bearer 1000.978a7eaa4e6ed4f4c18274d46b867409.a0d78927f6451845e7ae6988cd78dd' -H 'api_key: 46bbd3a0812dc1b9afe50ac1cd1272d' --data-raw '[{\"category_name\": \"Test Category\"}]'",
+        "response": {
+          "code": "0",
+          "message": "Patient category added successfully."
+        }
+      }
+    },
+    {
+      "name": "Upload ID of a patient.",
+      "method": "POST",
+      "path": "/patients/{patient_id}/identity",
+      "description": "API to upload the file for a patient ID",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "id_qualifier": {
+            "type": "integer",
+            "required": true,
+            "description": "ID Qualifier Number"
+          },
+          "id_of_patient": {
+            "type": "string",
+            "required": false,
+            "description": "id of patient"
+          },
+          "file": {
+            "type": "file",
+            "required": true,
+            "description": "identity file"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Uploaded successfully."
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -L -X POST 'https://ehr.charmtracker.com/api/ehr/v1/patients/1884000024473083/identity' -H 'api_key: c1288b984f7f4bde85789bc099de4ae6' -H 'Authorization: Bearer 1000.432c1da2144d90b540bdb2178b527dda.fad19099d354f807c89002b8e1652' -F 'id_qualifier=1' -F 'id_of_patient=12345' -F 'file=@\"/home/local/Downloads/testImage.png\"'",
+        "response": {
+          "code": "0",
+          "message": "Uploaded successfully."
+        }
+      }
+    },
+    {
+      "name": "Upload patient photo API.",
+      "method": "POST",
+      "path": "/patients/{patient_id}/photo",
+      "description": "API to upload the profile photo of a patient",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {
+        "body": {
+          "file": {
+            "type": "file",
+            "required": true,
+            "description": "Photo image file"
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Profile Photo added successfully"
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -L -X POST 'https://ehr.charmtracker.com/api/ehr/v1/patients/1884000024644237/photo' -H 'api_key: c1288b984f7f4bde85789bc099de7ae6' -H 'Authorization: Bearer 1000.c45b4b0d653a7912c4591b11689fbb96.d741cab0347719e7aafd5cb99feb' -F 'file=@\"/home/local/Downloads/patient_image.png\"'",
+        "response": {
+          "code": "0",
+          "message": "Patient Profile Photo added successfully"
+        }
+      }
+    },
+    {
+      "name": "Delete patient photo API.",
+      "method": "DELETE",
+      "path": "/patients/{patient_id}/photo",
+      "description": "API to delete the profile photo of a patient",
+      "headers": {
+        "Authorization": "Bearer {token}",
+        "api_key": "{api_key}"
+      },
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Patient Profile Photo deleted successfully"
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -L -X DELETE 'https://ehr2.charmtracker.com/api/ehr/v1/patients/1884000024644237/photo' -H 'api_key: c1288b984f7f4bde85789bc099de4ae6' -H 'Authorization: Bearer 1000.c45b4b0d653a7912c4591b22689fbb96.da31cab0347719e7aafd5cb99feb'",
+        "response": {
+          "code": "0",
+          "message": "Patient Profile Photo deleted successfully"
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

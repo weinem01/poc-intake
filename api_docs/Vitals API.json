@@ -1,0 +1,217 @@
+{
+  "apiName": "Vitals API",
+  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
+  "authentication": {
+    "type": "Bearer",
+    "headerName": "Authorization",
+    "notes": "Token obtained from /auth/login endpoint"
+  },
+  "endpoints": [
+    {
+      "name": "List Vitals Metrics",
+      "method": "GET",
+      "path": "/vitals/metrics",
+      "description": "This API is to list of vitals available for the practice",
+      "headers": {},
+      "request": {},
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "vitals": [
+              {
+                "vital_id": "string",
+                "vital_name": "string",
+                "vital_unit": "string",
+                "vital_type": "string",
+                "vital_value_options": "string"
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://ehr.charmtracker.com/api/ehr/v1/vitals/metrics?'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "vitals": [
+            {
+              "vital_id": "0",
+              "vital_name": "Weight",
+              "vital_unit": "lbs",
+              "vital_type": "Number",
+              "vital_value_options": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Add Patient Vitals",
+      "method": "POST",
+      "path": "/patients/{patient_id}/vitals",
+      "description": "This api is to add vitals for a patient",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Basic {token}"
+      },
+      "request": {
+        "body": {
+          "encounter_id": {
+            "type": "integer",
+            "required": false,
+            "description": "If encounter association is required for then provide encounter ID. Required - if associated to encounter, else Optional"
+          },
+          "entry_date": {
+            "type": "string",
+            "required": false,
+            "description": "eg. 2021-02-15. Required - if encounter_id not provided, else Optional"
+          },
+          "vitals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vital_name": {
+                  "type": "string",
+                  "required": true,
+                  "description": "Name of the Vital"
+                },
+                "vital_value": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Value of Vital"
+                },
+                "vital_unit": {
+                  "type": "string",
+                  "required": false,
+                  "description": "Unit of Vital"
+                }
+              }
+            }
+          }
+        }
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "Vital(s) added successfully",
+            "vital_entries": [
+              {
+                "vital_entry_id": "string",
+                "encounter_id": "string",
+                "entry_date": "string",
+                "vitals": [
+                  {
+                    "vital_name": "string",
+                    "vital_value": "string",
+                    "vital_unit": "string"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X POST -H \"Content-Type: application/json\" -H \"Authorization:Basic YXBpZGVtbzJAbWVkaWNhbG1pbmUuY29tOkFQSURIbW8yJA==\" -d '[{\"encounter_id\": \"491141000002882001\",\"vitals\": [{\"vital_name\": \"Weight\",\"vital_unit\": \"kgs\",\"vital_value\": \"80\"}]}]' 'https://apiehr.charmtracker.com/api/ehr/v1/patients/100001000000006003/vitals'",
+        "response": {
+          "code": "0",
+          "message": "Vital(s) added successfully",
+          "vital_entries": [
+            {
+              "vital_entry_id": "100001000002966411",
+              "encounter_id": "100001000002898047",
+              "entry_date": "2021-04-09 00:00:00",
+              "vitals": [
+                {
+                  "vital_name": "Weight",
+                  "vital_value": "80.0",
+                  "vital_unit": "lbs"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Patient Vitals",
+      "method": "GET",
+      "path": "/patients/{patient_id}/vitals",
+      "description": "This API is to list all vitals associated with a patient",
+      "headers": {},
+      "request": {
+        "params": [
+          {
+            "name": "encounter_id",
+            "type": "integer",
+            "required": false,
+            "description": "Encounter id"
+          },
+          {
+            "name": "vital_entry_id",
+            "type": "integer",
+            "required": false,
+            "description": "Entry Id of specific vital"
+          }
+        ]
+      },
+      "response": {
+        "success": {
+          "status": 200,
+          "body": {
+            "code": "0",
+            "message": "success",
+            "vital_entries": [
+              {
+                "vital_entry_id": "string",
+                "encounter_id": "string",
+                "entry_date": "string",
+                "vitals": [
+                  {
+                    "vital_name": "string",
+                    "vital_value": "string",
+                    "vital_unit": "string"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "errors": {}
+      },
+      "examples": {
+        "request": "curl -i -X GET 'https://ehr.charmtracker.com/api/ehr/v1/patients/{patient_id}/vitals?'",
+        "response": {
+          "code": "0",
+          "message": "success",
+          "vital_entries": [
+            {
+              "vital_entry_id": "1884000022588035",
+              "encounter_id": "1884000022588027",
+              "entry_date": "2022-12-02 02:05:00",
+              "vitals": [
+                {
+                  "vital_name": "Weight",
+                  "vital_value": "111.0",
+                  "vital_unit": "lbs"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "fieldMappings": {
+    "intakeToApi": {}
+  }
+}

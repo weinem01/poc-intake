@@ -1,0 +1,57 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Backend (FastAPI)",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/main.py",
+      "cwd": "${workspaceFolder}/backend",
+      "console": "integratedTerminal",
+      "args": [],
+      "envFile": "${workspaceFolder}/backend/.env",
+      "python": "${workspaceFolder}/backend/.venv/Scripts/python.exe"
+    },
+    {
+      "name": "Debug Frontend (Next.js)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "cwd": "${workspaceFolder}/frontend",
+      "console": "integratedTerminal",
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+    {
+      "name": "Python: Attach to Running FastAPI",
+      "type": "debugpy",
+      "request": "attach",
+      "connect": {
+        "host": "localhost",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/backend",
+          "remoteRoot": "."
+        }
+      ],
+      "justMyCode": false
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🚀 Debug Full Stack",
+      "configurations": [
+        "Debug Backend (FastAPI)",
+        "Debug Frontend (Next.js)"
+      ],
+      "stopAll": true
+    }
+  ]
+}
