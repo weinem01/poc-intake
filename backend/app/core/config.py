@@ -121,16 +121,42 @@ class Settings(BaseSettings):
     ]
     
     def get_openai_api_key(self) -> str:
-        """Get OpenAI API key from Secret Manager (on-demand)"""
-        return get_secret_manager().get_secret("openai-api-key")
+        """Get OpenAI API key from environment variable or Secret Manager"""
+        # Try environment variable first (for development)
+        env_key = os.getenv("OPENAI_API_KEY")
+        if env_key:
+            return env_key
+        
+        # Fall back to Secret Manager (for production)
+        try:
+            return get_secret_manager().get_secret("openai-api-key")
+        except Exception as e:
+            logger.error(f"Failed to get OpenAI API key from Secret Manager: {e}")
+            raise ValueError("OpenAI API key not found in environment variables or Secret Manager")
     
     def get_supabase_url(self) -> str:
-        """Get Supabase URL from Secret Manager (on-demand)"""
-        return get_secret_manager().get_secret("supabase-url")
+        """Get Supabase URL from environment variable or Secret Manager"""
+        env_url = os.getenv("SUPABASE_URL")
+        if env_url:
+            return env_url
+        
+        try:
+            return get_secret_manager().get_secret("supabase-url")
+        except Exception as e:
+            logger.error(f"Failed to get Supabase URL from Secret Manager: {e}")
+            raise ValueError("Supabase URL not found in environment variables or Secret Manager")
     
     def get_supabase_service_role_key(self) -> str:
-        """Get Supabase service role key from Secret Manager (on-demand)"""
-        return get_secret_manager().get_secret("supabase-service-role-key")
+        """Get Supabase service role key from environment variable or Secret Manager"""
+        env_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        if env_key:
+            return env_key
+            
+        try:
+            return get_secret_manager().get_secret("supabase-service-role-key")
+        except Exception as e:
+            logger.error(f"Failed to get Supabase service role key from Secret Manager: {e}")
+            raise ValueError("Supabase service role key not found in environment variables or Secret Manager")
     
     def get_charm_client_id(self) -> str:
         """Get Charm Tracker client ID from Secret Manager (on-demand)"""
@@ -152,6 +178,15 @@ class Settings(BaseSettings):
         """Get Charm Tracker auth base URL from Secret Manager (on-demand)"""
         return get_secret_manager().get_secret("charm-auth-base-url")
     
+    def get_perplexity_api_key(self) -> str:
+        """Get Perplexity API key from environment variable or Secret Manager"""
+        # Try environment variable first (for local development)
+        env_key = os.getenv("PERPLEXITY_API_KEY")
+        if env_key:
+            return env_key
+        # Fall back to Secret Manager for production
+        return get_secret_manager().get_secret("perplexity-api-key")
+    
     @property
     def charm_api_base_url(self) -> str:
         """Get Charm Tracker API base URL (static)"""
@@ -160,6 +195,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"  # Ignore extra fields in .env file
 
 
 @lru_cache()

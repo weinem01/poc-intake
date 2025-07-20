@@ -17,6 +17,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "google-cloud-secret-manager>=2.18.1",
     "google-auth>=2.25.2",
+    "pytest>=8.4.1",
 ]
 
 [tool.uv]

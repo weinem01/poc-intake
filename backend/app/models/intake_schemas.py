@@ -75,288 +75,388 @@ class TreatmentApproachEnum(str, Enum):
 
 # Demographics Models
 class PhoneInfo(BaseModel):
-    mobile: str = Field(..., max_length=15)
-    home: Optional[str] = Field(None, max_length=15)
-    work: Optional[str] = Field(None, max_length=15)
-    work_extension: Optional[str] = Field(None, max_length=4, alias="workExtension")
-    preferred: Optional[PreferredContactEnum] = None
+    mobile: str = Field(..., max_length=15, description="AI Agent: Ask 'What is your mobile phone number?'")
+    home: Optional[str] = Field(None, max_length=15, description="AI Agent: Ask 'Do you have a home phone number?'")
+    work: Optional[str] = Field(None, max_length=15, description="AI Agent: Ask 'Do you want to provide a work phone number?'")
+    preferred: Optional[PreferredContactEnum] = Field(None, description="AI Agent: Ask 'Which phone number would you prefer us to contact you on?' Options: mobile, home, work, only if there is more than one phone number, otherwise choose mobile")
 
 
 class Address(BaseModel):
-    address_line1: str = Field(..., max_length=35, alias="addressLine1")
-    address_line2: Optional[str] = Field(None, max_length=35, alias="addressLine2")
-    city: str = Field(..., max_length=35)
-    state: str = Field(..., max_length=50)
-    country: str = Field(default="us", max_length=2)
-    zip_code: str = Field(..., max_length=10, alias="zipCode")
+    address_line1: str = Field(..., max_length=35, alias="addressLine1", description="AI Agent: Ask 'What is your home address?' If the patient adds more than their street address, review the response and use it to populate the remaining address fields")
+    address_line2: Optional[str] = Field(None, max_length=35, alias="addressLine2", description="AI Agent: Ask 'Do you have an apartment, suite, or unit number?' (Optional)")
+    city: str = Field(..., max_length=35, description="AI Agent: Ask 'What city do you live in?'")
+    state: str = Field(..., max_length=50, description="AI Agent: Ask 'What state do you live in?'")
+    country: str = Field(default="us", max_length=2, description="AI Agent: Country code - defaults to 'us' for United States. Only ask if address format suggests international (postal codes with letters, unusual formats).")
+    zip_code: str = Field(..., max_length=10, alias="zipCode", description="AI Agent: Ask 'What is your ZIP code?'")
 
 
 class EmergencyContact(BaseModel):
-    name: str = Field(..., max_length=70)
-    phone: str = Field(..., max_length=10)
-    phone_extension: Optional[str] = Field(None, max_length=4, alias="phoneExtension")
+    name: str = Field(..., max_length=70, description="AI Agent: Ask 'Who should we contact in case of an emergency? Can you also provide a phone number and relationship?'")
+    phone: str = Field(..., max_length=10, description="AI Agent: Ask 'What is their phone number?'")
+    relationship: Optional[str] = Field(None, max_length=35, description="AI Agent: Ask 'What is their relationship to you?'")
 
 
 class CommunicationPreferences(BaseModel):
-    preferred_method: Optional[CommunicationMethodEnum] = Field(None, alias="preferredMethod")
-    email_notifications: bool = Field(default=True, alias="emailNotifications")
-    text_notifications: bool = Field(default=True, alias="textNotifications")
-    voice_notifications: bool = Field(default=True, alias="voiceNotifications")
+    preferred_method: Optional[CommunicationMethodEnum] = Field(None, alias="preferredMethod", description="AI Agent: Ask 'How would you prefer to receive important communications from us?' Options: email, phone, text, portal")
+    email_notifications: bool = Field(default=True, alias="emailNotifications", description="AI Agent: Ask 'Would you like to receive email notifications?' Default: True")
+    text_notifications: bool = Field(default=True, alias="textNotifications", description="AI Agent: Ask 'Would you like to receive text message notifications?' Default: True")
+    voice_notifications: bool = Field(default=True, alias="voiceNotifications", description="AI Agent: Ask 'Would you like to receive voice call notifications?' Default: True")
 
 
-class AdditionalInfo(BaseModel):
-    language: str = Field(default="English", max_length=100)
-    marital_status: Optional[MaritalStatusEnum] = Field(None, alias="maritalStatus")
-    employment_status: Optional[EmploymentStatusEnum] = Field(None, alias="employmentStatus")
+# Removed AdditionalInfo class - fields moved to IntakeDemographics directly
 
 
 class CareTeamProvider(BaseModel):
-    provider_name: Optional[str] = Field(None, alias="providerName")
-    phone: Optional[str] = Field(None, max_length=15)
-    specialty: Optional[str] = None
-    practice_name: Optional[str] = Field(None, alias="practiceName")
-    provider_id: Optional[int] = Field(None, alias="providerId")
-    relationship_type: Optional[str] = Field(None, alias="relationshipType")
-    is_primary_care_physician: Optional[bool] = Field(None, alias="isPrimaryCarePhysician")
+    provider_name: Optional[str] = Field(None, alias="providerName", description="AI Agent: Ask 'Would you like to provide the name of any of your doctors or other healthcare providers?'")
+    phone: Optional[str] = Field(None, max_length=15, description="AI Agent: Ask 'What is this provider's phone number?'")
+    provider_id: Optional[int] = Field(None, alias="providerId", description="This is never asked to the user, instead, use the search_providers tool to get the provider ID using the provider name and phone number. No need to gather additional data if a match is found")
+    specialty: Optional[str] = Field(None, description="AI Agent: Ask 'What is this provider's specialty?' If the provider is a pcp, specialty should be left empty and not asked about unless the user volunteers a specialty")
+    practice_name: Optional[str] = Field(None, alias="practiceName", description="AI Agent: Ask 'What is the name of their practice or clinic?'")
+    relationship_type: Optional[str] = Field(None, alias="relationshipType", description="AI Agent: Ask 'What type of care do they provide you?'")
+    is_primary_care_physician: Optional[bool] = Field(None, alias="isPrimaryCarePhysician", description="AI Agent: Ask 'Is this your primary care physician?' Yes/No question")
 
 
 class IntakeDemographics(BaseModel):
-    first_name: str = Field(..., max_length=35, alias="firstName")
-    middle_name: Optional[str] = Field(None, max_length=35, alias="middleName")
-    last_name: str = Field(..., max_length=35, alias="lastName")
-    date_of_birth: date = Field(..., alias="dateOfBirth")
-    gender: GenderEnum
-    email: str = Field(..., max_length=100)
-    phone: PhoneInfo
-    address: Address
-    emergency_contact: EmergencyContact = Field(..., alias="emergencyContact")
-    communication_preferences: Optional[CommunicationPreferences] = Field(None, alias="communicationPreferences")
-    additional_info: Optional[AdditionalInfo] = Field(None, alias="additionalInfo")
-    care_team_providers: Optional[List[CareTeamProvider]] = Field(None, alias="careTeamProviders")
+    first_name: str = Field(..., max_length=35, alias="firstName", description="AI Agent: Ask 'What is your first name?'")
+    middle_name: Optional[str] = Field(None, max_length=35, alias="middleName", description="AI Agent: Ask 'What is your middle name?'")
+    last_name: str = Field(..., max_length=35, alias="lastName", description="AI Agent: Ask 'What is your last name?'")
+    date_of_birth: date = Field(..., alias="dateOfBirth", description="AI Agent: Ask 'What is your date of birth?'")
+    gender: GenderEnum = Field(..., description="AI Agent: Ask 'What is your gender?' Options: male, female, other, unknown")
+    email: str = Field(..., max_length=100, description="AI Agent: Ask 'What is your email address?'")
+    phone: PhoneInfo = Field(..., description="AI Agent: 'What is your phone number?' Collect mobile, home, work, and preferred contact method")
+    address: Address = Field(..., description="AI Agent: Collect home address information")
+    emergency_contact: EmergencyContact = Field(..., alias="emergencyContact", description="AI Agent: Collect emergency contact information")
+    communication_preferences: Optional[CommunicationPreferences] = Field(None, alias="communicationPreferences", description="AI Agent: Ask about communication preferences (Optional)")
+    marital_status: Optional[MaritalStatusEnum] = Field(None, alias="maritalStatus", description="AI Agent: Ask 'What is your marital status?' Single, Married, Other?")
+    employment_status: Optional[EmploymentStatusEnum] = Field(None, alias="employmentStatus", description="AI Agent: Ask 'What is your employment status?' Employed, Full-Time Student, Part-Time Student, Unemployed, Retired")
+    care_team_providers: Optional[List[CareTeamProvider]] = Field(None, alias="careTeamProviders", description="AI Agent: Ask 'Do you have any current healthcare providers we should know about?' Based on the user's input, use the search_providers endpoint to get the provider ID and populate the care team provider information. If an existing provider can be found, return the details of that provider to the user to confirm that this is the correct provider. If no provider can be found on the search_providers tool, use the web search tool to try to find the provider, using the user's city and state as additioanl search terms to improve the accuracy of the search. Also, the user can enter a list of providers, so after adding a provider, be sure to ask if there are any additional providers that they'd like to add. If no providers are provided, this field can be None.")
+    is_complete: bool = Field(default=False, alias="isComplete", description="System field: Indicates if this demographics section has been completed. Default: False")
 
 
-# Insurance Models
-class PolicyHolder(BaseModel):
-    relationship: RelationshipEnum
-    first_name: str = Field(..., max_length=35, alias="firstName")
-    last_name: str = Field(..., max_length=35, alias="lastName")
-    date_of_birth: date = Field(..., alias="dateOfBirth")
-    gender: GenderEnum
-
-
-class InsuranceCards(BaseModel):
-    front_image_url: Optional[str] = Field(None, alias="frontImageUrl")
-    back_image_url: Optional[str] = Field(None, alias="backImageUrl")
-
-
-class InsurancePlan(BaseModel):
-    insurance_type: InsuranceTypeEnum = Field(..., alias="insuranceType")
-    plan_name: Optional[str] = Field(None, max_length=150, alias="planName")
-    plan_id: str = Field(..., max_length=30, alias="planId")
-    group_number: Optional[str] = Field(None, max_length=30, alias="groupNumber")
-    practice_payer_id: Optional[int] = Field(None, alias="practicePayerId")
-    payer_name: Optional[str] = Field(None, max_length=150, alias="payerName")
-    employer: Optional[str] = Field(None, max_length=150)
-    valid_from: Optional[date] = Field(None, alias="validFrom")
-    valid_to: Optional[date] = Field(None, alias="validTo")
-    policy_holder: PolicyHolder = Field(..., alias="policyHolder")
-    insurance_cards: Optional[InsuranceCards] = Field(None, alias="insuranceCards")
-
-
-class SecondaryInsurance(BaseModel):
-    has_secondary: Optional[bool] = Field(None, alias="hasSecondary")
-    insurance_type: Optional[InsuranceTypeEnum] = Field(None, alias="insuranceType")
-    plan_name: Optional[str] = Field(None, max_length=150, alias="planName")
-    plan_id: Optional[str] = Field(None, max_length=30, alias="planId")
-    group_number: Optional[str] = Field(None, max_length=30, alias="groupNumber")
-    payer_name: Optional[str] = Field(None, max_length=150, alias="payerName")
-    policy_holder: Optional[PolicyHolder] = Field(None, alias="policyHolder")
-    insurance_cards: Optional[InsuranceCards] = Field(None, alias="insuranceCards")
-
-
-class PharmacyCard(BaseModel):
-    has_separate_pharmacy: Optional[bool] = Field(None, alias="hasSeparatePharmacy")
-    front_image_url: Optional[str] = Field(None, alias="frontImageUrl")
-    back_image_url: Optional[str] = Field(None, alias="backImageUrl")
-
-
-class DriversLicense(BaseModel):
-    has_drivers_license: Optional[bool] = Field(None, alias="hasDriversLicense")
-    image_url: Optional[str] = Field(None, alias="imageUrl")
-
-
-class IdentificationDocuments(BaseModel):
-    drivers_license: Optional[DriversLicense] = Field(None, alias="driversLicense")
-
-
-class IntakeInsurance(BaseModel):
-    primary_insurance: InsurancePlan = Field(..., alias="primaryInsurance")
-    secondary_insurance: Optional[SecondaryInsurance] = Field(None, alias="secondaryInsurance")
-    pharmacy_card: Optional[PharmacyCard] = Field(None, alias="pharmacyCard")
-    identification_documents: Optional[IdentificationDocuments] = Field(None, alias="identificationDocuments")
+# Insurance Models - COMMENTED OUT FOR TESTING
+# # class PolicyHolder(BaseModel):
+#     relationship: RelationshipEnum = Field(
+#         ...,
+#         description="AI Agent: Ask 'What is your relationship to the policy holder?' Options: Self, Spouse, Child, Other"
+#     )
+#     first_name: str = Field(
+#         ..., 
+#         max_length=35, 
+#         alias="firstName",
+#         description="AI Agent: Ask 'What is the policy holder's first name?'"
+#     )
+#     last_name: str = Field(
+#         ..., 
+#         max_length=35, 
+#         alias="lastName",
+#         description="AI Agent: Ask 'What is the policy holder's last name?'"
+#     )
+#     date_of_birth: date = Field(
+#         ..., 
+#         alias="dateOfBirth",
+#         description="AI Agent: Ask 'What is the policy holder's date of birth?' Format as YYYY-MM-DD"
+#     )
+#     gender: GenderEnum = Field(
+#         ...,
+#         description="AI Agent: Ask 'What is the policy holder's gender?' Options: Male, Female, Other"
+#     )
+# 
+# 
+# class InsuranceCards(BaseModel):
+#     front_image_url: Optional[str] = Field(None, alias="frontImageUrl")
+#     back_image_url: Optional[str] = Field(None, alias="backImageUrl")
+# 
+# 
+# class InsurancePlan(BaseModel):
+#     insurance_type: InsuranceTypeEnum = Field(
+#         ..., 
+#         alias="insuranceType",
+#         description="AI Agent: Ask 'What type of insurance do you have?' Options: Medicare, Medicaid, Tricare, Group Health Plan, or Other"
+#     )
+#     plan_name: Optional[str] = Field(
+#         None, 
+#         max_length=150, 
+#         alias="planName",
+#         description="AI Agent: Ask 'What is the name of your insurance plan?' (e.g., Blue Cross Blue Shield PPO, Aetna HMO, etc.)"
+#     )
+#     member_id: str = Field(
+#         ..., 
+#         max_length=30, 
+#         alias="memberId",
+#         description="AI Agent: Ask 'What is your member ID or policy number as shown on your insurance card?' Note: This is also called subscriber ID - they are the same thing"
+#     )
+#     group_number: Optional[str] = Field(
+#         None, 
+#         max_length=30, 
+#         alias="groupNumber",
+#         description="AI Agent: Ask 'What is your group number from your insurance card?' This is usually found on the front of the card"
+#     )
+#     practice_payer_id: Optional[int] = Field(None, alias="practicePayerId")
+#     payer_name: Optional[str] = Field(
+#         None, 
+#         max_length=150, 
+#         alias="payerName",
+#         description="AI Agent: Ask 'Who is your insurance provider?' (e.g., Blue Cross Blue Shield, UnitedHealthcare, Aetna, Cigna, etc.)"
+#     )
+#     employer: Optional[str] = Field(
+#         None, 
+#         max_length=150,
+#         description="AI Agent: Ask 'What is the name of your employer or the organization that provides your insurance?' Only ask if insurance_type is GROUP_HEALTH_PLAN"
+#     )
+#     valid_from: Optional[date] = Field(
+#         None, 
+#         alias="validFrom",
+#         description="AI Agent: Ask 'When did your insurance coverage start?' Format as YYYY-MM-DD"
+#     )
+#     valid_to: Optional[date] = Field(
+#         None, 
+#         alias="validTo",
+#         description="AI Agent: Ask 'When does your insurance coverage end or expire?' Format as YYYY-MM-DD. Optional field"
+#     )
+#     policy_holder: PolicyHolder = Field(
+#         ..., 
+#         alias="policyHolder",
+#         description="AI Agent: Ask for policy holder information - who the insurance policy belongs to"
+#     )
+#     insurance_cards: Optional[InsuranceCards] = Field(
+#         None, 
+#         alias="insuranceCards",
+#         description="AI Agent: Ask 'Can you upload photos of the front and back of your insurance card?' Optional but helpful for verification"
+#     )
+# 
+# 
+# class SecondaryInsurance(BaseModel):
+#     has_secondary: Optional[bool] = Field(
+#         None, 
+#         alias="hasSecondary",
+#         description="AI Agent: Ask 'Do you have a secondary insurance plan?' Yes/No question"
+#     )
+#     insurance_type: Optional[InsuranceTypeEnum] = Field(
+#         None, 
+#         alias="insuranceType",
+#         description="AI Agent: If has_secondary is True, ask 'What type of secondary insurance do you have?' Options: Medicare, Medicaid, Tricare, Group Health Plan, or Other"
+#     )
+#     plan_name: Optional[str] = Field(
+#         None, 
+#         max_length=150, 
+#         alias="planName",
+#         description="AI Agent: Ask 'What is the name of your secondary insurance plan?'"
+#     )
+#     member_id: Optional[str] = Field(
+#         None, 
+#         max_length=30, 
+#         alias="memberId",
+#         description="AI Agent: Ask 'What is your member ID for your secondary insurance?'"
+#     )
+#     group_number: Optional[str] = Field(
+#         None, 
+#         max_length=30, 
+#         alias="groupNumber",
+#         description="AI Agent: Ask 'What is your group number for your secondary insurance?'"
+#     )
+#     payer_name: Optional[str] = Field(
+#         None, 
+#         max_length=150, 
+#         alias="payerName",
+#         description="AI Agent: Ask 'Who is your secondary insurance provider?'"
+#     )
+#     policy_holder: Optional[PolicyHolder] = Field(
+#         None, 
+#         alias="policyHolder",
+#         description="AI Agent: Ask for secondary insurance policy holder information"
+#     )
+#     insurance_cards: Optional[InsuranceCards] = Field(
+#         None, 
+#         alias="insuranceCards",
+#         description="AI Agent: Ask 'Can you upload photos of your secondary insurance card?'"
+#     )
+# 
+# 
+# class PharmacyCard(BaseModel):
+#     has_separate_pharmacy: Optional[bool] = Field(None, alias="hasSeparatePharmacy", description="AI Agent: Ask 'Do you have a separate pharmacy card?' Yes/No question (Optional)")
+#     front_image_url: Optional[str] = Field(None, alias="frontImageUrl", description="AI Agent: Ask 'Can you upload a photo of the front of your pharmacy card?' (Optional)")
+#     back_image_url: Optional[str] = Field(None, alias="backImageUrl", description="AI Agent: Ask 'Can you upload a photo of the back of your pharmacy card?' (Optional)")
+# 
+# 
+# class DriversLicense(BaseModel):
+#     has_drivers_license: Optional[bool] = Field(None, alias="hasDriversLicense", description="AI Agent: Ask 'Do you have a driver's license for identification?' Yes/No question (Optional)")
+#     image_url: Optional[str] = Field(None, alias="imageUrl", description="AI Agent: Ask 'Can you upload a photo of your driver's license?' (Optional)")
+# 
+# 
+# class IdentificationDocuments(BaseModel):
+#     drivers_license: Optional[DriversLicense] = Field(None, alias="driversLicense", description="AI Agent: Collect driver's license information for identification (Optional)")
+# 
+# 
+# class IntakeInsurance(BaseModel):
+#     primary_insurance: InsurancePlan = Field(..., alias="primaryInsurance", description="AI Agent: Collect primary insurance information")
+#     secondary_insurance: Optional[SecondaryInsurance] = Field(None, alias="secondaryInsurance", description="AI Agent: Collect secondary insurance information if applicable (Optional)")
+#     pharmacy_card: Optional[PharmacyCard] = Field(None, alias="pharmacyCard", description="AI Agent: Collect pharmacy card information if applicable (Optional)")
+#     identification_documents: Optional[IdentificationDocuments] = Field(None, alias="identificationDocuments", description="AI Agent: Collect identification documents like driver's license (Optional)")
 
 
 # Weight History Models
 class Height(BaseModel):
-    feet: int
-    inches: int
+    feet: int = Field(..., description="AI Agent: Ask 'How tall are you?' Extract feet and inches from the response")
+    inches: int = Field(..., description="AI Agent: Ask 'How many additional inches?'")
 
 
 class CurrentVitals(BaseModel):
-    height: Height
-    weight: float
+    height: Height = Field(..., description="AI Agent: Collect current height information")
+    weight: float = Field(..., description="AI Agent: Ask 'What is your current weight in pounds?'")
 
 
 class WeightHistory(BaseModel):
-    max_ever_weighed: Optional[float] = Field(None, alias="maxEverWeighed")
-    age_at_max_weight: Optional[int] = Field(None, alias="ageAtMaxWeight")
-    max_weight_lost_by_dieting: Optional[float] = Field(None, alias="maxWeightLostByDieting")
+    max_ever_weighed: Optional[float] = Field(None, alias="maxEverWeighed", description="AI Agent: Ask 'What is the most you have ever weighed?' Specify that they should exclude pregnancy weight if they are female")
+    age_at_max_weight: Optional[int] = Field(None, alias="ageAtMaxWeight", description="AI Agent: Ask 'How old were you when you weighed the most?'")
+    max_weight_lost_by_dieting: Optional[float] = Field(None, alias="maxWeightLostByDieting", description="AI Agent: Ask 'What is the most weight you have ever lost through dieting?'")
 
 
 class WeightGainFactors(BaseModel):
-    weight_gaining_medications: Optional[str] = Field(None, alias="weightGainingMedications")
-    injuries: Optional[str] = None
-    chronic_stress_or_depression: Optional[str] = Field(None, alias="chronicStressOrDepression")
-    processed_food_addictions: Optional[str] = Field(None, alias="processedFoodAddictions")
-    pregnancy: Optional[str] = None
-    menopause: Optional[str] = None
-    sugar_containing_beverages: Optional[str] = Field(None, alias="sugarContainingBeverages")
-    alcohol: Optional[str] = None
-    artificial_sweetener: Optional[str] = Field(None, alias="artificialSweetener")
-    quitting_smoking: Optional[str] = Field(None, alias="quittingSmoking")
-    genetics: Optional[str] = None
-    night_shift_work: Optional[str] = Field(None, alias="nightShiftWork")
-    childhood_trauma: Optional[str] = Field(None, alias="childhoodTrauma")
+    weight_gaining_medications: Optional[str] = Field(None, alias="weightGainingMedications", description="AI Agent: Ask 'Let's discuss things that have caused your weight gain, Have you taken any medications that may have caused weight gain? Please list as many factors as you can including injuries, chronic stress, depression, food addictions, pregnancy, menopause, sugary beverages, alcohol, artificial sweeteners, quitting smoking, genetics, night shift work, and childhood trauma.'")
+    injuries: Optional[str] = Field(None, description="AI Agent: Ask 'Have you had any injuries that affected your activity level or weight?'")
+    chronic_stress_or_depression: Optional[str] = Field(None, alias="chronicStressOrDepression", description="AI Agent: Ask 'Have you experienced chronic stress or depression that affected your weight?'")
+    processed_food_addictions: Optional[str] = Field(None, alias="processedFoodAddictions", description="AI Agent: Ask 'Do you struggle with cravings for processed foods?'")
+    pregnancy: Optional[str] = Field(None, description="AI Agent: Ask 'Has pregnancy affected your weight?' Only ask if gender=female")
+    menopause: Optional[str] = Field(None, description="AI Agent: Ask 'Has menopause affected your weight?' Only ask if gender=female")
+    sugar_containing_beverages: Optional[str] = Field(None, alias="sugarContainingBeverages", description="AI Agent: Ask 'Do you regularly drink sugary beverages like soda, sugary coffee drinks, sweet tea, fruit juice or other beverages that contain sugar?'")
+    alcohol: Optional[str] = Field(None, description="AI Agent: Ask 'Has alcohol consumption affected your weight?'")
+    artificial_sweetener: Optional[str] = Field(None, alias="artificialSweetener", description="AI Agent: Ask 'Do you use artificial sweeteners regularly?'")
+    quitting_smoking: Optional[str] = Field(None, alias="quittingSmoking", description="AI Agent: Ask 'Did you gain weight after quitting smoking?'")
+    genetics: Optional[str] = Field(None, description="AI Agent: Ask 'Do you have a family history of obesity?'")
+    night_shift_work: Optional[str] = Field(None, alias="nightShiftWork", description="AI Agent: Ask 'Do you work night shifts or have you ever in the past?'")
+    childhood_trauma: Optional[str] = Field(None, alias="childhoodTrauma", description="AI Agent: Ask 'Did childhood experiences affect your relationship with food?'")
 
 
 class TypicalDayEating(BaseModel):
-    breakfast: Optional[str] = None
-    lunch: Optional[str] = None
-    dinner: Optional[str] = None
-    snacks_desserts: Optional[str] = Field(None, alias="snacksDesserts")
-    beverages: Optional[str] = None
+    breakfast: Optional[str] = Field(None, description="AI Agent: Ask 'Tell me about a typical day of eating, go through each meal and also include beverages and snacks.'")
+    lunch: Optional[str] = Field(None, description="AI Agent: Ask 'What do you typically eat for lunch?'")
+    dinner: Optional[str] = Field(None, description="AI Agent: Ask 'What do you typically eat for dinner?'")
+    snacks_desserts: Optional[str] = Field(None, alias="snacksDesserts", description="AI Agent: Ask 'What snacks or desserts do you typically eat?'")
+    beverages: Optional[str] = Field(None, description="AI Agent: Ask 'What do you typically drink throughout the day?'")
 
 
 class DietHistory(BaseModel):
-    past_diets_tried: Optional[List[str]] = Field(None, alias="pastDietsTried")
-    weight_gain_factors: Optional[WeightGainFactors] = Field(None, alias="weightGainFactors")
-    struggles_with_diet: Optional[List[str]] = Field(None, alias="strugglesWithDiet")
-    typical_day_eating: Optional[TypicalDayEating] = Field(None, alias="typicalDayEating")
+    past_diets_tried: Optional[List[str]] = Field(None, alias="pastDietsTried", description="AI Agent: Ask 'What diets have you tried in the past?' Examples: ['Keto', 'Weight Watchers', 'Low carb', 'Intermittent fasting'] (Optional)")
+    weight_gain_factors: Optional[WeightGainFactors] = Field(None, alias="weightGainFactors", description="AI Agent: Collect information about factors that may have contributed to weight gain (Optional)")
+    struggles_with_diet: Optional[List[str]] = Field(None, alias="strugglesWithDiet", description="AI Agent: Ask 'What are your biggest challenges with dieting?' Examples: ['Portion control', 'Late night eating', 'Emotional eating'] (Optional)")
+    typical_day_eating: Optional[TypicalDayEating] = Field(None, alias="typicalDayEating", description="AI Agent: Collect information about typical daily eating patterns (Optional)")
 
 
 class GLP1Medication(BaseModel):
-    has_tried: Optional[bool] = Field(None, alias="hasTried")
-    brand_names: Optional[List[str]] = Field(None, alias="brandNames")
-    highest_dose: Optional[str] = Field(None, alias="highestDose")
-    treatment_duration: Optional[str] = Field(None, alias="treatmentDuration")
-    weight_lost: Optional[float] = Field(None, alias="weightLost")
+    has_tried: Optional[bool] = Field(None, alias="hasTried", description="AI Agent: Ask 'Have you tried this type of GLP-1 medication?' Yes/No question")
+    brand_names: Optional[List[str]] = Field(None, alias="brandNames", description="AI Agent: Ask 'What brand names have you used?' Examples: ['Ozempic', 'Wegovy', 'Mounjaro'] (Optional)")
+    highest_dose: Optional[str] = Field(None, alias="highestDose", description="AI Agent: Ask 'What was the highest dose you reached?'")
+    treatment_duration: Optional[str] = Field(None, alias="treatmentDuration", description="AI Agent: Ask 'How long did you use this medication?'")
+    weight_lost: Optional[float] = Field(None, alias="weightLost", description="AI Agent: Ask 'How much weight did you lose on this medication?'")
 
 
 class GLP1Medications(BaseModel):
-    has_tried_glp1: Optional[bool] = Field(None, alias="hasTriedGlp1")
-    tirzepatide: Optional[GLP1Medication] = None
-    semaglutide: Optional[GLP1Medication] = None
+    has_tried_glp1: Optional[bool] = Field(None, alias="hasTriedGlp1", description="AI Agent: Ask 'Have you ever tried GLP-1 medications for weight loss? What was the highest dose that you took, how much weight did you lose ont the medication?' Yes/No question")
+    tirzepatide: Optional[GLP1Medication] = Field(None, description="AI Agent: If they've tried tirzepatide (Mounjaro, Zepbound), collect details (Optional)")
+    semaglutide: Optional[GLP1Medication] = Field(None, description="AI Agent: If they've tried semaglutide (Ozempic, Wegovy), collect details (Optional)")
 
 
 class WeightLossMedicationHistory(BaseModel):
-    glp1_medications: Optional[GLP1Medications] = Field(None, alias="glp1Medications")
-    other_weight_loss_medications: Optional[List[str]] = Field(None, alias="otherWeightLossMedications")
+    glp1_medications: Optional[GLP1Medications] = Field(None, alias="glp1Medications", description="AI Agent: Collect information about GLP-1 medication history (Optional)")
+    other_weight_loss_medications: Optional[List[str]] = Field(None, alias="otherWeightLossMedications", description="AI Agent: Ask 'Have you tried any other weight loss medications?' Examples: ['Phentermine', 'Orlistat', 'Contrave'] (Optional)")
 
 
 class BariatricSurgeryHistory(BaseModel):
-    has_bariatric_surgery_history: Optional[bool] = Field(None, alias="hasBariatricSurgeryHistory")
-    surgery_year: Optional[int] = Field(None, alias="surgeryYear")
-    surgery_type: Optional[List[str]] = Field(None, alias="surgeryType")
-    pre_surgery_weight: Optional[float] = Field(None, alias="preSurgeryWeight")
-    lowest_weight_after_surgery: Optional[float] = Field(None, alias="lowestWeightAfterSurgery")
+    has_bariatric_surgery_history: Optional[bool] = Field(None, alias="hasBariatricSurgeryHistory", description="AI Agent: Ask 'Have you had bariatric (weight loss) surgery?' Yes/No question")
+    surgery_year: Optional[int] = Field(None, alias="surgeryYear", description="AI Agent: Ask 'What year did you have the surgery?'")
+    surgery_type: Optional[List[str]] = Field(None, alias="surgeryType", description="AI Agent: Ask 'What type of bariatric surgery did you have?' Examples: ['Gastric bypass', 'Sleeve gastrectomy', 'Lap band'] (Optional)")
+    pre_surgery_weight: Optional[float] = Field(None, alias="preSurgeryWeight", description="AI Agent: Ask 'What was your weight before surgery?'")
+    lowest_weight_after_surgery: Optional[float] = Field(None, alias="lowestWeightAfterSurgery", description="AI Agent: Ask 'What was the lowest weight you reached after surgery?'")
 
 
 class TreatmentPreferences(BaseModel):
-    treatment_approach: Optional[TreatmentApproachEnum] = Field(None, alias="treatmentApproach")
+    treatment_approach: Optional[TreatmentApproachEnum] = Field(None, alias="treatmentApproach", description="AI Agent: Ask 'What type of weight loss treatment are you most interested in?' Options: Surgical, Non-surgical, Both, Undecided")
 
 
 class IntakeWeightHistory(BaseModel):
-    current_vitals: CurrentVitals = Field(..., alias="currentVitals")
-    weight_history: Optional[WeightHistory] = Field(None, alias="weightHistory")
-    diet_history: Optional[DietHistory] = Field(None, alias="dietHistory")
-    exercise_information: Optional[str] = Field(None, alias="exerciseInformation")
-    weight_loss_medication_history: Optional[WeightLossMedicationHistory] = Field(None, alias="weightLossMedicationHistory")
-    bariatric_surgery_history: Optional[BariatricSurgeryHistory] = Field(None, alias="bariatricSurgeryHistory")
-    treatment_preferences: Optional[TreatmentPreferences] = Field(None, alias="treatmentPreferences")
+    current_vitals: CurrentVitals = Field(..., alias="currentVitals", description="AI Agent: Collect current height and weight measurements")
+    weight_history: Optional[WeightHistory] = Field(None, alias="weightHistory", description="AI Agent: Collect historical weight information (Optional)")
+    diet_history: Optional[DietHistory] = Field(None, alias="dietHistory", description="AI Agent: Collect information about past dieting attempts and eating patterns (Optional)")
+    exercise_information: Optional[str] = Field(None, alias="exerciseInformation", description="AI Agent: Ask 'Tell me about your current exercise routine.'")
+    weight_loss_medication_history: Optional[WeightLossMedicationHistory] = Field(None, alias="weightLossMedicationHistory", description="AI Agent: Collect information about previous weight loss medication use (Optional)")
+    bariatric_surgery_history: Optional[BariatricSurgeryHistory] = Field(None, alias="bariatricSurgeryHistory", description="AI Agent: Collect information about previous bariatric surgery (Optional)")
+    treatment_preferences: Optional[TreatmentPreferences] = Field(None, alias="treatmentPreferences", description="AI Agent: Collect patient preferences for treatment approach (Optional)")
+    is_complete: bool = Field(default=False, alias="isComplete", description="System field: Indicates if this weight history section has been completed. Default: False")
 
 
 # Medical History Models
 class Medication(BaseModel):
-    medication_name: Optional[str] = Field(None, alias="medicationName")
-    strength: Optional[str] = None
-    directions: Optional[str] = None
+    medication_name: Optional[str] = Field(None, alias="medicationName", description="AI Agent: Ask 'What is the name of this medication?'")
+    strength: Optional[str] = Field(None, description="AI Agent: Ask 'What is the strength or dosage?'")
+    directions: Optional[str] = Field(None, description="AI Agent: Ask 'How do you take this medication?'")
 
 
 class Allergy(BaseModel):
-    allergen: Optional[str] = None
-    reaction: Optional[str] = None
-    severity: Optional[SeverityEnum] = None
+    allergen: Optional[str] = Field(None, description="AI Agent: Ask 'What are you allergic to?'")
+    reaction: Optional[str] = Field(None, description="AI Agent: Ask 'What reaction do you have?'")
+    severity: Optional[SeverityEnum] = Field(None, description="AI Agent: Ask 'How severe is this allergy?' Options: Mild, Moderate, Severe (Optional)")
 
 
 class FamilyHistoryItem(BaseModel):
-    family_member: str = Field(..., alias="familyMember")
-    medical_problem: str = Field(..., alias="medicalProblem")
+    family_member: str = Field(..., alias="familyMember", description="AI Agent: Ask 'Which family member?'")
+    medical_problem: str = Field(..., alias="medicalProblem", description="AI Agent: Ask 'What medical condition did they have?'")
 
 
 class PastSurgery(BaseModel):
-    surgery_type: str = Field(..., alias="surgeryType")
-    year: int
+    surgery_type: str = Field(..., alias="surgeryType", description="AI Agent: Ask 'What type of surgery did you have?'")
+    year: int = Field(..., description="AI Agent: Ask 'What year was the surgery?'")
 
 
 class GERDHeartburn(BaseModel):
-    has_gerd: Optional[bool] = Field(None, alias="hasGerd")
-    gerd_details: Optional[str] = Field(None, alias="gerdDetails")
+    has_gerd: Optional[bool] = Field(None, alias="hasGerd", description="AI Agent: Ask 'Do you have GERD or frequent heartburn?' Yes/No question")
+    gerd_details: Optional[str] = Field(None, alias="gerdDetails", description="AI Agent: Ask 'Tell me about your GERD symptoms.'")
 
 
 class Pancreatitis(BaseModel):
-    has_pancreatitis: Optional[bool] = Field(None, alias="hasPancreatitis")
-    number_of_attacks: Optional[int] = Field(None, alias="numberOfAttacks")
-    cause: Optional[str] = None
+    has_pancreatitis: Optional[bool] = Field(None, alias="hasPancreatitis", description="AI Agent: Ask 'Have you ever had pancreatitis?' Yes/No question")
+    number_of_attacks: Optional[int] = Field(None, alias="numberOfAttacks", description="AI Agent: Ask 'How many episodes of pancreatitis have you had?'")
+    cause: Optional[str] = Field(None, description="AI Agent: Ask 'What caused your pancreatitis?'")
 
 
 class SpecificConditions(BaseModel):
-    gerd_heartburn: Optional[GERDHeartburn] = Field(None, alias="gerdHeartburn")
-    pancreatitis: Optional[Pancreatitis] = None
+    gerd_heartburn: Optional[GERDHeartburn] = Field(None, alias="gerdHeartburn", description="AI Agent: Collect information about GERD/heartburn history (Optional)")
+    pancreatitis: Optional[Pancreatitis] = Field(None, description="AI Agent: Collect information about pancreatitis history (Optional)")
 
 
 class SocialHistory(BaseModel):
-    smoking_summary: str = Field(..., alias="smokingSummary")
-    alcohol_summary: str = Field(..., alias="alcoholSummary")
-    marijuana_summary: Optional[str] = Field(None, alias="marijuanaSummary")
-    drug_summary: str = Field(..., alias="drugSummary")
-    employment_status: Optional[EmploymentStatusEnum] = Field(None, alias="employmentStatus")
-    financial_situation: Optional[str] = Field(None, alias="financialSituation")
-    employment_details: Optional[str] = Field(None, alias="employmentDetails")
-    education_background: Optional[str] = Field(None, alias="educationBackground")
+    smoking_summary: str = Field(..., alias="smokingSummary", description="AI Agent: Ask 'Tell me about your smoking history.'")
+    alcohol_summary: str = Field(..., alias="alcoholSummary", description="AI Agent: Ask 'Tell me about your alcohol use.'")
+    marijuana_summary: Optional[str] = Field(None, alias="marijuanaSummary", description="AI Agent: Ask 'Do you use marijuana?'")
+    drug_summary: str = Field(..., alias="drugSummary", description="AI Agent: Ask 'Have you used any recreational drugs?'")
+    employment_status: Optional[EmploymentStatusEnum] = Field(None, alias="employmentStatus", description="AI Agent: Ask 'What is your current employment status?' Options: Employed, Full-Time Student, Part-Time Student, Unemployed, Retired (Optional)")
+    financial_situation: Optional[str] = Field(None, alias="financialSituation", description="AI Agent: Ask 'How would you describe your financial situation?'")
+    employment_details: Optional[str] = Field(None, alias="employmentDetails", description="AI Agent: Ask 'What is your job or occupation?'")
+    education_background: Optional[str] = Field(None, alias="educationBackground", description="AI Agent: Ask 'What is your highest level of education?'")
 
 
 class IntakeMedicalHistory(BaseModel):
-    current_medications: Optional[List[Medication]] = Field(None, alias="currentMedications")
-    allergies: Optional[List[Allergy]] = None
-    pmhx: Optional[List[str]] = Field(None, alias="PMHx")
-    pmhx_obesity_comorbid: Optional[List[str]] = Field(None, alias="PMHxObesityComorbid")
-    family_history: Optional[List[FamilyHistoryItem]] = Field(None, alias="familyHistory")
-    past_surgical_history: Optional[List[PastSurgery]] = Field(None, alias="pastSurgicalHistory")
-    specific_conditions: Optional[SpecificConditions] = Field(None, alias="specificConditions")
-    social_history: SocialHistory = Field(..., alias="socialHistory")
+    current_medications: Optional[List[Medication]] = Field(None, alias="currentMedications", description="AI Agent: Ask 'What medications are you currently taking? Feel free to list all of them at once.' Include prescription and over-the-counter medications (Optional)")
+    allergies: Optional[List[Allergy]] = Field(None, description="AI Agent: Ask 'Do you have any allergies to medications, foods, or other substances?' (Optional)")
+    pmhx: Optional[List[str]] = Field(None, alias="PMHx", description="AI Agent: Ask 'What medical cond itions have you been diagnosed with?' Examples: ['Hypertension', 'Diabetes Type 2', 'Asthma'] (Optional)")
+    pmhx_obesity_comorbid: Optional[List[str]] = Field(None, alias="PMHxObesityComorbid", description="AI Agent: Ask 'Do you have any weight-related health conditions?' Examples: ['Sleep apnea', 'High cholesterol', 'Joint pain'] (Optional)")
+    family_history: Optional[List[FamilyHistoryItem]] = Field(None, alias="familyHistory", description="AI Agent: Ask 'What medical conditions run in your family?' Collect family member and condition pairs (Optional)")
+    past_surgical_history: Optional[List[PastSurgery]] = Field(None, alias="pastSurgicalHistory", description="AI Agent: Ask 'Have you had any surgeries?' Collect surgery type and year (Optional)")
+    specific_conditions: Optional[SpecificConditions] = Field(None, alias="specificConditions", description="AI Agent: Ask about specific conditions like GERD and pancreatitis (Optional)")
+    social_history: SocialHistory = Field(..., alias="socialHistory", description="AI Agent: Collect social history including smoking, alcohol, drugs, employment, and education")
+    is_complete: bool = Field(default=False, alias="isComplete", description="System field: Indicates if this medical history section has been completed. Default: False")
 
 
 # Main Intake Session Model
 class IntakeSession(BaseModel):
     """Complete intake session containing all four schema sections"""
-    intake_demographics: Optional[IntakeDemographics] = Field(None, alias="intake_demographics")
-    intake_insurance: Optional[IntakeInsurance] = Field(None, alias="intake_insurance")
-    intake_weight_history: Optional[IntakeWeightHistory] = Field(None, alias="intake_weight_history")
-    intake_medical_history: Optional[IntakeMedicalHistory] = Field(None, alias="intake_medical_history")
-    completed: bool = False
-    session_id: Optional[str] = None
-    patient_mrn: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
-    rating: Optional[int] = Field(None, ge=1, le=5)
-    comments: Optional[str] = None
+    intake_demographics: Optional[IntakeDemographics] = Field(None, alias="intake_demographics", description="AI Agent: Collect patient demographic information including name, contact info, and address (Optional)")
+    # intake_insurance: Optional[IntakeInsurance] = Field(None, alias="intake_insurance", description="AI Agent: Collect insurance information including primary and secondary coverage (Optional)")
+    intake_weight_history: Optional[IntakeWeightHistory] = Field(None, alias="intake_weight_history", description="AI Agent: Collect weight management history including current vitals, diet history, and treatment preferences (Optional)")
+    intake_medical_history: Optional[IntakeMedicalHistory] = Field(None, alias="intake_medical_history", description="AI Agent: Collect medical history including medications, allergies, past conditions, and social history (Optional)")
+    completed: bool = Field(False, description="System field: Indicates if the intake session has been completed. Default: False")
+    session_id: Optional[str] = Field(None, description="System field: Unique identifier for this intake session.")
+    patient_mrn: Optional[str] = Field(None, description="System field: Patient's medical record number.")
+    created_at: Optional[str] = Field(None, description="System field: Timestamp when session was created.")
+    updated_at: Optional[str] = Field(None, description="System field: Timestamp when session was last updated.")
+    rating: Optional[int] = Field(None, ge=1, le=5, description="AI Agent: Ask 'How would you rate your experience with this intake process?' Scale 1-5 (Optional)")
+    comments: Optional[str] = Field(None, description="AI Agent: Ask 'Do you have any additional comments or concerns?'")

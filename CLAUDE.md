@@ -126,6 +126,17 @@ Frontend → API Request → Router → Service → Repository → Database
 - CORS configured in FastAPI for frontend access
 - API endpoints follow RESTful conventions
 
+### Charm Tracker API Integration
+- **API Documentation**: The `api_docs/` folder contains JSON files with detailed specifications for all Charm Tracker API endpoints
+- **Important**: Always consult the appropriate API documentation file when creating or editing Charm API calls to ensure correct payload structure, field names, and data types
+- Example API docs include:
+  - `Allergy API.json` - For patient allergy management
+  - `Patient API.json` - For patient demographics
+  - `Medication API.json` - For patient medications
+  - `Medical History API.json` - For medical history data
+- Each API doc specifies required fields, optional fields, valid enum values, and expected response formats
+- **Best Practice**: Before implementing any Charm API integration, review the corresponding JSON file in `api_docs/` to understand the exact payload requirements
+
 ### Authentication Flow
 1. Frontend sends credentials to `/auth/login`
 2. Backend validates and returns JWT token

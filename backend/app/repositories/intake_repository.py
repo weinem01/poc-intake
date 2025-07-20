@@ -183,22 +183,98 @@ class IntakeSessionRepository:
     
     def determine_current_section(self, intake_data: Dict[str, Any]) -> str:
         """
-        Determine which section the patient should continue with based on completed data
+        Determine which section the patient should continue with based on is_complete fields
         Returns the next section to work on
         """
+        # Insurance is commented out for testing
         sections = [
             "intake_demographics",
-            "intake_insurance", 
+            # "intake_insurance", 
             "intake_weight_history",
             "intake_medical_history"
         ]
         
+        # Check each section's is_complete status
         for section in sections:
-            if section not in intake_data or not intake_data[section]:
+            section_data = intake_data.get(section, {})
+            
+            # If section doesn't exist or is not marked complete, return it
+            if not section_data or not section_data.get("isComplete", False):
                 return section
         
-        # All sections have some data, return the last one for completion
+        # All sections are marked complete
         return "completed"
+    
+    async def mark_section_complete(self, session_id: str, section_name: str) -> bool:
+        """
+        Mark a specific intake section as complete
+        """
+        try:
+            # Get current session data
+            session_record = await self.verify_session(session_id)
+            if not session_record:
+                logger.error(f"Session {session_id} not found")
+                return False
+            
+            # Get current intake data
+            intake_data = session_record.get("intake", {})
+            
+            # Update the section's is_complete field
+            if section_name in intake_data:
+                intake_data[section_name]["isComplete"] = True
+                
+                # Update the session with modified intake data
+                success = await self.update_session_intake(session_record["id"], intake_data)
+                
+                if success:
+                    logger.info(f"Marked section {section_name} as complete for session {session_id}")
+                return success
+            else:
+                logger.warning(f"Section {section_name} not found in intake data for session {session_id}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error marking section {section_name} complete for session {session_id}: {e}")
+            raise
+    
+    def _is_demographics_complete(self, demographics_data: Dict[str, Any]) -> bool:
+        """
+        Check if demographics section has sufficient required information
+        (Kept for validation purposes - actual completion should use is_complete field)
+        """
+        if not demographics_data:
+            return False
+            
+        # Check required fields
+        required_fields = [
+            "firstName", "lastName", "dateOfBirth", "gender", "email"
+        ]
+        
+        for field in required_fields:
+            if field not in demographics_data or not demographics_data[field]:
+                return False
+        
+        # Check phone information
+        phone_data = demographics_data.get("phone", {})
+        if not phone_data or not phone_data.get("mobile"):
+            return False
+            
+        # Check address information
+        address_data = demographics_data.get("address", {})
+        if not address_data:
+            return False
+            
+        address_required = ["addressLine1", "city", "state", "zipCode"]
+        for field in address_required:
+            if field not in address_data or not address_data[field]:
+                return False
+                
+        # Check emergency contact
+        emergency_contact = demographics_data.get("emergencyContact")
+        if not emergency_contact or not emergency_contact.get("name") or not emergency_contact.get("phone"):
+            return False
+            
+        return True
     
     async def create_session_with_verification(self, charm_mrn: str, session_id: str, patient_data: Optional[Dict[str, Any]] = None) -> str:
         """
@@ -279,6 +355,50 @@ class IntakeSessionRepository:
             logger.error(f"Error verifying session {session_id}: {e}")
             raise
     
+    async def update_session_data(self, session_id: str, session_updates: Dict[str, Any]) -> bool:
+        """
+        Update specific session data fields
+        """
+        try:
+            # Find the record containing this session
+            record = await self.verify_session(session_id)
+            if not record:
+                logger.error(f"Session {session_id} not found")
+                return False
+            
+            # Update the session data
+            sessions = record.get("sessions", [])
+            session_updated = False
+            
+            for session in sessions:
+                if session.get("session_id") == session_id:
+                    session.update(session_updates)
+                    session_updated = True
+                    break
+            
+            if not session_updated:
+                logger.error(f"Session {session_id} not found in sessions array")
+                return False
+            
+            # Update the record with modified sessions
+            update_data = {
+                "sessions": sessions,
+                "last_updated": datetime.utcnow().isoformat()
+            }
+            
+            response = self._get_client().table(self.table_name).update(update_data).eq("id", record["id"]).execute()
+            
+            if not response.data:
+                logger.error(f"Failed to update session data for {session_id}")
+                return False
+            
+            logger.info(f"Updated session data for {session_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error updating session data for {session_id}: {e}")
+            raise
+
     async def confirm_session(self, session_id: str) -> bool:
         """
         Mark a session as confirmed after identity verification

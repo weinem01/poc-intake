@@ -1,120 +1,405 @@
 {
-  "apiName": "Medication API",
-  "baseUrl": "https://ehr.charmtracker.com/api/ehr/v1",
-  "authentication": {
-    "type": "Bearer",
-    "headerName": "Authorization",
-    "notes": "Token obtained from /auth/login endpoint"
+  "info": {
+    "title": "CharmHealth Medication API",
+    "description": "API for managing patient medications.",
+    "version": "1.0"
   },
+  "basePath": "/api/ehr/v1",
   "endpoints": [
     {
-      "name": "List Medications",
-      "method": "GET",
       "path": "/patients/{patient_id}/medications",
-      "description": "The API to list medications.",
-      "headers": {},
-      "request": {
-        "params": [
-          {
-            "name": "encounter_id",
-            "type": "integer",
-            "required": false,
-            "description": "Encounter Identifier"
-          },
-          {
-            "name": "page",
-            "type": "integer",
-            "required": false,
-            "description": "Page number"
-          },
-          {
-            "name": "per_page",
-            "type": "integer",
-            "required": false,
-            "description": "Medications per page"
-          },
-          {
-            "name": "sort_order",
-            "type": "string",
-            "required": false,
-            "description": "Sort ascending (A) or descending (D)"
-          }
-        ]
-      },
-      "response": {
-        "success": {
-          "status": 200,
-          "body": {
-            "code": "0",
-            "message": "success",
-            "medications": [
-              {
-                "patient_medication_id": "string",
-                "patient_id": "string",
-                "date_of_entry": "string",
-                "dosage_unit": "string",
-                "intake_rounte": "string",
-                "dispense": "string",
-                "refills": "string",
-                "dispense_unit": "string",
-                "drug_details_id": "string",
-                "generic_drug_name": "string",
-                "generic_product_name": "string",
-                "trade_name": "string",
-                "strength_description": "string",
-                "doseform_description": "string",
-                "encounter_id": "string",
-                "directions": "string",
-                "is_directions_edited": "boolean",
-                "manufacturing_type": "string",
-                "substitute_generic": "string",
-                "days_of_supply": "string"
-              }
-            ],
-            "page_context": {
-              "page": "string",
-              "per_page": "string",
-              "has_more_page": "boolean",
-              "sort_column": "string",
-              "sort_order": "string"
-            }
-          }
+      "method": "GET",
+      "summary": "List Medications for a Patient",
+      "parameters": [
+        {
+          "name": "patient_id",
+          "in": "path",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier for the patient."
+        },
+        {
+          "name": "encounter_id",
+          "in": "query",
+          "type": "long",
+          "required": false,
+          "description": "Filter medications by a specific encounter."
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "type": "integer",
+          "required": false,
+          "description": "Page number for pagination."
+        },
+        {
+          "name": "per_page",
+          "in": "query",
+          "type": "integer",
+          "required": false,
+          "description": "Number of medications per page."
+        },
+        {
+          "name": "sort_order",
+          "in": "query",
+          "type": "string",
+          "enum": [
+            "A",
+            "D"
+          ],
+          "required": false,
+          "description": "Sort order: 'A' for ascending, 'D' for descending."
         }
-      },
-      "examples": {
-        "request": "curl -i -X GET 'https://ehr.charmtracker.com/api/ehr/v1/patients/188400000002811/medications'",
-        "response": {
-          "code": "0",
-          "message": "success",
-          "medications": [
-            {
-              "patient_medication_id": "1884000023655067",
-              "patient_id": "188400000002811",
-              "date_of_entry": "2023-05-02",
-              "dosage_unit": "tablet(s)",
-              "intake_rounte": "oral",
-              "dispense": "90",
-              "refills": "3",
-              "dispense_unit": "C48542",
-              "drug_details_id": "1884000005904098",
-              "generic_drug_name": "pravastatin",
-              "generic_product_name": "pravastatin 40 mg oral tablet",
-              "trade_name": "Pravastatin Sodium",
-              "strength_description": "40 mg",
-              "doseform_description": "tablet",
-              "encounter_id": "1884000023611093",
-              "directions": "1 tablet(s) once a day in the evening for 90 Day(s), oral",
-              "is_directions_edited": "false",
-              "manufacturing_type": "Manufactured",
-              "substitute_generic": "1",
-              "days_of_supply": ""
-            }
-          ]
+      ],
+      "response": {
+        "code": "string",
+        "message": "string",
+        "medications": [
+          {
+            "patient_medication_id": "string",
+            "patient_id": "string",
+            "date_of_entry": "date",
+            "dosage_unit": "string",
+            "intake_rounte": "string",
+            "dispense": "string",
+            "refills": "string",
+            "dispense_unit": "string",
+            "drug_details_id": "string",
+            "generic_drug_name": "string",
+            "generic_product_name": "string",
+            "trade_name": "string",
+            "strength_description": "string",
+            "doseform_description": "string",
+            "encounter_id": "string",
+            "directions": "string",
+            "is_directions_edited": "boolean",
+            "manufacturing_type": "string",
+            "substitute_generic": "string",
+            "days_of_supply": "string",
+            "internal_comments": "string",
+            "rx_status": "string",
+            "start_date": "date",
+            "end_date": "date",
+            "is_active": "boolean",
+            "note_to_pharmacy": "string",
+            "route_description": "string",
+            "is_custom": "boolean",
+            "pharmacy_name": "string",
+            "pharmacy_ncpdp": "string",
+            "pharmacy_npi": "string",
+            "prescriber_name": "string",
+            "diagnosis": [
+              {
+                "DIAGNOSIS_CODE": "string",
+                "DIAGNOSIS_CODE_TYPE": "string",
+                "DIAGNOSIS": "string"
+              }
+            ]
+          }
+        ],
+        "page_context": {
+          "page": "string",
+          "per_page": "string",
+          "has_more_page": "boolean",
+          "sort_column": "string",
+          "sort_order": "string"
         }
       }
+    },
+    {
+      "path": "/patients/{patient_id}/medications",
+      "method": "POST",
+      "summary": "Add Medications for a Patient",
+      "parameters": [
+        {
+          "name": "patient_id",
+          "in": "path",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier for the patient."
+        }
+      ],
+      "body": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "drug_name": {
+              "type": "string",
+              "required": true
+            },
+            "trade_name": {
+              "type": "string",
+              "required": false
+            },
+            "strength_description": {
+              "type": "string",
+              "required": false
+            },
+            "is_active": {
+              "type": "boolean",
+              "required": true
+            },
+            "is_custom_drug": {
+              "type": "boolean",
+              "required": false,
+              "default": false
+            },
+            "directions": {
+              "type": "string",
+              "required": true,
+              "maxLength": 140
+            },
+            "is_directions_edited": {
+              "type": "boolean",
+              "required": false,
+              "default": false
+            },
+            "start_date": {
+              "type": "date",
+              "required": false
+            },
+            "stop_date": {
+              "type": "date",
+              "required": false
+            },
+            "encounter_id": {
+              "type": "long",
+              "required": false
+            },
+            "dispense": {
+              "type": "float",
+              "required": true
+            },
+            "dispense_unit": {
+              "type": "string",
+              "required": false
+            },
+            "refills": {
+              "type": "string",
+              "pattern": "[0-9]{1,2} | PRN | -1",
+              "required": true
+            },
+            "substitute_generic": {
+              "type": "boolean",
+              "required": true
+            },
+            "manufacturing_type": {
+              "type": "string",
+              "enum": [
+                "Manufactured",
+                "Compounded"
+              ],
+              "required": true
+            },
+            "prior_authorization_code": {
+              "type": "string",
+              "required": false
+            },
+            "prior_authorization_status": {
+              "type": "string",
+              "enum": [
+                "A",
+                "D",
+                "F",
+                "N",
+                "R"
+              ],
+              "required": false
+            },
+            "note_to_pharmacy": {
+              "type": "string",
+              "required": false
+            },
+            "internal_comments": {
+              "type": "string",
+              "required": false
+            },
+            "ndc": {
+              "type": "long",
+              "required": false
+            },
+            "route": {
+              "type": "string",
+              "required": false
+            },
+            "dose_form": {
+              "type": "string",
+              "required": false
+            },
+            "dosage_unit": {
+              "type": "string",
+              "required": false
+            },
+            "rx_sig": {
+              "type": "array",
+              "required": false,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "dosage": {
+                    "type": "float",
+                    "required": true
+                  },
+                  "sig_frequency": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "sig_intake": {
+                    "type": "string",
+                    "required": false
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "required": false
+                  },
+                  "duration_unit": {
+                    "type": "string",
+                    "enum": [
+                      "Day(s)",
+                      "Week(s)",
+                      "Month(s)"
+                    ],
+                    "required": false
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "path": "/patients/{patient_id}/medications/{patient_medication_id}",
+      "method": "PUT",
+      "summary": "Edit a Medication for a Patient",
+      "parameters": [
+        {
+          "name": "patient_id",
+          "in": "path",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier for the patient."
+        },
+        {
+          "name": "patient_medication_id",
+          "in": "path",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier for the medication record."
+        }
+      ],
+      "body": {
+        "type": "object",
+        "properties": {
+          "is_active": {
+            "type": "boolean",
+            "required": true
+          },
+          "directions": {
+            "type": "string",
+            "required": true
+          },
+          "is_directions_edited": {
+            "type": "boolean",
+            "required": false,
+            "default": false
+          },
+          "start_date": {
+            "type": "date",
+            "required": false
+          },
+          "stop_date": {
+            "type": "date",
+            "required": false
+          },
+          "encounter_id": {
+            "type": "long",
+            "required": false
+          },
+          "dispense": {
+            "type": "float",
+            "required": true
+          },
+          "refills": {
+            "type": "string",
+            "pattern": "[0-9]{1,2} | PRN | -1",
+            "required": true
+          },
+          "substitute_generic": {
+            "type": "boolean",
+            "required": true
+          },
+          "manufacturing_type": {
+            "type": "string",
+            "enum": [
+              "Manufactured",
+              "Compounded"
+            ],
+            "required": true
+          },
+          "prior_authorization_code": {
+            "type": "string",
+            "required": false
+          },
+          "prior_authorization_status": {
+            "type": "string",
+            "enum": [
+              "A",
+              "D",
+              "F",
+              "N",
+              "R"
+            ],
+            "required": false
+          },
+          "note_to_pharmacy": {
+            "type": "string",
+            "required": false
+          },
+          "internal_comments": {
+            "type": "string",
+            "required": false
+          },
+          "dispense_unit": {
+            "type": "string",
+            "required": false
+          },
+          "route": {
+            "type": "string",
+            "required": false
+          },
+          "dosage_unit": {
+            "type": "string",
+            "required": false
+          }
+        }
+      }
+    },
+    {
+      "path": "/patients/{patient_id}/medications/{patient_medication_id}",
+      "method": "DELETE",
+      "summary": "Delete a Medication for a Patient",
+      "parameters": [
+        {
+          "name": "patient_id",
+          "in": "path",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier for the patient."
+        },
+        {
+          "name": "patient_medication_id",
+          "in": "path",
+          "type": "string",
+          "required": true,
+          "description": "Unique identifier for the medication record."
+        }
+      ],
+      "response": {
+        "code": "string",
+        "message": "string"
+      }
     }
-  ],
-  "fieldMappings": {
-    "intakeToApi": {}
-  }
+  ]
 }

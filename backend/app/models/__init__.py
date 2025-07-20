@@ -4,7 +4,7 @@ Pydantic models for the POC Intake application
 
 from .intake_schemas import (
     IntakeDemographics,
-    IntakeInsurance,
+   # IntakeInsurance,
     IntakeWeightHistory,
     IntakeMedicalHistory,
     IntakeSession,
@@ -17,7 +17,7 @@ from .intake_schemas import (
 
 __all__ = [
     "IntakeDemographics",
-    "IntakeInsurance", 
+#    "IntakeInsurance", 
     "IntakeWeightHistory",
     "IntakeMedicalHistory",
     "IntakeSession",

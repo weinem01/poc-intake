@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
 
 interface Message {
   id: string;
@@ -21,6 +20,8 @@ export default function ChatbotPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [patientMRN, setPatientMRN] = useState<string | null>(null);
   const [sessionStatus, setSessionStatus] = useState<"initializing" | "active" | "error">("initializing");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const id = searchParams.get("id");
@@ -50,10 +51,19 @@ export default function ChatbotPage() {
     }
   }, [searchParams]);
 
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const initializeSession = async (mrn: string) => {
     try {
       setIsLoading(true);
-      
+
       // Call backend to initialize session
       const response = await fetch('http://localhost:8000/api/v1/sessions/init', {
         method: 'POST',
@@ -69,26 +79,28 @@ export default function ChatbotPage() {
       }
 
       const sessionData = await response.json();
-      
+
       // Store session ID for future requests
       sessionStorage.setItem('intake_session_id', sessionData.session_id);
-      
+
       // Add initial greeting with personalized message
       const patientName = sessionData.patient_data?.first_name || '';
       const greeting: Message = {
         id: `msg-${Date.now()}`,
-        text: `Hello${patientName ? ` ${patientName}` : ''}! My name is Sage, and I'm here to help gather information to prepare for your upcoming visit at Pound of Cure Weight Loss. This conversation will take between 10-30 minutes and will help our team provide you with the best possible care.
+        text: `<p>Hello${patientName ? ` ${patientName}` : ''}! My name is <strong>Sage</strong>, I'm <strong>AI powered</strong> and I'm here to help gather information to prepare for your upcoming visit at <strong>Pound of Cure Weight Loss</strong>. This conversation will take between <strong>10-30 minutes</strong> and will help our team provide you with the best possible care.</p>
 
-Before we begin, I'll need you to have the following items available:
-• Your insurance card
-• Driver's license or photo ID
-• A list of your current medications
-• Information about any doctors you see regularly
-• Any other health information you think our team should know
+<p>Before we begin, I'll need you to have the following items available:</p>
+<ul style="list-style-type: disc; padding-left: 20px; margin: 10px 0;">
+  <li>Your insurance card</li>
+  <li>Driver's license or photo ID</li>
+  <li>A list of your current medications</li>
+  <li>Information about any doctors you see regularly</li>
+  <li>Any other health information you think our team should know</li>
+</ul>
 
-You can stop at any time and return to this same link to continue where you left off. 
+<p><em>You can stop at any time and return to this same link to continue where you left off.</em></p>
 
-Let's get started!`,
+<p style="margin-top: 20px;"><strong>To get started, please confirm your <em>date of birth and last name</em> for verification purposes.</strong></p>`,
         sender: "sage",
         timestamp: new Date()
       };
@@ -96,6 +108,9 @@ Let's get started!`,
       setMessages([greeting]);
       setSessionStatus("active");
       
+      // Focus textarea after initial greeting
+      setTimeout(() => textareaRef.current?.focus(), 100);
+
     } catch (error) {
       console.error("Session initialization failed:", error);
       setSessionStatus("error");
@@ -124,6 +139,9 @@ Let's get started!`,
     setCurrentMessage("");
     setIsLoading(true);
 
+    // Scroll immediately after adding user message
+    setTimeout(scrollToBottom, 100);
+
     try {
       const sessionId = sessionStorage.getItem('intake_session_id');
       if (!sessionId) {
@@ -148,7 +166,7 @@ Let's get started!`,
       }
 
       const chatResponse = await response.json();
-      
+
       const sageResponse: Message = {
         id: `msg-${Date.now()}-sage`,
         text: chatResponse.response,
@@ -157,6 +175,12 @@ Let's get started!`,
       };
 
       setMessages(prev => [...prev, sageResponse]);
+      
+      // Scroll to bottom and focus textarea after bot response
+      setTimeout(() => {
+        scrollToBottom();
+        textareaRef.current?.focus();
+      }, 100);
     } catch (error) {
       console.error("Failed to send message:", error);
       const errorMessage: Message = {
@@ -166,6 +190,12 @@ Let's get started!`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
+      
+      // Scroll to bottom and focus textarea after error message
+      setTimeout(() => {
+        scrollToBottom();
+        textareaRef.current?.focus();
+      }, 100);
     } finally {
       setIsLoading(false);
     }
@@ -211,7 +241,7 @@ Let's get started!`,
               Powered by Sage AI Assistant
             </p>
           </CardHeader>
-          
+
           <CardContent className="flex-1 flex flex-col p-0">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((message) => (
@@ -220,20 +250,26 @@ Let's get started!`,
                   className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
-                      message.sender === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
-                    }`}
+                    className={`max-w-[80%] p-3 rounded-lg ${message.sender === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                      }`}
                   >
-                    <p className="whitespace-pre-wrap">{message.text}</p>
+                    {message.sender === "sage" ? (
+                      <div
+                        className="prose prose-sm max-w-none text-muted-foreground"
+                        dangerouslySetInnerHTML={{ __html: message.text }}
+                      />
+                    ) : (
+                      <p className="whitespace-pre-wrap">{message.text}</p>
+                    )}
                     <p className="text-xs opacity-70 mt-1">
                       {message.timestamp.toLocaleTimeString()}
                     </p>
                   </div>
                 </div>
               ))}
-              
+
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="bg-muted text-muted-foreground p-3 rounded-lg">
@@ -243,11 +279,15 @@ Let's get started!`,
                   </div>
                 </div>
               )}
+              
+              {/* Invisible element to scroll to */}
+              <div ref={messagesEndRef} />
             </div>
-            
+
             <div className="border-t p-4">
               <div className="flex space-x-2">
                 <Textarea
+                  ref={textareaRef}
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
