@@ -51,9 +51,12 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
-  body {
-    @apply bg-background text-foreground;
+  html, body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    height: 100%;
+    overflow: hidden;
   }
 }
