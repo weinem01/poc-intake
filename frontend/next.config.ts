@@ -9,13 +9,15 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
   },
   
-  // Optimize for production
-  swcMinify: true,
+  // External packages for server components
+  serverExternalPackages: [],
   
   // Experimental features
-  experimental: {
-    // Enable server components optimization
-    serverComponentsExternalPackages: [],
+  experimental: {},
+  
+  // ESLint configuration for build
+  eslint: {
+    ignoreDuringBuilds: false,
   },
   
   // Image optimization

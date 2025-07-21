@@ -107,7 +107,8 @@ Set these in Cloud Run console or using gcloud:
 
 ```bash
 # Required secrets (store in Secret Manager)
-gcloud secrets create openai-api-key --data-file=- <<< "your-openai-key"
+# Note: OpenAI key secret is named "open-ai-key" to match existing setup
+gcloud secrets create open-ai-key --data-file=- <<< "your-openai-key"
 gcloud secrets create supabase-url --data-file=- <<< "your-supabase-url"
 gcloud secrets create supabase-service-role-key --data-file=- <<< "your-supabase-key"
 gcloud secrets create charm-client-id --data-file=- <<< "your-charm-client-id"

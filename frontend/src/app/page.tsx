@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense, useCallback } from "react";
+import Image from "next/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../graphics/cropped loading animation.json";
 
@@ -40,7 +41,7 @@ function ChatbotPageContent() {
   }, [messages, isLoading]);
 
   // Session initialization
-  const initializeSession = async () => {
+  const initializeSession = useCallback(async () => {
     try {
       setIsInitializing(true);
       setSessionError(null);
@@ -77,7 +78,7 @@ function ChatbotPageContent() {
     } finally {
       setIsInitializing(false);
     }
-  };
+  }, [searchParams]);
 
   // Initialize session and add welcome message after hydration
   useEffect(() => {
@@ -103,7 +104,7 @@ function ChatbotPageContent() {
     setTimeout(() => scrollToBottom(), 200);
     
     initializeSession();
-  }, []);
+  }, [initializeSession]);
 
   // Focus textarea when session is ready
   useEffect(() => {
@@ -258,20 +259,19 @@ function ChatbotPageContent() {
       <div className="bg-white shadow-sm mx-4 mt-4 rounded-lg p-6 text-center flex-shrink-0">
         <div className="flex items-center justify-center gap-4 mb-2">
           <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
-            <img 
+            <Image 
               src="/head-logo.png" 
               alt="Healthy mind logo" 
+              width={80}
+              height={80}
               className="w-full h-full object-contain"
-              style={{ maxWidth: '80px', maxHeight: '80px' }}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
+              onError={() => {}}
             />
           </div>
           <h2 className="text-2xl font-bold text-gray-800">Welcome to Pound of Cure</h2>
         </div>
         <p className="text-gray-600">
-          We're excited to help you on your weight loss journey. Let's start with a few questions to get to know you better.
+          We&apos;re excited to help you on your weight loss journey. Let&apos;s start with a few questions to get to know you better.
         </p>
       </div>
 
