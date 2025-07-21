@@ -138,7 +138,7 @@ class Settings(BaseSettings):
         
         # Fall back to Secret Manager (for production)
         try:
-            return get_secret_manager().get_secret("openai-api-key")
+            return get_secret_manager().get_secret("open-ai-key")
         except Exception as e:
             logger.error(f"Failed to get OpenAI API key from Secret Manager: {e}")
             raise ValueError("OpenAI API key not found in environment variables or Secret Manager")

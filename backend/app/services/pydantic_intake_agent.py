@@ -9,7 +9,7 @@ from datetime import datetime
 import httpx
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, RunContext # type: ignore
+from pydantic_ai import Agent # type: ignore
 from pydantic_ai.models.openai import OpenAIModel
 
 from app.core.config import get_settings

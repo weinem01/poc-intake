@@ -3,6 +3,7 @@ Main FastAPI application for POC Intake
 """
 
 import logging
+import logging.config
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
