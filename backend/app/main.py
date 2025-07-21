@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting POC Intake application")
     logger.info("Token manager initialized with Supabase storage")
-    
+  
     yield
     
     # Shutdown

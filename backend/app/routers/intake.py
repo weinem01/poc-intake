@@ -65,7 +65,16 @@ async def initialize_session(request: SessionInitRequest = None):
             "dob": patient_data.get("dob"),
             "last_name": patient_data.get("last_name")
         }
-        record_id = await intake_repository.create_session_with_verification(request.mrn, new_session_id, verification_data)
+        
+        # Extract charm_patient_id from the EHR response
+        charm_patient_id = patient_data.get("patient_id")
+        
+        record_id = await intake_repository.create_session_with_verification(
+            request.mrn, 
+            new_session_id, 
+            verification_data, 
+            charm_patient_id
+        )
         
         logger.info(f"DEBUG: Created/updated record {record_id} with session {new_session_id}")
         

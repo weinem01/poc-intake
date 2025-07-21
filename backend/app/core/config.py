@@ -103,22 +103,31 @@ class Settings(BaseSettings):
     
     # API Configuration
     api_host: str = "0.0.0.0"
-    api_port: int = 8000
+    api_port: int = int(os.getenv("PORT", "8000"))  # Cloud Run sets PORT environment variable
     debug: bool = environment == "development"
     
     # Charm API Configuration
     charm_facility_id: str = "1043817000000046409"
     
     # CORS Configuration
-    cors_origins: list[str] = [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:3002",
-        "http://localhost:3003",
-        "https://localhost:3000",
-        "https://poc-intake-dev.web.app",
-        "https://poc-intake.poundofcure.com"
-    ]
+    @property
+    def cors_origins(self) -> list[str]:
+        """Get CORS origins from environment or use defaults"""
+        # Check for environment variable first (set by deployment script)
+        env_origins = os.getenv("CORS_ORIGINS")
+        if env_origins:
+            return env_origins.split(",")
+        
+        # Default origins for development
+        return [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:3002",
+            "http://localhost:3003",
+            "https://localhost:3000",
+            "https://poc-intake-dev.web.app",
+            "https://poc-intake.poundofcure.com"
+        ]
     
     def get_openai_api_key(self) -> str:
         """Get OpenAI API key from environment variable or Secret Manager"""

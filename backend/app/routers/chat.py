@@ -67,59 +67,9 @@ def _identify_missing_demographics_fields(demographics_data: Dict[str, Any]) -> 
     return missing_fields
 
 
-def _track_populated_field(data: Dict[str, Any], field_path: str, fields_answered: List[str]) -> None:
-    """
-    Helper function to track if a nested field has data and add it to fields_answered
-    """
-    try:
-        # Navigate the nested path to check if field has data
-        current = data
-        parts = field_path.split('.')
-        
-        for part in parts:
-            if isinstance(current, dict) and part in current:
-                current = current[part]
-            else:
-                return  # Field doesn't exist or no data
-        
-        # If we got here and current has a value, add to fields_answered
-        if current and current != "":
-            fields_answered.append(field_path)
-            
-    except Exception:
-        # Ignore errors in field checking
-        pass
 
 
-def _auto_handle_country_detection(updated_data: Dict[str, Any]) -> None:
-    """
-    Automatically set country to 'us' for US addresses, detect international formats
-    """
-    demographics = updated_data.get("intake_demographics", {})
-    if not demographics:
-        return
-    
-    address = demographics.get("address", {})
-    if not address:
-        return
-    
-    zip_code = address.get("zipCode", "")
-    
-    # If ZIP code is provided, check if it's international format
-    if zip_code:
-        if _is_international_address_format(zip_code):
-            # Don't auto-set country for international addresses
-            # Let the AI agent ask about it
-            pass
-        else:
-            # Standard US ZIP code format, set country to US
-            address["country"] = "us"
-    else:
-        # No ZIP code yet, assume US for now
-        address["country"] = "us"
-
-
-def _is_international_address_format(zip_code: str = "", address_parts: Dict[str, str] = None) -> bool:
+def _is_international_address_format(zip_code: str = "", address_parts: Dict[str, str] = None) -> bool: # type: ignore
     """
     Detect if address format suggests international location
     """
@@ -389,59 +339,77 @@ async def chat_message(request: ChatMessage):
                         await intake_repository.update_session_data(request.session_id, {"charm_patient_id": patient_id})
                         logger.info(f"Stored patient_id {patient_id} for session {request.session_id}")
                     
-                    # Populate demographics with EHR data
-                    demographics_data = {
-                        "patient_id":patient_id,
-                        "record_id":session_record["charm_mrn"],
-                        "firstName": patient_data.get("first_name", ""),
-                        "lastName": patient_data.get("last_name", ""),
-                        "dateOfBirth": patient_data.get("dob", ""),
-                        "gender": patient_data.get("gender", ""),
-                        "email": patient_data.get("email", ""),
+                    # Get existing intake data first (resume functionality)
+                    existing_intake = session_record.get("intake", {})
+                    existing_demographics = existing_intake.get("intake_demographics", {})
+                    
+                    # Create EHR data structure
+                    ehr_demographics_data = {
+                        "patient_id": patient_id,
+                        "record_id": session_record["charm_mrn"], # type: ignore
+                        "firstName": patient_data.get("first_name", ""), # type: ignore
+                        "lastName": patient_data.get("last_name", ""), # type: ignore
+                        "dateOfBirth": patient_data.get("dob", ""), # type: ignore
+                        "gender": patient_data.get("gender", ""), # type: ignore
+                        "email": patient_data.get("email", ""), # type: ignore
                         "phone": {
-                            "mobile": patient_data.get("mobile", ""),
-                            "home": patient_data.get("home_phone", ""),
-                            "work": patient_data.get("work_phone", ""),
-                            "workExtension": patient_data.get("work_phone_extn", ""),
-                            "preferred": "mobile" if patient_data.get("mobile") else ""
+                            "mobile": patient_data.get("mobile", ""), # type: ignore
+                            "home": patient_data.get("home_phone", ""), # type: ignore
+                            "work": patient_data.get("work_phone", ""), # type: ignore
+                            "workExtension": patient_data.get("work_phone_extn", ""), # type: ignore
+                            "preferred": "mobile" if patient_data.get("mobile") else "" # type: ignore
                         },
                         "address": {
-                            "addressLine1": patient_data.get("address_line1", ""),
-                            "addressLine2": patient_data.get("address_line2", ""),
-                            "city": patient_data.get("city", ""),
-                            "state": patient_data.get("state", ""),
-                            "country": patient_data.get("country", "us"),
-                            "zipCode": patient_data.get("postal_code", "")
+                            "addressLine1": patient_data.get("address_line1", ""), # type: ignore
+                            "addressLine2": patient_data.get("address_line2", ""), # type: ignore
+                            "city": patient_data.get("city", ""), # type: ignore
+                            "state": patient_data.get("state", ""), # type: ignore
+                            "country": patient_data.get("country", "us"), # type: ignore
+                            "zipCode": patient_data.get("postal_code", "") # type: ignore
                         },
                         "communicationPreferences": {
                             "preferredMethod": "",
-                            "emailNotifications": patient_data.get("email_notification", "true") == "true",
-                            "textNotifications": patient_data.get("text_notification", "true") == "true",
-                            "voiceNotifications": patient_data.get("voice_notification", "true") == "true"
+                            "emailNotifications": patient_data.get("email_notification", "true") == "true", # type: ignore
+                            "textNotifications": patient_data.get("text_notification", "true") == "true", # type: ignore
+                            "voiceNotifications": patient_data.get("voice_notification", "true") == "true" # type: ignore
                         },
-                        "maritalStatus": patient_data.get("marital_status", ""),
+                        "maritalStatus": patient_data.get("marital_status", ""), # type: ignore
                         "employmentStatus": "",
                         "isComplete": False  # Always start as incomplete, even with EHR data
                     }
+                    
+                    # Merge existing user data with EHR data (user data takes precedence)
+                    from app.services.pydantic_intake_agent import _deep_merge_dict
+                    demographics_data = _deep_merge_dict(ehr_demographics_data, existing_demographics)
+                    
+                    # Debug logging for resume functionality
+                    logger.info(f"🔄 VERIFICATION SUCCESS - Session {request.session_id}")
+                    logger.info(f"📋 Existing demographics: {existing_demographics}")
+                    logger.info(f"🏥 EHR demographics: {ehr_demographics_data}")
+                    logger.info(f"🔀 Merged demographics: {demographics_data}")
                     
                     # Create tracking data - initialize unasked_fields with all fields, then remove populated ones
                     from app.services.pydantic_intake_agent import _initialize_unasked_fields
                     unasked_fields = _initialize_unasked_fields("intake_demographics", demographics_data)
                     
-                    # Create tracking object
+                    # Preserve existing tracking data and update it
+                    existing_tracking = existing_intake.get("intake_demographics_tracking", {})
                     tracking_data = {
                         "unasked_fields": unasked_fields,
-                        "isComplete": False,
-                        "pushed_to_charm": False
+                        "isComplete": existing_tracking.get("isComplete", False),
+                        "pushed_to_charm": existing_tracking.get("pushed_to_charm", False)
                     }
                     
-                    # Complete data structure with tracking
-                    complete_data = {
+                    # Complete data structure with tracking - merge with ALL existing data
+                    complete_data = existing_intake.copy()  # Start with existing intake data
+                    complete_data.update({
                         "intake_demographics": demographics_data,
                         "intake_demographics_tracking": tracking_data
-                    }
+                    })
                     
-                    # Update the session with demographics data and tracking
+                    logger.info(f"💾 Complete merged intake data: {complete_data}")
+                    
+                    # Update the session with merged intake data
                     await intake_repository.update_session_intake(session_record["id"], complete_data)
                     
                     # Generate intelligent response based on what data is missing
@@ -519,7 +487,7 @@ async def chat_message(request: ChatMessage):
         # Get conversation history from chat history table
         conversation_history = await chat_history_repository.get_recent_messages(request.session_id, count=40)
         
-        # Create context for Pydantic AI agent
+        # Create context for single agent system
         context = IntakeContext(
             session_id=request.session_id,
             current_section=current_section,
@@ -528,22 +496,13 @@ async def chat_message(request: ChatMessage):
             conversation_history=conversation_history
         )
         
-        # Process message with Pydantic AI agent
+        # Process message with single Pydantic agent
         agent_response = await pydantic_intake_agent.process_conversation(request.message, context)
         
-        # Update session with any new data
-        if agent_response.updated_data:
-            # Auto-detect and handle country setting for addresses
-            _auto_handle_country_detection(agent_response.updated_data)
-            
-            await intake_repository.update_session_intake(session_record["id"], agent_response.updated_data)
-            
-            # Check if the current section should be marked as complete
-            await _check_and_mark_section_complete(request.session_id, current_section, agent_response.updated_data)
-            
-            # Check if the entire intake is completed and push diagnoses if so
-            await _check_and_push_diagnoses_on_completion(request.session_id, agent_response.updated_data)
-            
+        # Update database with any extracted data
+        if agent_response.updated_data:     
+            result = await intake_repository.update_session_intake(session_record["id"], agent_response.updated_data)
+                   
         # Add new messages to chat history table
         now = datetime.utcnow().isoformat()
         user_message = {"role": "user", "content": request.message, "timestamp": now}
@@ -568,7 +527,7 @@ async def chat_message(request: ChatMessage):
             detail="Internal server error processing message"
         )
 
-
+ 
 @router.get("/chat/{session_id}/summary")
 async def get_conversation_summary(session_id: str):
     """Get a summary of the conversation for a session"""
@@ -630,3 +589,214 @@ async def get_chat_sections():
             }
         ]
     }
+
+
+@router.get("/chat/{session_id}/section-summary")
+async def get_section_summary(session_id: str):
+    """Get summary of collected data for section confirmation"""
+    try:
+        # Wait a moment for any background extraction to complete
+        import asyncio
+        await asyncio.sleep(1)
+        
+        session_record = await intake_repository.verify_session(session_id)
+        if not session_record:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        intake_data = session_record.get("intake", {})
+        current_section = intake_repository.determine_current_section(intake_data)
+        
+        # Get collected data for current section
+        section_data = intake_data.get(current_section, {})
+        
+        # Format collected data for display
+        formatted_data = _format_section_data_for_confirmation(section_data, current_section)
+        
+        return {
+            "session_id": session_id,
+            "current_section": current_section,
+            "section_title": current_section.replace("intake_", "").replace("_", " ").title(),
+            "collected_data": formatted_data,
+            "is_complete": len(formatted_data) > 0
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting section summary for session {session_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error retrieving section summary"
+        )
+
+
+@router.post("/chat/{session_id}/confirm-section")
+async def confirm_section_data(session_id: str, corrections: dict = None): # type: ignore
+    """Confirm section data and move to next section"""
+    try:
+        session_record = await intake_repository.verify_session(session_id)
+        if not session_record:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        # Apply any corrections
+        if corrections:
+            current_intake = session_record.get("intake", {})
+            # Apply corrections to the data
+            updated_data = _apply_corrections(current_intake, corrections)
+            await intake_repository.update_session_intake(session_record["id"], updated_data)
+        
+        # Mark current section as complete and move to next
+        intake_data = session_record.get("intake", {})
+        current_section = intake_repository.determine_current_section(intake_data)
+        
+        # Mark section complete
+        await intake_repository.mark_section_complete(session_id, current_section)
+        
+        # Get next section
+        next_section = intake_repository.determine_current_section(intake_data)
+        
+        # Initialize conversation state for next section
+        from app.services.conversation_state_manager import conversation_state_manager
+        if next_section != "completed":
+            conversation_state_manager.move_to_next_section(session_id, next_section)
+        
+        return {
+            "session_id": session_id,
+            "completed_section": current_section,
+            "next_section": next_section,
+            "message": f"✅ {current_section.replace('intake_', '').title()} completed! Moving to {next_section.replace('intake_', '').title()}." if next_section != "completed" else "🎉 All sections completed!"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error confirming section for session {session_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error confirming section"
+        )
+
+
+def _format_section_data_for_confirmation(section_data: dict, section_name: str) -> dict:
+    """Format section data for user confirmation"""
+    formatted = {}
+    
+    if section_name == "intake_demographics":
+        if section_data.get("firstName"):
+            formatted["Name"] = f"{section_data.get('firstName', '')} {section_data.get('middleName', '')} {section_data.get('lastName', '')}".strip()
+        if section_data.get("email"):
+            formatted["Email"] = section_data.get("email")
+        if section_data.get("phone", {}).get("mobile"):
+            formatted["Mobile Phone"] = section_data.get("phone", {}).get("mobile")
+        if section_data.get("phone", {}).get("work"):
+            formatted["Work Phone"] = section_data.get("phone", {}).get("work")
+        if section_data.get("phone", {}).get("home"):
+            formatted["Home Phone"] = section_data.get("phone", {}).get("home")
+        
+        # Format address
+        address = section_data.get("address", {})
+        if address.get("addressLine1"):
+            addr_parts = [address.get("addressLine1")]
+            if address.get("addressLine2"):
+                addr_parts.append(address.get("addressLine2"))
+            if address.get("city") and address.get("state"):
+                addr_parts.append(f"{address.get('city')}, {address.get('state')} {address.get('zipCode', '')}".strip())
+            formatted["Address"] = ", ".join(addr_parts)
+        
+        # Emergency contact
+        emergency = section_data.get("emergencyContact", {})
+        if emergency.get("name"):
+            emergency_text = emergency.get("name")
+            if emergency.get("relationship"):
+                emergency_text += f" ({emergency.get('relationship')})"
+            if emergency.get("phone"):
+                emergency_text += f" - {emergency.get('phone')}"
+            formatted["Emergency Contact"] = emergency_text
+            
+        if section_data.get("maritalStatus"):
+            formatted["Marital Status"] = section_data.get("maritalStatus")
+        if section_data.get("employmentStatus"):
+            formatted["Employment Status"] = section_data.get("employmentStatus")
+    
+    # Add formatting for other sections as needed
+    elif section_name == "intake_weight_history":
+        # Add weight history formatting
+        pass
+    elif section_name == "intake_medical_history":
+        # Add medical history formatting  
+        pass
+    
+    return formatted
+
+
+def _apply_corrections(current_intake: dict, corrections: dict) -> dict:
+    """Apply user corrections to intake data"""
+    # Simple implementation - could be enhanced
+    updated_intake = current_intake.copy()
+    
+    # Apply corrections based on correction keys
+    for field_path, new_value in corrections.items():
+        # Navigate nested structure and update
+        parts = field_path.split('.')
+        current = updated_intake
+        
+        for part in parts[:-1]:
+            if part not in current:
+                current[part] = {}
+            current = current[part]
+        
+        current[parts[-1]] = new_value
+    
+    return updated_intake
+
+
+# =============================================================================
+# UNUSED FUNCTIONS - Commented out but kept for reference
+# =============================================================================
+
+# def _track_populated_field(data: Dict[str, Any], field_path: str, fields_answered: List[str]) -> None:
+#     """
+#     Helper function to track if a nested field has data and add it to fields_answered
+#     """
+#     try:
+#         # Navigate the nested path to check if field has data
+#         current = data
+#         parts = field_path.split('.')
+#         
+#         for part in parts:
+#             if isinstance(current, dict) and part in current:
+#                 current = current[part]
+#             else:
+#                 return  # Field doesn't exist or no data
+#         
+#         # If we got here and current has a value, add to fields_answered
+#         if current and current != "":
+#             fields_answered.append(field_path)
+#             
+#     except Exception:
+#         # Ignore errors in field checking
+#         pass
+
+
+# def _auto_handle_country_detection(updated_data: Dict[str, Any]) -> None:
+#     """
+#     Automatically set country to 'us' for US addresses, detect international formats
+#     """
+#     demographics = updated_data.get("intake_demographics", {})
+#     if not demographics:
+#         return
+#     
+#     address = demographics.get("address", {})
+#     if not address:
+#         return
+#     
+#     zip_code = address.get("zipCode", "")
+#     
+#     # If ZIP code is provided, check if it's international format
+#     if zip_code:
+#         if _is_international_address_format(zip_code):
+#             # Don't auto-set country for international addresses
+#             # Let the AI agent ask about it
+#             pass
+#         else:
+#             # Standard US ZIP code format, set country to US
+#             address["country"] = "us"
+#     else:
+#         # No ZIP code yet, assume US for now
+#         address["country"] = "us"

@@ -126,12 +126,12 @@ class CharmTokenManager:
 
     async def get_token(self) -> str:
         """Get current valid access token, refreshing if necessary"""
-        print("DEBUG: get_token called")
+        #print("DEBUG: get_token called")
         try:
-            print("DEBUG: About to get token from database")
+            #print("DEBUG: About to get token from database")
             # Get token from database
             token_record = await self._get_token_from_db()
-            print(f"DEBUG: Got token record: {token_record}")
+            #print(f"DEBUG: Got token record: {token_record}")
             
             if token_record:
                 # Check if token is still valid

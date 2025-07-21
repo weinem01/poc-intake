@@ -32,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${notoSans.variable} antialiased`}
         style={{fontFamily: 'Lexend, "Noto Sans", sans-serif'}}
+        suppressHydrationWarning={true}
       >
         {children}
       </body>

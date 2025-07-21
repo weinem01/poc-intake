@@ -75,61 +75,76 @@ class TreatmentApproachEnum(str, Enum):
 
 # Demographics Models
 class PhoneInfo(BaseModel):
-    mobile: str = Field(..., max_length=15, description="AI Agent: Ask 'What is your mobile phone number?'")
-    home: Optional[str] = Field(None, max_length=15, description="AI Agent: Ask 'Do you have a home phone number?'")
-    work: Optional[str] = Field(None, max_length=15, description="AI Agent: Ask 'Do you want to provide a work phone number?'")
-    preferred: Optional[PreferredContactEnum] = Field(None, description="AI Agent: Ask 'Which phone number would you prefer us to contact you on?' Options: mobile, home, work, only if there is more than one phone number, otherwise choose mobile")
+    mobile: str = Field(..., max_length=15, question_group=2, description="AI Agent: Ask 'What is your mobile phone number?'")# type: ignore
+    home: Optional[str] = Field(None, max_length=15, question_group=3, description="AI Agent: Ask 'Do you have a home phone number?'")# type: ignore
+    work: Optional[str] = Field(None, max_length=15, question_group=3, description="AI Agent: Ask 'Do you want to provide a work phone number?'")# type: ignore
+    preferred: Optional[PreferredContactEnum] = Field(None, question_group=3, description="AI Agent: Ask 'Which phone number would you prefer us to contact you on?' Options: mobile, home, work, only if there is more than one phone number, otherwise choose mobile")# type: ignore
 
 
 class Address(BaseModel):
-    address_line1: str = Field(..., max_length=35, alias="addressLine1", description="AI Agent: Ask 'What is your home address?' If the patient adds more than their street address, review the response and use it to populate the remaining address fields")
-    address_line2: Optional[str] = Field(None, max_length=35, alias="addressLine2", description="AI Agent: Ask 'Do you have an apartment, suite, or unit number?' (Optional)")
-    city: str = Field(..., max_length=35, description="AI Agent: Ask 'What city do you live in?'")
-    state: str = Field(..., max_length=50, description="AI Agent: Ask 'What state do you live in?'")
-    country: str = Field(default="us", max_length=2, description="AI Agent: Country code - defaults to 'us' for United States. Only ask if address format suggests international (postal codes with letters, unusual formats).")
-    zip_code: str = Field(..., max_length=10, alias="zipCode", description="AI Agent: Ask 'What is your ZIP code?'")
+    address_line1: str = Field(..., max_length=35, alias="addressLine1", question_group=4, description="AI Agent: Ask 'What is your home address?' If the patient adds more than their street address, review the response and use it to populate the remaining address fields")# type: ignore
+    # address_line2: Optional[str] = Field(None, max_length=35, alias="addressLine2", question_group=4, description="AI Agent: Ask 'Do you have an apartment, suite, or unit number?' (Optional)")# type: ignore
+    city: str = Field(..., max_length=35, question_group=4, description="AI Agent: Ask 'What city do you live in?'")# type: ignore
+    state: str = Field(..., max_length=50, question_group=4, description="AI Agent: Ask 'What state do you live in?'")# type: ignore
+    zip_code: str = Field(..., max_length=10, alias="zipCode", question_group=4, description="AI Agent: Ask 'What is your ZIP code?'")# type: ignore
+    country: str = Field(default="us", max_length=2, question_group=4, description="AI Agent: Country code - defaults to 'us' for United States. Only ask if address format suggests international (postal codes with letters, unusual formats).")# type: ignore
 
 
 class EmergencyContact(BaseModel):
-    name: str = Field(..., max_length=70, description="AI Agent: Ask 'Who should we contact in case of an emergency? Can you also provide a phone number and relationship?'")
-    phone: str = Field(..., max_length=10, description="AI Agent: Ask 'What is their phone number?'")
-    relationship: Optional[str] = Field(None, max_length=35, description="AI Agent: Ask 'What is their relationship to you?'")
+    name: str = Field(..., max_length=70, question_group=5, description="AI Agent: Ask 'Who should we contact in case of an emergency? Can you also provide a phone number and relationship?'")# type: ignore
+    phone: str = Field(..., max_length=10, question_group=5, description="AI Agent: Ask 'What is their phone number?'") # type: ignore
+    relationship: Optional[str] = Field(None, max_length=35, question_group=5, description="AI Agent: Ask 'What is their relationship to you?'")# type: ignore
 
 
 class CommunicationPreferences(BaseModel):
-    preferred_method: Optional[CommunicationMethodEnum] = Field(None, alias="preferredMethod", description="AI Agent: Ask 'How would you prefer to receive important communications from us?' Options: email, phone, text, portal")
-    email_notifications: bool = Field(default=True, alias="emailNotifications", description="AI Agent: Ask 'Would you like to receive email notifications?' Default: True")
-    text_notifications: bool = Field(default=True, alias="textNotifications", description="AI Agent: Ask 'Would you like to receive text message notifications?' Default: True")
-    voice_notifications: bool = Field(default=True, alias="voiceNotifications", description="AI Agent: Ask 'Would you like to receive voice call notifications?' Default: True")
+    preferred_method: Optional[CommunicationMethodEnum] = Field(None, alias="preferredMethod", question_group=7, description="AI Agent: Ask 'How would you prefer to receive important communications from us?' Options: email, phone, text, portal")# type: ignore
+    email_notifications: bool = Field(default=True, alias="emailNotifications", question_group=7, description="AI Agent: Ask 'Would you like to receive email notifications?' Default: True")# type: ignore
+    text_notifications: bool = Field(default=True, alias="textNotifications", question_group=7, description="AI Agent: Ask 'Would you like to receive text message notifications?' Default: True")# type: ignore
+    voice_notifications: bool = Field(default=True, alias="voiceNotifications", question_group=7, description="AI Agent: Ask 'Would you like to receive voice call notifications?' Default: True")# type: ignore
 
 
 # Removed AdditionalInfo class - fields moved to IntakeDemographics directly
 
 
 class CareTeamProvider(BaseModel):
-    provider_name: Optional[str] = Field(None, alias="providerName", description="AI Agent: Ask 'Would you like to provide the name of any of your doctors or other healthcare providers?'")
-    phone: Optional[str] = Field(None, max_length=15, description="AI Agent: Ask 'What is this provider's phone number?'")
-    provider_id: Optional[int] = Field(None, alias="providerId", description="This is never asked to the user, instead, use the search_providers tool to get the provider ID using the provider name and phone number. No need to gather additional data if a match is found")
-    specialty: Optional[str] = Field(None, description="AI Agent: Ask 'What is this provider's specialty?' If the provider is a pcp, specialty should be left empty and not asked about unless the user volunteers a specialty")
-    practice_name: Optional[str] = Field(None, alias="practiceName", description="AI Agent: Ask 'What is the name of their practice or clinic?'")
-    relationship_type: Optional[str] = Field(None, alias="relationshipType", description="AI Agent: Ask 'What type of care do they provide you?'")
-    is_primary_care_physician: Optional[bool] = Field(None, alias="isPrimaryCarePhysician", description="AI Agent: Ask 'Is this your primary care physician?' Yes/No question")
+    provider_name: Optional[str] = Field(None, alias="providerName", question_group=8, description="AI Agent: Ask 'Would you like to provide the name of any of your doctors or other healthcare providers?'")# type: ignore
+    phone: Optional[str] = Field(None, max_length=15, question_group=8, description="AI Agent: Ask 'What is this provider's phone number?'")# type: ignore
+    provider_id: Optional[int] = Field(None, alias="providerId", description="This is never asked to the user, instead, use the search_providers tool to get the provider ID using the provider name and phone number. No need to gather additional data if a match is found")# type: ignore
+    specialty: Optional[str] = Field(None, question_group=8, description="AI Agent: Ask 'What is this provider's specialty?' If the provider is a pcp, specialty should be left empty and not asked about unless the user volunteers a specialty")# type: ignore
+    practice_name: Optional[str] = Field(None, alias="practiceName", question_group=8, description="AI Agent: Ask 'What is the name of their practice or clinic?'")# type: ignore
+    relationship_type: Optional[str] = Field(None, alias="relationshipType", question_group=8, description="AI Agent: Ask 'What type of care do they provide you?'")# type: ignore
+    is_primary_care_physician: Optional[bool] = Field(None, alias="isPrimaryCarePhysician", question_group=8, description="AI Agent: Ask 'Is this your primary care physician?' Yes/No question")# type: ignore
 
 
 class IntakeDemographics(BaseModel):
-    first_name: str = Field(..., max_length=35, alias="firstName", description="AI Agent: Ask 'What is your first name?'")
-    middle_name: Optional[str] = Field(None, max_length=35, alias="middleName", description="AI Agent: Ask 'What is your middle name?'")
-    last_name: str = Field(..., max_length=35, alias="lastName", description="AI Agent: Ask 'What is your last name?'")
-    date_of_birth: date = Field(..., alias="dateOfBirth", description="AI Agent: Ask 'What is your date of birth?'")
-    gender: GenderEnum = Field(..., description="AI Agent: Ask 'What is your gender?' Options: male, female, other, unknown")
-    email: str = Field(..., max_length=100, description="AI Agent: Ask 'What is your email address?'")
-    phone: PhoneInfo = Field(..., description="AI Agent: 'What is your phone number?' Collect mobile, home, work, and preferred contact method")
-    address: Address = Field(..., description="AI Agent: Collect home address information")
-    emergency_contact: EmergencyContact = Field(..., alias="emergencyContact", description="AI Agent: Collect emergency contact information")
-    communication_preferences: Optional[CommunicationPreferences] = Field(None, alias="communicationPreferences", description="AI Agent: Ask about communication preferences (Optional)")
-    marital_status: Optional[MaritalStatusEnum] = Field(None, alias="maritalStatus", description="AI Agent: Ask 'What is your marital status?' Single, Married, Other?")
-    employment_status: Optional[EmploymentStatusEnum] = Field(None, alias="employmentStatus", description="AI Agent: Ask 'What is your employment status?' Employed, Full-Time Student, Part-Time Student, Unemployed, Retired")
-    care_team_providers: Optional[List[CareTeamProvider]] = Field(None, alias="careTeamProviders", description="AI Agent: Ask 'Do you have any current healthcare providers we should know about?' Based on the user's input, use the search_providers endpoint to get the provider ID and populate the care team provider information. If an existing provider can be found, return the details of that provider to the user to confirm that this is the correct provider. If no provider can be found on the search_providers tool, use the web search tool to try to find the provider, using the user's city and state as additioanl search terms to improve the accuracy of the search. Also, the user can enter a list of providers, so after adding a provider, be sure to ask if there are any additional providers that they'd like to add. If no providers are provided, this field can be None.")
+    # Group 1: Basic Personal Information (already have most from EHR)
+    first_name: str = Field(..., max_length=35, alias="firstName", question_group=1, description="AI Agent: Ask 'What is your first name?'")# type: ignore
+    middle_name: Optional[str] = Field(None, max_length=35, alias="middleName", question_group=1, description="AI Agent: Ask 'What is your middle name?'")# type: ignore
+    last_name: str = Field(..., max_length=35, alias="lastName", question_group=1, description="AI Agent: Ask 'What is your last name?'")# type: ignore
+    date_of_birth: date = Field(..., alias="dateOfBirth", question_group=1, description="AI Agent: Ask 'What is your date of birth?'")# type: ignore
+    gender: GenderEnum = Field(..., question_group=1, description="AI Agent: Ask 'What is your gender?' Options: male, female, other, unknown")# type: ignore
+    
+    # Group 2: Essential Contact Information
+    email: str = Field(..., max_length=100, question_group=2, description="AI Agent: Ask 'What is your email address?'")# type: ignore
+    phone: PhoneInfo = Field(..., question_group=2, description="AI Agent: 'What is your phone number?' Collect mobile first (group 2), then optional home/work phones (group 3)")# type: ignore
+    
+    # Group 4: Address Information
+    address: Address = Field(..., question_group=4, description="AI Agent: Collect home address information")# type: ignore
+    
+    # Group 5: Emergency Contact
+    emergency_contact: EmergencyContact = Field(..., alias="emergencyContact", question_group=5, description="AI Agent: Collect emergency contact information")# type: ignore
+    
+    # Group 6: Personal Details
+    marital_status: Optional[MaritalStatusEnum] = Field(None, alias="maritalStatus", question_group=6, description="AI Agent: Ask 'What is your marital status?' Single, Married, Other?")# type: ignore
+    employment_status: Optional[EmploymentStatusEnum] = Field(None, alias="employmentStatus", question_group=6, description="AI Agent: Ask 'What is your employment status?' Employed, Full-Time Student, Part-Time Student, Unemployed, Retired")# type: ignore
+    
+    # Group 7: Communication Preferences  
+    communication_preferences: Optional[CommunicationPreferences] = Field(None, alias="communicationPreferences", question_group=7, description="AI Agent: Ask about communication preferences (Optional)")# type: ignore
+    
+    # Group 8: Healthcare Providers (complex workflow)
+    care_team_providers: Optional[List[CareTeamProvider]] = Field(None, alias="careTeamProviders", question_group=8, description="AI Agent: Ask 'Do you have any current healthcare providers we should know about?' Based on the user's input, use the search_providers endpoint to get the provider ID and populate the care team provider information. If an existing provider can be found, return the details of that provider to the user to confirm that this is the correct provider. If no provider can be found on the search_providers tool, use the web search tool to try to find the provider, using the user's city and state as additioanl search terms to improve the accuracy of the search. Also, the user can enter a list of providers, so after adding a provider, be sure to ask if there are any additional providers that they'd like to add. If no providers are provided, this field can be None.")# type: ignore
+    
+    # System field (not asked)
     is_complete: bool = Field(default=False, alias="isComplete", description="System field: Indicates if this demographics section has been completed. Default: False")
 
 

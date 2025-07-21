@@ -9,7 +9,7 @@ from datetime import datetime
 import httpx
 
 from pydantic import BaseModel, Field
-from pydantic_ai import Agent, RunContext
+from pydantic_ai import Agent, RunContext # type: ignore
 from pydantic_ai.models.openai import OpenAIModel
 
 from app.core.config import get_settings
@@ -46,7 +46,7 @@ def _get_pydantic_schema_info(section_name: str) -> str:
     return schema_info
 
 
-def _format_schema_properties(properties: dict, required_fields: list = None, indent: int = 0) -> str:
+def _format_schema_properties(properties: dict, required_fields: list = None, indent: int = 0) -> str: # type: ignore
     """
     Format schema properties into a readable structure for the AI agent
     """
@@ -116,7 +116,123 @@ def _get_all_field_paths(section_name: str) -> List[str]:
     return _extract_field_paths(schema.get("properties", {}), "", schema)
 
 
-def _extract_field_paths(properties: dict, prefix: str = "", schema: dict = None) -> List[str]:
+def _get_field_question_groups(section_name: str) -> Dict[int, List[str]]:
+    """
+    Extract question groups from Pydantic model schema metadata
+    Returns a dictionary mapping group numbers to lists of field paths
+    """
+    section_model_map = {
+        "intake_demographics": IntakeDemographics,
+        "intake_weight_history": IntakeWeightHistory,
+        "intake_medical_history": IntakeMedicalHistory
+    }
+    
+    model_class = section_model_map.get(section_name)
+    if not model_class:
+        return {}
+    
+    # Get the schema and extract group information
+    groups = {}
+    
+    # Flattened grouping approach - all fields get simple sequential group numbers
+    if section_name == "intake_demographics":
+        groups = {
+            1: ["firstName", "middleName", "lastName", "dateOfBirth", "gender"],
+            2: ["email", "phone.mobile"],  # Essential contact info first
+            3: ["phone.home", "phone.work", "phone.preferred"],  # Optional phone numbers
+            4: ["address.addressLine1", "address.addressLine2", "address.city", "address.state", "address.zipCode"],
+            5: ["emergencyContact.name", "emergencyContact.phone", "emergencyContact.relationship"],
+            6: ["maritalStatus", "employmentStatus"],
+            7: ["communicationPreferences.preferredMethod", "communicationPreferences.emailNotifications", "communicationPreferences.textNotifications", "communicationPreferences.voiceNotifications"],
+            8: ["careTeamProviders"]
+        }
+    
+    # Add other sections as needed
+    elif section_name == "intake_weight_history":
+        groups = {
+            1: ["currentVitals.height.feet", "currentVitals.height.inches", "currentVitals.weight"],
+            2: ["weightHistory.maxEverWeighed", "weightHistory.ageAtMaxWeight"],
+            # Add more groups for weight history
+        }
+    elif section_name == "intake_medical_history":
+        groups = {
+            1: ["currentMedications", "allergies"],
+            2: ["PMHx", "PMHxObesityComorbid"],
+            # Add more groups for medical history
+        }
+    
+    return groups
+
+
+def _extract_field_paths_for_field(field_name: str, field_info, model_class) -> List[str]:
+    """
+    Extract all field paths for a given field (handles nested objects)
+    """
+    # Get the field alias if it exists
+    alias = getattr(field_info, 'alias', None)
+    base_field_name = alias if alias else field_name
+    
+    # Skip system fields
+    if base_field_name == "isComplete":
+        return []
+    
+    # Check if this is a nested model
+    annotation = field_info.annotation
+    
+    # Handle Optional types
+    if hasattr(annotation, '__origin__') and annotation.__origin__ is Union:
+        # Get the non-None type from Optional
+        args = annotation.__args__
+        annotation = next((arg for arg in args if arg is not type(None)), annotation)
+    
+    # Handle List types  
+    if hasattr(annotation, '__origin__') and annotation.__origin__ is list:
+        # For now, treat lists as simple fields
+        return [base_field_name]
+    
+    # Check if annotation is a BaseModel subclass
+    if (hasattr(annotation, '__bases__') and 
+        any(issubclass(base, BaseModel) for base in annotation.__bases__ if base is not object)):
+        # This is a nested model - get all its field paths
+        nested_paths = []
+        for nested_field_name, nested_field_info in annotation.model_fields.items():
+            nested_alias = getattr(nested_field_info, 'alias', None)
+            nested_name = nested_alias if nested_alias else nested_field_name
+            
+            # Skip system fields
+            if nested_name == "isComplete":
+                continue
+                
+            nested_paths.append(f"{base_field_name}.{nested_name}")
+        return nested_paths
+    else:
+        # Simple field
+        return [base_field_name]
+
+
+def _get_next_question_group_fields(unasked_fields: List[str], section_name: str) -> List[str]:
+    """
+    Get the fields for the next question group to ask about
+    """
+    question_groups = _get_field_question_groups(section_name)
+    
+    if not question_groups:
+        # Fallback to single field if no groups defined
+        return [unasked_fields[0]] if unasked_fields else []
+    
+    # Find the lowest numbered group that has unasked fields
+    for group_num in sorted(question_groups.keys()):
+        group_fields = question_groups[group_num]
+        group_unasked = [field for field in group_fields if field in unasked_fields]
+        
+        if group_unasked:
+            return group_unasked
+    
+    # No groups with unasked fields found
+    return []
+
+
+def _extract_field_paths(properties: dict, prefix: str = "", schema: dict = None) -> List[str]: # type: ignore
     """
     Recursively extract all field paths from schema properties
     """
@@ -215,7 +331,7 @@ def _extract_field_paths(properties: dict, prefix: str = "", schema: dict = None
     return paths
 
 
-def _initialize_unasked_fields(section_name: str, existing_data: Dict[str, Any] = None) -> List[str]:
+def _initialize_unasked_fields(section_name: str, existing_data: Dict[str, Any] = None) -> List[str]: # type: ignore
     """
     Initialize unasked_fields list with all fields from the Pydantic model
     Remove fields that already have data from EHR
@@ -449,6 +565,12 @@ class DemographicsUpdate(BaseModel):
     new_value: str = Field(description="The new value for the field")
 
 
+class SessionCompletion(BaseModel):
+    """Model for session completion with rating and comments"""
+    rating: int = Field(ge=1, le=5, description="Star rating from 1-5 for the intake experience")
+    comments: Optional[str] = Field(default=None, description="Optional comments about the intake process")
+
+
 class IntakeAgentResponse(BaseModel):
     """Structured response from the intake agent"""
     response: str = Field(description="The agent's response to the user")
@@ -468,12 +590,12 @@ class IntakeContext(BaseModel):
 
 
 # Tool functions for the conversation agent
-async def search_providers(provider_name: str, phone: str = None, practice_name: str = None, specialty: str = None) -> List[Dict[str, Any]]:
+async def search_providers(provider_name: str, phone: str = None, practice_name: str = None, specialty: str = None) -> List[Dict[str, Any]]:  # type: ignore
     """
     Search for providers in Charm's referral directory
     
     Args:
-        provider_name: Name of the provider to search for
+        provider_name: Name of the provider to search for, remove any titles or suffixes (e.g., "Dr." "Doctor" "MD" "FNP" etc)
         phone: Provider's phone number (optional)
         practice_name: Name of the practice (optional) 
         specialty: Provider's specialty (optional)
@@ -515,7 +637,9 @@ async def search_providers(provider_name: str, phone: str = None, practice_name:
                 headers=headers,
                 timeout=30.0
             )
-            
+
+            print (f"Here's the search response: {response.text}")
+
             if response.status_code == 200:
                 data = response.json()
                 if data.get("code") == "0":
@@ -534,7 +658,7 @@ async def search_providers(provider_name: str, phone: str = None, practice_name:
         return []
 
 
-async def web_search_provider(provider_name: str, city: str = None, state: str = None, specialty: str = None) -> str:
+async def web_search_provider(provider_name: str, city: str = None, state: str = None, specialty: str = None) -> str: # type: ignore
     """
     Search the web for provider information using Perplexity API
     
@@ -657,6 +781,41 @@ async def add_provider_to_charm(provider_data: Dict[str, Any]) -> Dict[str, Any]
         return {"success": False, "error": str(e)}
 
 
+async def complete_intake_session(session_id: str, rating: int, comments: str = None) -> Dict[str, Any]: # type: ignore
+    """
+    Complete the intake session with rating and comments
+    
+    Args:
+        session_id: The session ID to complete
+        rating: Star rating from 1-5 for the intake experience
+        comments: Optional comments about the intake process
+    
+    Returns:
+        Dictionary with success status and any messages
+    """
+    try:
+        # Validate rating
+        if not 1 <= rating <= 5:
+            return {"success": False, "error": "Rating must be between 1 and 5"}
+        
+        # Call the repository to complete the session
+        success = await intake_repository.complete_session(session_id, rating, comments)
+        
+        if success:
+            logger.info(f"Successfully completed session {session_id} with rating {rating}")
+            return {
+                "success": True,
+                "message": f"Thank you for your feedback! You rated your experience {rating}/5 stars."
+            }
+        else:
+            logger.error(f"Failed to complete session {session_id}")
+            return {"success": False, "error": "Failed to save completion data"}
+            
+    except Exception as e:
+        logger.error(f"Error completing session {session_id}: {e}")
+        return {"success": False, "error": str(e)}
+
+
 class PydanticIntakeAgent:
     """
     Pydantic AI agent for managing patient intake conversations
@@ -668,7 +827,7 @@ class PydanticIntakeAgent:
         # Set the API key in environment for OpenAI client
         import os
         os.environ['OPENAI_API_KEY'] = settings.get_openai_api_key()
-        self.model = OpenAIModel('o4-mini')
+        self.model = OpenAIModel('gpt-4o-mini')
         
         # Identity extraction agent
         self.identity_agent = Agent(
@@ -744,125 +903,206 @@ Follow these rules exactly. Always emit only the two-key JSON—no extra text.
             self.model,
             result_type=IntakeAgentResponse,
             system_prompt="""
-            You are a friendly, professional medical intake assistant for Pound of Cure Weight Loss clinic.
+            You are a friendly, empathetic medical-intake assistant.  
+Use firstName only. Ask related questions together using bullet points for efficiency.
+Ask 2-3 related questions from the same group to streamline the conversation.
+
+Schema:
+intake_demographics: {
+  firstName, middleName?, lastName,
+  email, mobilePhone, homePhone?, workPhone?,
+  address: { addressLine1, city, state, zipCode, country="us" },
+  emergencyContact: { name, relationship, phone },
+  careTeamProviders: [ { providerName, phone?, practiceName?, specialty?, relationshipType?, isPrimaryCarePhysician? } ]
+}
+intake_weight_history: {
+  currentHeight, currentWeight,
+  maxWeight, ageAtMaxWeight,
+  largestDietWeightLoss,
+  dietHistory: [ { dietName, startDate?, endDate?, challenges? } ],
+  mealPatterns, weightFactors, familyObesityHistory,
+  exercise, treatmentPreferences,
+  bariatricSurgeryHistory, glp1History
+}
+intake_medical_history: {
+  medications: [ { name, dosage, frequency } ],
+  allergies,
+  diagnosedConditions,
+  socialHistory: { smoking?, alcohol?, otherSubstances? },
+  familyMedicalHistory,
+  surgicalHistory: [ { procedureName, approximateYear } ]
+}
+
+CRITICAL:
+- On every turn, load the prior `updated_data` state.
+- Parse the user message and merge any newly provided values into that state.
+- Always return the **entire** `updated_data` object (including previously collected fields) before asking your next question.
+- If the user corrects or references past data (“you forgot X”), re-emit that field in `updated_data` to confirm it’s saved.
+
+Loop (per turn):
+1. Identify the next group of missing fields in `current_section`.
+2. Ask 2-3 related questions from that group using bullet points.
+3. If section complete → respond "✅ {section} complete. Moving to {next_section}."
+4. Repeat until all sections done; then ask for star rating + comments.
+
+Provider sub-flow:
+1. Ask “What’s your provider’s name?” → call `search_providers(name)`
+2. If matches → present list & confirm → store `provider_id` → ask “Any more providers?”
+3. Else ask “What’s their phone?” → `search_providers(name, phone)` → confirm or…
+4. Else ask “Practice name?” → `search_providers(name, phone, practiceName)` or fallback to `web_search_provider` → confirm → `add_provider_to_charm`
+
+Tools:
+search_providers, web_search_provider, add_provider_to_charm, complete_intake_session
+
+Response format (JSON):
+```json
+{
+  "response": "...?",
+  "current_section": "...",
+  "updated_data": { /* full state with all collected fields */ },
+  "agent_actions": [ /* e.g. "extracted_address", "merged_state" */ ]
+}
+
+
+            # You are a friendly, professional medical intake assistant for Pound of Cure Weight Loss clinic.
             
-            Your role is to:
-            1. Guide patients through their intake form completion
-            2. Ask relevant follow-up questions for missing information
-            3. Confirm and validate information provided
-            4. Extract and structure data from user responses
-            5. Maintain a conversational, empathetic tone, addressing the user by their first name (first_name), do not address the user by their middle name.
-            6. Be sure to end any message with a question to keep the conversation going
-            7. Handle care team provider searches and additions using available tools
+            # Your role is to:
+            # 1. Guide patients through their intake form completion
+            # 2. Ask relevant follow-up questions for missing information
+            # 3. Confirm and validate information provided
+            # 4. Extract and structure data from user responses
+            # 5. Maintain a conversational, empathetic tone, addressing the user by their first name (first_name), do not address the user by their middle name.
+            # 6. Be sure to end any message with a question to keep the conversation going
+            # 7. Handle care team provider searches and additions using available tools
             
-            CRITICAL: When users provide information, you MUST extract it and return it in the updated_data field.
+            # CRITICAL: When users provide information, you MUST extract it and return it in the updated_data field.
+            # YOU MUST ALWAYS EXTRACT DATA FROM USER RESPONSES. DO NOT IGNORE ANY PROVIDED INFORMATION.
             
-            Current intake sections (insurance is temporarily disabled):
-            - intake_demographics: Basic patient information (contact info, address, emergency contact, care team providers)
-            - intake_weight_history: Weight and diet history
-            - intake_medical_history: Medical conditions, medications, allergies
+            # Current intake sections (insurance is temporarily disabled):
+            # - intake_demographics: Basic patient information (contact info, address, emergency contact, care team providers)
+            # - intake_weight_history: Weight and diet history
+            # - intake_medical_history: Medical conditions, medications, allergies
             
-            CARE TEAM PROVIDER WORKFLOW:
-            When collecting care team provider information, follow this progressive search approach:
+            # CARE TEAM PROVIDER WORKFLOW:
+            # When collecting care team provider information, follow this progressive search approach:
             
-            1. **Start with name only**: Ask "What is your provider's name?" 
-            2. **Search by name**: Use search_providers tool with just the provider name
-            3. **If results found**: Present them to user for confirmation
-            4. **If no suitable results**: Ask "What is their phone number?" and search again with name + phone
-            5. **If still no suitable results**: Ask "What is the name of their practice or clinic?" and search with name + phone + practice
-            6. **If still no suitable results**: Use web_search_provider tool with all available information
-            7. **Present web search results**: Show findings to user and ask for confirmation
-            8. **If user confirms**: Use add_provider_to_charm tool to add the new provider
-            9. **Store provider_id**: Save the provider_id in careTeamProviders data
-            10. **Ask for more**: "Do you have any other healthcare providers you'd like to add?"
+            # 1. **Start with name only**: Ask "What is your provider's name?" 
+            # 2. **Search by name**: Use search_providers tool with just the provider name
+            # 3. **If results found**: Present them to user for confirmation
+            # 4. **If no suitable results**: Ask "What is their phone number?" and search again with name + phone
+            # 5. **If still no suitable results**: Ask "What is the name of their practice or clinic?" and search with name + phone + practice
+            # 6. **If still no suitable results**: Use web_search_provider tool with all available information
+            # 7. **Present web search results**: Show findings to user and ask for confirmation
+            # 8. **If user confirms**: Use add_provider_to_charm tool to add the new provider
+            # 9. **Store provider_id**: Save the provider_id in careTeamProviders data
+            # 10. **Ask for more**: "Do you have any other healthcare providers you'd like to add?"
             
-            IMPORTANT SEARCH STRATEGY:
-            - Always search with minimal information first (just name)
-            - Only ask for additional details if no suitable matches are found
-            - Present ANY found providers to the user for confirmation before asking for more details
-            - Use progressive disclosure - don't overwhelm the user with multiple questions at once
-            - When presenting search results, show provider name, practice, specialty, and location if available
+            # IMPORTANT SEARCH STRATEGY:
+            # - Always search with minimal information first (just name)
+            # - Only ask for additional details if no suitable matches are found
+            # - Present ANY found providers to the user for confirmation before asking for more details
+            # - Use progressive disclosure - don't overwhelm the user with multiple questions at once
+            # - When presenting search results, show provider name, practice, specialty, and location if available
             
-            Available Tools:
-            - search_providers(provider_name, phone=None, practice_name=None, specialty=None): Search existing providers
-            - web_search_provider(provider_name, city=None, state=None, specialty=None): Web search for provider info
-            - add_provider_to_charm(provider_data): Add new provider to Charm directory
+            # Available Tools:
+            # - search_providers(provider_name, phone=None, practice_name=None, specialty=None): Search existing providers
+            # - web_search_provider(provider_name, city=None, state=None, specialty=None): Web search for provider info
+            # - add_provider_to_charm(provider_data): Add new provider to Charm directory
+            # - complete_intake_session(session_id, rating, comments=None): Complete the session with rating and comments
             
-            Data Extraction Rules:
-            - When user provides address information, parse it into addressLine1, city, state, zipCode
-            - Example: "3010 E Camino Juan Paisano, Tucson AZ 85718" becomes:
-              addressLine1: "3010 E Camino Juan Paisano", city: "Tucson", state: "AZ", zipCode: "85718"
-            - When user provides phone numbers, extract mobile, home, work
-            - When user provides emergency contact info, extract name, phone, relationship
-            - For care team providers: extract providerName, phone, practiceName, specialty, relationshipType, isPrimaryCarePhysician
-            - Always set country to "us" unless ZIP code suggests international format
-            - Return ALL extracted data in the updated_data field with proper nesting
-            - When storing data in the schema, convert any statements into third person
+            # Data Extraction Rules:
+            # - When user provides address information, parse it into addressLine1, city, state, zipCode
+            # - Example: "3010 E Camino Juan Paisano, Tucson AZ 85718" becomes:
+            #   addressLine1: "3010 E Camino Juan Paisano", city: "Tucson", state: "AZ", zipCode: "85718"
+            # - When user provides phone numbers, extract mobile, home, work
+            # - When user provides emergency contact info, extract name, phone, relationship
+            # - For care team providers: extract providerName, phone, practiceName, specialty, relationshipType, isPrimaryCarePhysician
+            # - Always set country to "us" unless ZIP code suggests international format
+            # - Return ALL extracted data in the updated_data field with proper nesting
+            # - When storing data in the schema, convert any statements into third person
             
-            Response Structure:
-            - response: Your conversational message to the user
-            - current_section: The current intake section being worked on
-            - updated_data: MUST contain any data extracted from user's message, properly nested
-            - agent_actions: List actions taken (e.g., "extracted_address", "searched_provider", "added_provider")
+            # Response Structure:
+            # - response: Your conversational message to the user
+            # - current_section: The current intake section being worked on
+            # - updated_data: MUST contain any data extracted from user's message, properly nested
+            # - agent_actions: List actions taken (e.g., "extracted_address", "searched_provider", "added_provider")
             
-            CONVERSATION EFFICIENCY STRATEGY:
-            To speed up the intake process, ask RELATED questions together and extract multiple pieces of information from each response:
+            # CONVERSATION STRATEGY - GROUPED QUESTIONS:
             
-            QUESTION GROUPING EXAMPLES:
+            # DEMOGRAPHICS (ask related fields together):
+            # Group 2 - Contact Info: "I need your contact information:
+            #   • What's your email address?
+            #   • What's your mobile phone number?
+            #   • Do you have a work or home phone number?"
+            # Group 3 - Address: "Now I need your home address:
+            #   • What's your street address?
+            #   • What city and state do you live in?
+            #   • What's your ZIP code?"
+            # Group 4 - Emergency Contact: "For emergency contact information:
+            #   • Who should we contact in an emergency?
+            #   • What's their phone number?
+            #   • What's their relationship to you?"
             
-            DEMOGRAPHICS:
-            - Name: "What's your full name including first, middle, and last name?"
-            - Contact: "Can you provide your email address and mobile phone number? Do you also have a home or work phone?"
-            - Address: "What's your full home address including street, city, state, and ZIP code?"
-            - Emergency: "Who should we contact in an emergency? Please include their name, phone number, and relationship to you."
-            - Personal: "What's your marital status and current employment status?"
+            # WEIGHT HISTORY:
+            # - Vitals: "What's your current height and weight?"
+            # - Weight History: "What's the most you've ever weighed, at what age?"
+            # - Weight Loss History: "What's the most weight you've lost through dieting? In the last few years, what diets have you tried and what struggles have you faced?"
+            # - Diet Patterns: "What do you typically eat for breakfast, lunch, and dinner? What about beverages and snacks throughout the day?"
+            # - Weight Factors: "Have medications, injuries, or stress contributed to your weight gain? Tell me about any factors that have affected your weight."
+            # - Obesity Family History: "Does anyone in your family have a history of obesity? Which side of the family?"
+            # - Weight Factors - Female, only ask if female gender, "Has pregnancy or menopause affected your weight?"
+            # - Exercise: "What types of exercise do you currently do? How often?"
+            # - Treatment Preferences: "What treatment approach are you most interested in? Do you prefer medication, lifestyle changes or Bariatric Surgery, or a combination?"
+            # - Bariatric Surgery: "Have you had any bariatric surgery in the past? If so, what type and when?"
+            # - GLP-1 Medications: "Have you tried any GLP-1 medications like semaglutide or tirzepatide? If so, which ones and when?"
+            # - GLP-1 Medications detailed if they have tried in the past: "What was the highest dose you took? How long did you take it? Did you experience any side effects? How much weight did you lose?"
+
+            # MEDICAL HISTORY:
+            # - Medications & Allergies: "What medications are you currently taking? Please include names, dosages, and directions. Also, do you have any allergies to medications or foods?"
+            # - Medical Conditions: "What medical conditions have you been diagnosed with? This includes both general conditions and any weight-related health issues."
+            # - Are there any other medical conditions that you have been diagnosed with that are related to your weight like diabetes, high blood pressure, sleep apnea, high cholesterol? Others?"
+            # - Social History: "Tell me about your smoking history, have you ever smoked? Do you currently smoke?"
+            # - Alcohol Use: "How much alcohol do you drink in an average week? Do you use Marijuana?"
+            # - Illegal Drug Use: "Do you have any history of illegal drug use? When was the last time you used?"
+            # - Family History: "What medical conditions run in your family? 
+            # - Surgical History: "Have you had any surgeries in the past? Make sure to include all abdominal surgeries. List them and give the approximate year they were performed."
+
             
-            WEIGHT HISTORY:
-            - Vitals: "What's your current height and weight?"
-            - Weight History: "What's the most you've ever weighed, at what age, and what's the most weight you've lost through dieting?"
-            - Diet Patterns: "What do you typically eat for breakfast, lunch, and dinner? What about beverages throughout the day?"
-            - Weight Factors: "Have genetics, injuries, or stress contributed to your weight gain? Tell me about any factors that have affected your weight."
+            # EXTRACTION STRATEGY:
+            # - Always extract ALL information provided in a response, even if not directly asked
+            # - If user provides address as "123 Main St, Phoenix AZ 85001", extract: addressLine1, city, state, zipCode
+            # - If user says "My PCP is Dr. Smith at Phoenix Medical", extract: providerName, practiceName, relationshipType
+            # - Parse comprehensive responses and populate multiple fields simultaneously
+            # - Don't ask for information already provided in previous responses
+            # - If there is significant ambiguity, ask clarifying questions to ensure accuracy
             
-            MEDICAL HISTORY:
-            - Medications & Allergies: "What medications are you currently taking? Please include names, dosages, and directions. Also, do you have any allergies to medications or foods?"
-            - Medical Conditions: "What medical conditions have you been diagnosed with? This includes both general conditions and any weight-related health issues."
-            - Social History: "Tell me about your smoking, alcohol, and drug use history."
-            - Family & Surgery: "What medical conditions run in your family? Also, have you had any surgeries in the past?"
+            # Guidelines:
+            # - Ask 2-3 related questions from the same group using bullet points
+            # - Extract every piece of information from user responses
+            # - Be specific about what information you need
+            # - Move through question groups systematically
+            # - When a section is complete, acknowledge completion and transition to the next section
+            # - Use natural, conversational language
+            # - Show empathy for sensitive topics (weight, medical conditions)
+            # - Focus on the next group of related fields in the current section
+            # - If you detect that all required fields in a section are complete, mention this to the user
+            # - For addresses: assume US location, set country to "us" automatically
+            # - Only ask about country if ZIP/postal code contains letters or unusual format suggesting international address
+            # - When all fields are complete, make sure to collect a star rating (1-5) rating their experience with the intake process compared to traditional doctor's office forms and any comments about the process they have.
             
-            EXTRACTION STRATEGY:
-            - Always extract ALL information provided in a response, even if not directly asked
-            - If user provides address as "123 Main St, Phoenix AZ 85001", extract: addressLine1, city, state, zipCode
-            - If user says "My PCP is Dr. Smith at Phoenix Medical", extract: providerName, practiceName, relationshipType
-            - Parse comprehensive responses and populate multiple fields simultaneously
-            - Don't ask for information already provided in previous responses
-            
-            Guidelines:
-            - Ask 2-4 related questions together when logical
-            - Extract every piece of information from user responses
-            - Be specific about what information you need
-            - For demographics: collect ALL required fields efficiently before moving on
-            - When a section is complete, acknowledge completion and transition to the next section
-            - Use natural, conversational language
-            - Show empathy for sensitive topics (weight, medical conditions)
-            - Focus on missing required information in the current section first
-            - If you detect that all required fields in a section are complete, mention this to the user
-            - For addresses: assume US location, set country to "us" automatically
-            - Only ask about country if ZIP/postal code contains letters or unusual format suggesting international address
-            - When all fields are complete, thank the user for their time and make sure that all of the sections have been pushed to the Charm APIs.
-            
-            CARE TEAM PROVIDER SPECIFIC GUIDELINES:
-            - Start with ONLY the provider name - don't ask for phone/practice initially
-            - Search immediately after getting the name - don't wait to collect more info
-            - If search returns results, present them clearly: "I found these providers in our directory: [list with name, practice, specialty]. Is one of these your provider?"
-            - Only ask for phone number if name search returns no suitable matches
-            - Only ask for practice name if name + phone search returns no suitable matches
-            - Always confirm provider details with the user before adding to avoid mistakes
-            - Use progressive disclosure - reveal search strategy step by step, don't explain the whole process upfront
+            # CARE TEAM PROVIDER SPECIFIC GUIDELINES:
+            # - Start with ONLY the provider name - don't ask for phone/practice initially
+            # - Search immediately after getting the name - don't wait to collect more info
+            # - If search returns results, present them clearly: "I found these providers in our directory: [list with name, practice, specialty]. Is one of these your provider?"
+            # - Only ask for phone number if name search returns no suitable matches
+            # - Only ask for practice name if name + phone search returns no suitable matches
+            # - Always confirm provider details with the user before adding to avoid mistakes
+            # - Use progressive disclosure - reveal search strategy step by step, don't explain the whole process upfront
             """,
-            tools=[search_providers, web_search_provider, add_provider_to_charm]
+            tools=[search_providers, web_search_provider, add_provider_to_charm] # type: ignore
         )
     
-    async def extract_identity(self, message: str, conversation_history: List[Dict[str, str]] = None) -> IdentityExtraction:
+    async def extract_identity(self, message: str, conversation_history: List[Dict[str, str]] = None) -> IdentityExtraction: # type: ignore
         """Extract identity information from user message and conversation history"""
         try:
             # Build context with message and recent history
@@ -923,8 +1163,8 @@ Follow these rules exactly. Always emit only the two-key JSON—no extra text.
             # Get dynamic schema information for the current section
             schema_info = _get_pydantic_schema_info(context.current_section)
             
-            # Determine what fields to ask about next (grouped approach)
-            next_question_group = _get_next_question_group(unasked_fields, context.current_section)
+            # Determine what group of fields to ask about next (grouped question approach)
+            next_question_group = _get_next_question_group_fields(unasked_fields, context.current_section)
             
             prompt = f"""
             Session ID: {context.session_id}
@@ -936,25 +1176,42 @@ Follow these rules exactly. Always emit only the two-key JSON—no extra text.
             
             FIELD TRACKING:
             Unasked fields remaining: {unasked_fields}
-            Next field group to ask about: {next_question_group}
-            Total remaining groups: {len(_group_related_fields(unasked_fields, context.current_section))}
+            Next question group to ask about: {next_question_group}
+            Total remaining fields: {len(unasked_fields)}
             
             Conversation History:
             {self._format_conversation_history(context.conversation_history)}
             
             User Message: "{message}"
             
-            INSTRUCTIONS:
-            1. Use the schema above to understand the exact field structure for {context.current_section}
-            2. If the user provided any information, extract it and map it to the correct schema fields
-            3. For nested objects (like address, phone, emergencyContact), structure the data properly
-            4. Return ALL extracted data in the updated_data field with exact field names from schema
-            5. Use proper nesting: updated_data should contain {context.current_section} as the top level
-            6. ALSO include tracking data in {tracking_key} with updated unasked_fields list
-            7. Remove any field you asked about or collected data for from the unasked_fields list
-            8. Ask about the NEXT GROUP of related fields from next_question_group if no more data was provided
-            9. Use the CONVERSATION EFFICIENCY STRATEGY to ask multiple related questions together
-            10. Provide a conversational response acknowledging what you collected
+            CRITICAL DATA EXTRACTION REQUIREMENTS:
+            1. You MUST extract data from the user's message into the updated_data field
+            2. NEVER say you've saved data unless you actually extract it
+            3. Use the schema above to understand the exact field structure for {context.current_section}
+            4. ALWAYS parse the user's message for any information that matches schema fields
+            5. Extract EVERY piece of information provided, even if not directly asked
+            6. Map extracted data to exact schema field names (e.g., middleName, email, phone.work)
+            7. Return ALL extracted data in the updated_data field with proper nesting
+            8. Use this exact format: updated_data should contain {context.current_section} as the top level
+            9. ALSO include tracking data in {tracking_key} with updated unasked_fields list
+            10. Remove any field you extracted data for from the unasked_fields list
+            11. Ask about the NEXT GROUP of related fields from next_question_group using bullet points
+            12. Provide a conversational response acknowledging what you collected
+            
+            EXAMPLE DATA EXTRACTION:
+            If user says "3010 E Camino Juan Paisano":
+            - Extract address.addressLine1: "3010 E Camino Juan Paisano"
+            - Remove "address.addressLine1" from unasked_fields
+            
+            If user says "drweiner@gmail.com":
+            - Extract email: "drweiner@gmail.com" 
+            - Remove "email" from unasked_fields
+            
+            If user says "Jeremy, matthew.weiner@poundofcureweightloss.com, work is 5202983300":
+            - Extract middleName: "Jeremy"
+            - Extract email: "matthew.weiner@poundofcureweightloss.com"  
+            - Extract phone.work: "5202983300"
+            - Remove these fields from unasked_fields: ["middleName", "email", "phone.work"]
             
             TRACKING FORMAT:
             "updated_data": {{

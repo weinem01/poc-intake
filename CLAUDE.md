@@ -223,3 +223,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 ```
+
+## Development Rules
+
+### Field Management
+- NEVER hardcode field names, field mappings, or field lists
+- ALWAYS derive field information from Pydantic models
+- This ensures a single source of truth for all field definitions
+- Any hardcoding of fields must be explicitly approved by the user

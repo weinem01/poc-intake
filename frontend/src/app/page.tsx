@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useRef, Suspense } from "react";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../graphics/cropped loading animation.json";
 
 interface Message {
   id: string;
@@ -14,51 +16,125 @@ interface Message {
 
 function ChatbotPageContent() {
   const searchParams = useSearchParams();
-  const [messages, setMessages] = useState<Message[]>([
-    {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionError, setSessionError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-scroll to bottom when messages change and auto-focus textarea
+  useEffect(() => {
+    // Immediate scroll for better responsiveness
+    scrollToBottom();
+    
+    // Also scroll after a short delay to handle any async rendering
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+      textareaRef.current?.focus();
+    }, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [messages, isLoading]);
+
+  // Session initialization
+  const initializeSession = async () => {
+    try {
+      setIsInitializing(true);
+      setSessionError(null);
+
+      // Get the encoded ID from the URL
+      const encodedId = searchParams.get('id');
+      if (!encodedId) {
+        throw new Error('No session ID provided in URL');
+      }
+
+      // Decode the base64 MRN
+      const mrn = atob(encodedId);
+      
+      // Call the backend to initialize/get session
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/v1/sessions/init`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mrn }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to initialize session: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSessionId(data.session_id);
+      
+    } catch (error) {
+      console.error('Session initialization error:', error);
+      setSessionError(error instanceof Error ? error.message : 'Failed to initialize session');
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
+  // Initialize session and add welcome message after hydration
+  useEffect(() => {
+    // Add welcome message after component mounts (client-side only)
+    setMessages([{
       id: "welcome",
       text: `<p>Hello! My name is <strong>Sage</strong>, I'm <strong>AI powered</strong> and I'm here to help gather information to prepare for your upcoming visit at <strong>Pound of Cure Weight Loss</strong>. This conversation will take between <strong>10-30 minutes</strong> and will help our team provide you with the best possible care.</p>
-
-<p style="margin-top: 16px;">Before we begin, I'll need you to have the following items available:</p>
-<ul style="list-style-type: disc; padding-left: 20px; margin: 10px 0;">
+<p style="margin-top: 8px;">Before we begin, I'll need you to have the following items available:</p>
+<ul style="list-style-type: disc; padding-left: 20px; margin: 6px 0;">
   <li>Your insurance card</li>
   <li>Driver's license or photo ID</li>
   <li>A list of your current medications</li>
   <li>Information about any doctors you see regularly</li>
   <li>Any other health information you think our team should know</li>
 </ul>
-
-<p style="margin-top: 16px;"><em>You can stop at any time and return to this same link to continue where you left off.</em></p>
-
-<p style="margin-top: 20px;"><strong>To get started, please confirm your <em>date of birth and last name</em> for verification purposes.</strong></p>`,
+<p style="margin-top: 8px;"><em>You can stop at any time and return to this same link to continue where you left off.</em></p>
+<p style="margin-top: 8px;"><strong>To get started, please confirm your <em>date of birth and last name</em> for verification purposes.</strong></p>`,
       sender: "sage",
       timestamp: new Date()
-    }
-  ]);
-  const [currentMessage, setCurrentMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Auto-scroll to bottom when messages change and auto-focus textarea
-  useEffect(() => {
-    setTimeout(() => {
-      scrollToBottom();
-      textareaRef.current?.focus();
-    }, 100);
-  }, [messages, isLoading]);
-
-  // Focus textarea on component mount
-  useEffect(() => {
-    textareaRef.current?.focus();
+    }]);
+    
+    // Ensure welcome message is visible
+    setTimeout(() => scrollToBottom(), 200);
+    
+    initializeSession();
   }, []);
 
+  // Focus textarea when session is ready
+  useEffect(() => {
+    if (sessionId && !isInitializing) {
+      textareaRef.current?.focus();
+    }
+  }, [sessionId, isInitializing]);
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      // Use requestAnimationFrame to ensure DOM is fully rendered
+      requestAnimationFrame(() => {
+        messagesEndRef.current?.scrollIntoView({ 
+          behavior: "smooth",
+          block: "end",
+          inline: "nearest"
+        });
+      });
+    }
+  };
+
+  const formatMessageText = (text: string) => {
+    // Convert bullet points to proper HTML with line breaks
+    return text
+      .replace(/• /g, '<br/>• ')  // Add line break before each bullet
+      .replace(/^<br\/>/, '')    // Remove leading line break if it exists
+      .replace(/\n/g, '<br/>');  // Convert any remaining newlines to HTML breaks
   };
 
   const sendMessage = async () => {
-    if (!currentMessage.trim() || isLoading) return;
+    if (!currentMessage.trim() || isLoading || !sessionId) return;
 
     const userMessage: Message = {
       id: `msg-${Date.now()}-user`,
@@ -70,20 +146,58 @@ function ChatbotPageContent() {
     setMessages(prev => [...prev, userMessage]);
     setCurrentMessage("");
     setIsLoading(true);
+    
+    // Scroll to bottom immediately after adding user message
+    setTimeout(() => scrollToBottom(), 50);
 
-    // Simulate response (since backend is not connected)
-    setTimeout(() => {
+    try {
+      // Call the backend API
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/v1/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: currentMessage,
+          session_id: sessionId
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
       const sageResponse: Message = {
         id: `msg-${Date.now()}-sage`,
-        text: "Thank you for your message! I'm processing your information.",
+        text: data.response || "I received your message and I'm processing it.",
         sender: "sage",
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, sageResponse]);
+      
+      // Scroll to bottom after adding sage response
+      setTimeout(() => scrollToBottom(), 100);
+    } catch (error) {
+      console.error('Error calling backend:', error);
+      const errorResponse: Message = {
+        id: `msg-${Date.now()}-sage`,
+        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        sender: "sage",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+      
+      // Scroll to bottom after adding error response
+      setTimeout(() => scrollToBottom(), 100);
+    } finally {
       setIsLoading(false);
       // Auto-focus textarea after response
       setTimeout(() => textareaRef.current?.focus(), 100);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -92,6 +206,41 @@ function ChatbotPageContent() {
       sendMessage();
     }
   };
+
+  // Show loading state during session initialization
+  if (isInitializing) {
+    return (
+      <div className="h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-[#4CAF50] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Initializing your session...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if session initialization failed
+  if (sessionError) {
+    return (
+      <div className="h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Session Error</h2>
+          <p className="text-gray-600 mb-4">{sessionError}</p>
+          <button 
+            onClick={initializeSession}
+            className="bg-[#4CAF50] text-white px-4 py-2 rounded-lg hover:bg-[#45a049] transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen bg-white flex flex-col overflow-hidden">
@@ -163,9 +312,9 @@ function ChatbotPageContent() {
                       {message.sender === "sage" ? (
                         <div>
                           <div
-                            className="prose prose-sm max-w-none"
+                            className="text-sm leading-relaxed"
                             style={{ color: "#374151" }}
-                            dangerouslySetInnerHTML={{ __html: message.text }}
+                            dangerouslySetInnerHTML={{ __html: formatMessageText(message.text) }}
                           />
                           <p className="text-right mt-2" style={{ fontSize: '10px', color: '#6b7280' }}>
                             {message.timestamp.toLocaleDateString()} {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -197,10 +346,16 @@ function ChatbotPageContent() {
                     </div>
                   </div>
                   <div className="bg-[#eef4f2] border border-gray-200 shadow-sm rounded-2xl" style={{ borderTopLeftRadius: "4px", padding: "12px" }}>
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Thinking</span>
+                      <div style={{ width: '100px', height: '100px', overflow: 'hidden' }}>
+                        <Lottie 
+                          animationData={loadingAnimation}
+                          loop={true}
+                          autoplay={true}
+                          style={{ width: '100px', height: '100px' }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -220,10 +375,10 @@ function ChatbotPageContent() {
               value={currentMessage}
               onChange={(e) => setCurrentMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Type your message here..."
+              placeholder={sessionId ? "Type your message here..." : "Initializing session..."}
               className="flex-1 bg-[#f5f7fa] border border-gray-300 resize-none focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:border-transparent text-sm leading-relaxed min-h-[48px] max-h-32"
               rows={1}
-              disabled={isLoading}
+              disabled={isLoading || !sessionId}
               style={{
                 overflow: 'auto',
                 maxHeight: '128px',
@@ -235,8 +390,8 @@ function ChatbotPageContent() {
             <button
               type="button"
               onClick={sendMessage}
-              disabled={!currentMessage.trim() || isLoading}
-              className="flex-shrink-0 w-[100px] md:w-[150px] bg-[#4CAF50] hover:bg-[#45a049] active:bg-[#388E3C] font-medium transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:ring-offset-2 flex items-center justify-center"
+              disabled={!currentMessage.trim() || isLoading || !sessionId}
+              className="flex-shrink-0 w-[100px] md:w-[150px] bg-[#4CAF50] hover:bg-[#45a049] active:bg-[#388E3C] font-medium transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#4CAF50] focus:ring-offset-2 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ minHeight: '48px', borderRadius: '8px', fontSize: '18px', color: 'white' }}
             >
               Send

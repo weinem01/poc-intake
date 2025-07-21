@@ -75,15 +75,24 @@ class IntakeSessionRepository:
         Merges new data with existing data
         """
         try:
+            logger.info(f"\n🔄 UPDATE_SESSION_INTAKE - Session {session_id}")
+            logger.info(f"📥 INCOMING intake_data: {intake_data}")
+            
             # First get the current session
             current_response = self._get_client().table(self.table_name).select("intake").eq("id", session_id).execute()
             
             if not current_response.data:
+                logger.error(f"❌ Session {session_id} not found in database")
                 raise Exception(f"Session {session_id} not found")
             
             # Merge the intake data
             current_intake = current_response.data[0].get("intake", {})
+            logger.info(f"📊 CURRENT intake in DB: {current_intake}")
+            
+            # Show before merge
+            logger.info(f"🔀 MERGING: current_intake.update(intake_data)")
             current_intake.update(intake_data)
+            logger.info(f"🔄 MERGED result: {current_intake}")
             
             # Update the session
             now = datetime.utcnow().isoformat()
@@ -91,13 +100,18 @@ class IntakeSessionRepository:
                 "intake": current_intake,
                 "last_updated": now
             }
+            logger.info(f"📤 SENDING update_data to DB: {update_data}")
             
             response = self._get_client().table(self.table_name).update(update_data).eq("id", session_id).execute()
+            logger.info(f"📬 DATABASE response: {response}")
+            logger.info(f"📬 Response data: {response.data}")
+            logger.info(f"📬 Response count: {response.count}")
             
             if not response.data:
+                logger.error(f"❌ Database update failed - no data in response")
                 raise Exception("Failed to update session")
             
-            logger.info(f"Updated session {session_id} with new intake data")
+            logger.info(f"✅ Successfully updated session {session_id} with new intake data")
             return True
             
         except Exception as e:
@@ -276,7 +290,7 @@ class IntakeSessionRepository:
             
         return True
     
-    async def create_session_with_verification(self, charm_mrn: str, session_id: str, patient_data: Optional[Dict[str, Any]] = None) -> str:
+    async def create_session_with_verification(self, charm_mrn: str, session_id: str, patient_data: Optional[Dict[str, Any]] = None, charm_patient_id: Optional[str] = None) -> str:
         """
         Create a new intake session or add a new session to existing record
         Returns the main record ID
@@ -302,6 +316,10 @@ class IntakeSessionRepository:
                     "last_updated": datetime.utcnow().isoformat()
                 }
                 
+                # Update charm_patient_id if not already set
+                if charm_patient_id and not existing.get("charm_patient_id"):
+                    update_data["charm_patient_id"] = charm_patient_id
+                
                 response = self._get_client().table(self.table_name).update(update_data).eq("id", existing["id"]).execute()
                 
                 if not response.data:
@@ -313,6 +331,7 @@ class IntakeSessionRepository:
                 # Create new record with first session
                 session_data = {
                     "charm_mrn": charm_mrn,
+                    "charm_patient_id": charm_patient_id,
                     "sessions": [new_session_entry],
                     "intake": {},
                     "completed": False,

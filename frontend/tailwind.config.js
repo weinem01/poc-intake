@@ -17,6 +17,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        'lexend': ['Lexend', 'Noto Sans', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -24,12 +27,12 @@ module.exports = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4caf50",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#4CAF50",
+          foreground: "#111811",
         },
         secondary: {
           DEFAULT: "#eef4f2",
-          foreground: "hsl(var(--secondary-foreground))",
+          foreground: "#111811",
         },
         accent: {
           DEFAULT: "#f46a25",
@@ -40,8 +43,8 @@ module.exports = {
           foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#eaf0ea",
+          foreground: "#111811",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
