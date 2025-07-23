@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Important: WSL and Google Cloud Authentication
+
+When running through WSL, gcloud commands cannot be authenticated directly. For any gcloud commands:
+1. Either create a script that the user can run
+2. Or provide the exact commands as a single line (for Windows Terminal compatibility)
+3. The user will execute these commands and report back the results
+
+Always format gcloud commands as single-line for easy copy/paste in Windows Terminal.
+
 ## Development Commands
 
 ### Backend (Python/FastAPI)

@@ -653,11 +653,6 @@ async def confirm_section_data(session_id: str, corrections: dict = None): # typ
         # Get next section
         next_section = intake_repository.determine_current_section(intake_data)
         
-        # Initialize conversation state for next section
-        from app.services.conversation_state_manager import conversation_state_manager
-        if next_section != "completed":
-            conversation_state_manager.move_to_next_section(session_id, next_section)
-        
         return {
             "session_id": session_id,
             "completed_section": current_section,

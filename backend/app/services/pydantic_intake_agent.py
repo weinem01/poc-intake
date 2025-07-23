@@ -118,96 +118,35 @@ def _get_all_field_paths(section_name: str) -> List[str]:
 
 def _get_field_question_groups(section_name: str) -> Dict[int, List[str]]:
     """
-    Extract question groups from Pydantic model schema metadata
+    Load question groups from field_grouping.json configuration file
     Returns a dictionary mapping group numbers to lists of field paths
     """
-    section_model_map = {
-        "intake_demographics": IntakeDemographics,
-        "intake_weight_history": IntakeWeightHistory,
-        "intake_medical_history": IntakeMedicalHistory
-    }
+    import json
+    import os
     
-    model_class = section_model_map.get(section_name)
-    if not model_class:
+    # Load configuration from JSON file
+    config_path = os.path.join(os.path.dirname(__file__), '../models/field_grouping.json')
+    
+    try:
+        with open(config_path, 'r') as f:
+            config = json.load(f)
+    except FileNotFoundError:
+        logger.warning(f"field_grouping.json not found at {config_path}")
+        return {}
+    except json.JSONDecodeError:
+        logger.error(f"Invalid JSON in field_grouping.json")
         return {}
     
-    # Get the schema and extract group information
+    # Extract groups for the specified section
     groups = {}
+    section_config = config.get(section_name, {})
     
-    # Flattened grouping approach - all fields get simple sequential group numbers
-    if section_name == "intake_demographics":
-        groups = {
-            1: ["firstName", "middleName", "lastName", "dateOfBirth", "gender"],
-            2: ["email", "phone.mobile"],  # Essential contact info first
-            3: ["phone.home", "phone.work", "phone.preferred"],  # Optional phone numbers
-            4: ["address.addressLine1", "address.addressLine2", "address.city", "address.state", "address.zipCode"],
-            5: ["emergencyContact.name", "emergencyContact.phone", "emergencyContact.relationship"],
-            6: ["maritalStatus", "employmentStatus"],
-            7: ["communicationPreferences.preferredMethod", "communicationPreferences.emailNotifications", "communicationPreferences.textNotifications", "communicationPreferences.voiceNotifications"],
-            8: ["careTeamProviders"]
-        }
-    
-    # Add other sections as needed
-    elif section_name == "intake_weight_history":
-        groups = {
-            1: ["currentVitals.height.feet", "currentVitals.height.inches", "currentVitals.weight"],
-            2: ["weightHistory.maxEverWeighed", "weightHistory.ageAtMaxWeight"],
-            # Add more groups for weight history
-        }
-    elif section_name == "intake_medical_history":
-        groups = {
-            1: ["currentMedications", "allergies"],
-            2: ["PMHx", "PMHxObesityComorbid"],
-            # Add more groups for medical history
-        }
+    for group in section_config.get("groups", []):
+        group_id = group["group_id"]
+        fields = [field_info["field"] for field_info in group["fields"]]
+        groups[group_id] = fields
     
     return groups
-
-
-def _extract_field_paths_for_field(field_name: str, field_info, model_class) -> List[str]:
-    """
-    Extract all field paths for a given field (handles nested objects)
-    """
-    # Get the field alias if it exists
-    alias = getattr(field_info, 'alias', None)
-    base_field_name = alias if alias else field_name
-    
-    # Skip system fields
-    if base_field_name == "isComplete":
-        return []
-    
-    # Check if this is a nested model
-    annotation = field_info.annotation
-    
-    # Handle Optional types
-    if hasattr(annotation, '__origin__') and annotation.__origin__ is Union:
-        # Get the non-None type from Optional
-        args = annotation.__args__
-        annotation = next((arg for arg in args if arg is not type(None)), annotation)
-    
-    # Handle List types  
-    if hasattr(annotation, '__origin__') and annotation.__origin__ is list:
-        # For now, treat lists as simple fields
-        return [base_field_name]
-    
-    # Check if annotation is a BaseModel subclass
-    if (hasattr(annotation, '__bases__') and 
-        any(issubclass(base, BaseModel) for base in annotation.__bases__ if base is not object)):
-        # This is a nested model - get all its field paths
-        nested_paths = []
-        for nested_field_name, nested_field_info in annotation.model_fields.items():
-            nested_alias = getattr(nested_field_info, 'alias', None)
-            nested_name = nested_alias if nested_alias else nested_field_name
-            
-            # Skip system fields
-            if nested_name == "isComplete":
-                continue
-                
-            nested_paths.append(f"{base_field_name}.{nested_name}")
-        return nested_paths
-    else:
-        # Simple field
-        return [base_field_name]
 
 
 def _get_next_question_group_fields(unasked_fields: List[str], section_name: str) -> List[str]:

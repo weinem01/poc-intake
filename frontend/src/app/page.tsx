@@ -7,6 +7,8 @@ import { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import Image from "next/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../graphics/cropped loading animation.json";
+import { getApiUrl } from "@/config/api";
+import "./logo-fix.css";
 
 interface Message {
   id: string;
@@ -56,7 +58,7 @@ function ChatbotPageContent() {
       const mrn = atob(encodedId);
       
       // Call the backend to initialize/get session
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = getApiUrl();
       const response = await fetch(`${apiUrl}/api/v1/sessions/init`, {
         method: 'POST',
         headers: {
@@ -153,7 +155,7 @@ function ChatbotPageContent() {
 
     try {
       // Call the backend API
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const apiUrl = getApiUrl();
       const response = await fetch(`${apiUrl}/api/v1/chat`, {
         method: 'POST',
         headers: {
@@ -258,14 +260,17 @@ function ChatbotPageContent() {
       {/* Welcome Section - Fixed */}
       <div className="bg-white shadow-sm mx-4 mt-4 rounded-lg p-6 text-center flex-shrink-0">
         <div className="flex items-center justify-center gap-4 mb-2">
-          <div className="w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+          <div className="logo-container rounded-lg">
             <Image 
               src="/head-logo.png" 
               alt="Healthy mind logo" 
               width={80}
               height={80}
-              className="w-full h-full object-contain"
-              onError={() => {}}
+              className="object-contain"
+              unoptimized
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
             />
           </div>
           <h2 className="text-2xl font-bold text-gray-800">Welcome to Pound of Cure</h2>

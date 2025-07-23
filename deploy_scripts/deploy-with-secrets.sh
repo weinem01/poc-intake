@@ -70,8 +70,10 @@ echo ""
 echo "🌐 Building and deploying frontend..."
 cd frontend
 
-# Build and deploy
-gcloud builds submit --tag gcr.io/$PROJECT_ID/poc-intake-frontend
+# Build with backend URL
+gcloud builds submit \
+  --tag gcr.io/$PROJECT_ID/poc-intake-frontend \
+  --substitutions=_BACKEND_URL=$BACKEND_URL
 
 gcloud run deploy poc-intake-frontend \
   --image gcr.io/$PROJECT_ID/poc-intake-frontend \

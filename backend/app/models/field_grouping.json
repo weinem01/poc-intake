@@ -1,0 +1,120 @@
+{
+  "intake_demographics": {
+    "groups": [
+      {
+        "group_id": 1,
+        "name": "basic_info",
+        "fields": [
+          {"field": "firstName", "question": "What is your first name?"},
+          {"field": "middleName", "question": "Do you have a middle name?"},
+          {"field": "lastName", "question": "What is your last name?"},
+          {"field": "dateOfBirth", "question": "What is your date of birth?"},
+          {"field": "gender", "question": "What is your gender?"}
+        ]
+      },
+      {
+        "group_id": 2,
+        "name": "essential_contact",
+        "fields": [
+          {"field": "email", "question": "What is your email address?"},
+          {"field": "phone.mobile", "question": "What is your mobile phone number?"}
+        ]
+      },
+      {
+        "group_id": 3,
+        "name": "optional_phones",
+        "fields": [
+          {"field": "phone.home", "question": "Do you have a home phone number?"},
+          {"field": "phone.work", "question": "Do you want to provide a work phone number?"},
+          {"field": "phone.preferred", "question": "Which phone number would you prefer us to contact you on?"}
+        ]
+      },
+      {
+        "group_id": 4,
+        "name": "address",
+        "fields": [
+          {"field": "address.addressLine1", "question": "What is your home address?"},
+          {"field": "address.city", "question": "What city do you live in?"},
+          {"field": "address.state", "question": "What state do you live in?"},
+          {"field": "address.zipCode", "question": "What is your ZIP code?"},
+          {"field": "address.country", "question": "What country do you live in?"}
+        ]
+      },
+      {
+        "group_id": 5,
+        "name": "emergency_contact",
+        "fields": [
+          {"field": "emergencyContact.name", "question": "Who should we contact in case of an emergency?"},
+          {"field": "emergencyContact.phone", "question": "What is their phone number?"},
+          {"field": "emergencyContact.relationship", "question": "What is their relationship to you?"}
+        ]
+      },
+      {
+        "group_id": 6,
+        "name": "personal_info",
+        "fields": [
+          {"field": "maritalStatus", "question": "What is your marital status?"},
+          {"field": "employmentStatus", "question": "What is your employment status?"}
+        ]
+      },
+      {
+        "group_id": 7,
+        "name": "communication_preferences",
+        "fields": [
+          {"field": "communicationPreferences.preferredMethod", "question": "How would you prefer to receive important communications from us?"},
+          {"field": "communicationPreferences.emailNotifications", "question": "Would you like to receive email notifications?"},
+          {"field": "communicationPreferences.textNotifications", "question": "Would you like to receive text notifications?"},
+          {"field": "communicationPreferences.voiceNotifications", "question": "Would you like to receive voice call notifications?"}
+        ]
+      },
+      {
+        "group_id": 8,
+        "name": "care_team",
+        "fields": [
+          {"field": "careTeamProviders", "question": "Do you have any care team providers you'd like to add?"}
+        ]
+      }
+    ]
+  },
+  "intake_weight_history": {
+    "groups": [
+      {
+        "group_id": 1,
+        "name": "current_vitals",
+        "fields": [
+          {"field": "currentVitals.height.feet", "question": "What is your height in feet?"},
+          {"field": "currentVitals.height.inches", "question": "And how many inches?"},
+          {"field": "currentVitals.weight", "question": "What is your current weight?"}
+        ]
+      },
+      {
+        "group_id": 2,
+        "name": "weight_history",
+        "fields": [
+          {"field": "weightHistory.maxEverWeighed", "question": "What is the most you've ever weighed?"},
+          {"field": "weightHistory.ageAtMaxWeight", "question": "How old were you at that weight?"}
+        ]
+      }
+    ]
+  },
+  "intake_medical_history": {
+    "groups": [
+      {
+        "group_id": 1,
+        "name": "medications_allergies",
+        "fields": [
+          {"field": "currentMedications", "question": "What medications are you currently taking?"},
+          {"field": "allergies", "question": "Do you have any allergies?"}
+        ]
+      },
+      {
+        "group_id": 2,
+        "name": "medical_conditions",
+        "fields": [
+          {"field": "PMHx", "question": "Do you have any medical conditions?"},
+          {"field": "PMHxObesityComorbid", "question": "Do you have any obesity-related conditions?"}
+        ]
+      }
+    ]
+  }
+}

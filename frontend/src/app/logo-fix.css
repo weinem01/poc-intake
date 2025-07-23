@@ -1,0 +1,18 @@
+/* Logo fix styles */
+.logo-container {
+  width: 80px !important;
+  height: 80px !important;
+  max-width: 80px !important;
+  max-height: 80px !important;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.logo-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  max-width: 80px !important;
+  max-height: 80px !important;
+}
